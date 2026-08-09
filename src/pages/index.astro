@@ -1,9 +1,15 @@
 ---
-import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
+import ThemedShot from "../components/ThemedShot.astro";
+
 import adminShot from "../assets/screenshots/admin.png";
+import adminShotDark from "../assets/screenshots/admin-dark.png";
+import adminStats from "../assets/screenshots/admin-stats.png";
+import adminStatsDark from "../assets/screenshots/admin-stats-dark.png";
 import gradebookShot from "../assets/screenshots/teacher-gradebook.png";
+import gradebookShotDark from "../assets/screenshots/teacher-gradebook-dark.png";
 import studentShot from "../assets/screenshots/student.png";
+import studentShotDark from "../assets/screenshots/student-dark.png";
 
 const DEMO_URL = "https://demo.simplemanagepro.com";
 const PRIVACY_URL = `${DEMO_URL}/privacy.html`;
@@ -16,6 +22,19 @@ const WHATSAPP_MSG =
   "Buenas, soy director/a de [colegio] y quisiera conocer más sobre el piloto 2027.";
 const waHref = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MSG)}`;
 
+// Section 2's visual contrast. Left side is what the colegio runs on today;
+// each item is one of the sources the brief names as having to be reconciled
+// by hand at period close. Named as objects the director recognises, not as
+// abstractions.
+const patchwork = [
+  { label: "Notas de 7° A", meta: "notas_7A_final.xlsx" },
+  { label: "Asistencia", meta: "cuaderno, en papel" },
+  { label: "Notas de 8° B", meta: "copia_de_notas_v3.xlsx" },
+  { label: "Grupo de docentes", meta: "WhatsApp" },
+  { label: "Matrícula 2026", meta: "matricula_ok.xlsx" },
+  { label: "Notas de 9° A", meta: "notas9A_REVISADO.xlsx" },
+];
+
 const portals = [
   {
     id: "direccion",
@@ -23,6 +42,7 @@ const portals = [
     title: "El colegio completo, configurado desde un solo lugar",
     body: "Curso lectivo y periodos, niveles, secciones, aulas, materias, docentes, horarios, expedientes y matrícula. La matrícula se importa desde la hoja de cálculo que ya tiene — no hay que digitarla de nuevo.",
     image: adminShot,
+    imageDark: adminShotDark,
     alt: "Consola de administración mostrando el resumen del Colegio Técnico Profesional SMP: matrícula total, docentes, materias, secciones y aulas en uso.",
   },
   {
@@ -31,6 +51,7 @@ const portals = [
     title: "El libro de notas que reemplaza el archivo de Excel",
     body: "Categorías ponderadas, notas por periodo, asistencia por sección, registro disciplinario e informe de progreso listo para imprimir. Al cerrar el periodo, las notas ya están donde tienen que estar.",
     image: gradebookShot,
+    imageDark: gradebookShotDark,
     alt: "Libro de notas de Matemáticas, Duodécimo Sección 1, mostrando la nota de cada estudiante en el I Periodo.",
   },
   {
@@ -39,6 +60,7 @@ const portals = [
     title: "Lo que el estudiante necesita, sin tener que pedirlo",
     body: "Promedio, porcentaje de asistencia, notas por materia y periodo, horario semanal, docentes y la cartelera de eventos del colegio. Consultable en cualquier momento, desde el teléfono.",
     image: studentShot,
+    imageDark: studentShotDark,
     alt: "Portal del estudiante mostrando asistencia, promedio de notas, resumen de calificaciones por periodo y próximos eventos.",
   },
 ];
@@ -56,10 +78,42 @@ const pilotAsks = [
   "Permiso para nombrar al colegio públicamente, si el primer periodo cierra bien.",
 ];
 
+// The dates were already in the copy as prose; the timeline only gives them a
+// shape. No new commitment is made here that §5 did not already make.
+const timeline = [
+  {
+    when: "Octubre – enero",
+    what: "La conversación",
+    detail:
+      "Se revisa la estructura del colegio y se configura el sistema con ella. Nadie cambia de sistema a mitad de periodo.",
+  },
+  {
+    when: "Febrero 2027",
+    what: "Arranque del curso lectivo",
+    detail:
+      "El colegio empieza el curso lectivo ya con el sistema, no lo migra a medio camino.",
+  },
+  {
+    when: "Al cierre de cada periodo",
+    what: "Revisión",
+    detail:
+      "Una conversación sobre qué sirvió y qué no. Es la parte del piloto que devuelve más que el sistema mismo.",
+  },
+];
+
 const limits = [
-  "No hay portal para encargados. Los encargados figuran como contacto en el expediente, pero no tienen usuario propio.",
-  "Ningún colegio lo usa todavía. Por eso esto es un piloto y no una venta.",
-  "Los expedientes se alojan fuera del país, en Estados Unidos.",
+  {
+    title: "No hay portal para encargados",
+    body: "Los encargados figuran como contacto en el expediente, pero no tienen usuario propio.",
+  },
+  {
+    title: "Ningún colegio lo usa todavía",
+    body: "Por eso esto es un piloto y no una venta.",
+  },
+  {
+    title: "Los expedientes se alojan fuera del país",
+    body: "En Estados Unidos. Está dicho también más arriba, y en la política de privacidad.",
+  },
 ];
 ---
 
@@ -67,60 +121,147 @@ const limits = [
   title="Simple Manage Pro — El sistema con el que su colegio lleva el curso lectivo"
   description="Notas, asistencia, horarios y expedientes en un solo lugar, para la dirección, los docentes y los estudiantes. Hecho para Costa Rica. Piloto 2027 para tres colegios."
 >
-  <main>
+  <main id="contenido">
     <!-- 1 · Qué es, para quién, con la demo a un clic -->
     <section class="hero">
-      <div class="wrap">
-        <p class="eyebrow">Hecho para Costa Rica</p>
-        <h1>El sistema con el que su colegio lleva el curso lectivo.</h1>
-        <p class="lede">
-          Notas, asistencia, horarios y expedientes en un solo lugar — para la
-          dirección, para los docentes y para los estudiantes.
-        </p>
-        <div class="cta-row">
-          <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
-          <a class="btn btn-quiet" href="#piloto">Conocer el piloto 2027</a>
+      <!-- Decorative only: three drifting radial washes plus a fine grid.
+           aria-hidden and pointer-events:none so it is invisible to both
+           assistive tech and the cursor. -->
+      <div class="mesh" aria-hidden="true">
+        <span class="blob b1"></span>
+        <span class="blob b2"></span>
+        <span class="blob b3"></span>
+        <span class="grid"></span>
+      </div>
+
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Hecho para Costa Rica</p>
+          <h1>El sistema con el que su colegio lleva el curso lectivo.</h1>
+          <p class="lede">
+            Notas, asistencia, horarios y expedientes en un solo lugar — para la
+            dirección, para los docentes y para los estudiantes.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
+            <a class="btn btn-quiet" href="#piloto">Conocer el piloto 2027</a>
+          </div>
+          <p class="note">
+            Es un colegio de ejemplo, con datos de ejemplo. Nada de lo que haga
+            ahí se guarda.
+          </p>
         </div>
-        <p class="note">
-          Es un colegio de ejemplo, con datos de ejemplo. Nada de lo que haga
-          ahí se guarda.
-        </p>
+
+        <!-- Two planes, not three. The hero's job (BRIEF §7.1) is "what this
+             is, in one breath" — the full portal lineup is section 3's. The
+             gradebook is the frame that argues the case, the stat strip is the
+             director's own console answering "and what do I see?". -->
+        <div class="composite" data-tilt>
+          <div class="plane plane-main">
+            <div class="frame">
+              <div class="frame-bar" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </div>
+              <ThemedShot
+                light={gradebookShot}
+                dark={gradebookShotDark}
+                alt="Libro de notas de Matemáticas, Undécimo Sección 1: cada estudiante con su nota del periodo y sus tareas calificadas."
+                widths={[720, 1080, 1440]}
+                sizes="(min-width: 1000px) 640px, calc(100vw - 3.2rem)"
+                loading="eager"
+                priority={true}
+              />
+            </div>
+          </div>
+
+          <div class="plane plane-front">
+            <ThemedShot
+              light={adminStats}
+              dark={adminStatsDark}
+              alt="Resumen de la consola de dirección: matrícula total 90, 8 docentes, 6 de 10 aulas en uso."
+              widths={[270, 540]}
+              sizes="190px"
+              loading="eager"
+              priority={true}
+            />
+          </div>
+        </div>
       </div>
     </section>
 
     <!-- 2 · ¿Entiende usted mi realidad? -->
-    <section class="band">
-      <div class="wrap narrow">
-        <h2>En julio y en diciembre, todo se arma a mano.</h2>
-        <p>
-          Las notas viven en el archivo de Excel de cada docente. La asistencia,
-          en papel. Los encargados preguntan por WhatsApp. Y al cierre de cada
-          periodo alguien en la dirección junta todo eso, hoja por hoja, para
-          poder entregar notas a tiempo.
-        </p>
-        <p class="aside">
-          Simple Manage Pro no reemplaza nada del MEP. Es el sistema interno del
-          colegio: lo que hoy vive en hojas de cálculo, en papel y en grupos de
-          WhatsApp.
-        </p>
+    <section class="band pain">
+      <div class="wrap">
+        <div class="narrow reveal">
+          <h2>En julio y en diciembre, todo se arma a mano.</h2>
+          <p>
+            Las notas viven en el archivo de Excel de cada docente. La
+            asistencia, en papel. Los encargados preguntan por WhatsApp. Y al
+            cierre de cada periodo alguien en la dirección junta todo eso, hoja
+            por hoja, para poder entregar notas a tiempo.
+          </p>
+        </div>
+
+        <div class="contrast reveal">
+          <div class="side">
+            <p class="side-label">Hoy</p>
+            <ul class="scatter">
+              {
+                patchwork.map((p) => (
+                  <li>
+                    <span class="scatter-name">{p.label}</span>
+                    <span class="scatter-meta">{p.meta}</span>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+
+          <div class="arrow" aria-hidden="true">
+            <svg viewBox="0 0 40 24">
+              <path d="M2 12h34M27 3l9 9-9 9"></path>
+            </svg>
+          </div>
+
+          <div class="side">
+            <p class="side-label">Con Simple Manage Pro</p>
+            <div class="consolidated">
+              <p class="consolidated-title">Un solo sistema</p>
+              <p class="consolidated-body">
+                Las mismas notas, la misma asistencia y la misma matrícula, en
+                un solo lugar y actualizadas por quien las tiene de primera
+                mano.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="narrow reveal">
+          <p class="aside">
+            Simple Manage Pro no reemplaza nada del MEP. Es el sistema interno
+            del colegio: lo que hoy vive en hojas de cálculo, en papel y en
+            grupos de WhatsApp.
+          </p>
+        </div>
       </div>
     </section>
 
     <!-- 3 · Los tres portales -->
-    <section class="portals">
+    <section class="portals" id="portales">
       <div class="wrap">
-        <h2 class="section-title">Tres portales, un solo sistema</h2>
+        <h2 class="section-title reveal">Tres portales, un solo sistema</h2>
         {
           portals.map((p) => (
-            <article class="portal" id={p.id}>
+            <article class="portal reveal" id={p.id}>
               <div class="portal-copy">
                 <p class="eyebrow">{p.eyebrow}</p>
                 <h3>{p.title}</h3>
                 <p>{p.body}</p>
               </div>
               <figure class="shot">
-                <Image
-                  src={p.image}
+                <ThemedShot
+                  light={p.image}
+                  dark={p.imageDark}
                   alt={p.alt}
                   widths={[720, 1080, 1440]}
                   sizes="(min-width: 1180px) 1148px, calc(100vw - 3.2rem)"
@@ -134,12 +275,13 @@ const limits = [
 
     <!-- 4 · ¿Dónde viven los datos de mis estudiantes? -->
     <section class="band" id="datos">
-      <div class="wrap narrow">
+      <div class="wrap narrow reveal">
         <h2>Dónde viven los datos de sus estudiantes</h2>
         <p>
-          Cada colegio recibe <strong>su propia base de datos</strong>. Los datos
-          de un colegio no se guardan junto a los de otro y ninguna consulta
-          puede cruzar de uno a otro. Se cifran en tránsito y en reposo.
+          Cada colegio recibe <strong>su propia base de datos</strong>. Los
+          datos de un colegio no se guardan junto a los de otro y ninguna
+          consulta puede cruzar de uno a otro. Se cifran en tránsito y en
+          reposo.
         </p>
         <p>
           La región de alojamiento es Estados Unidos, lo que significa que los
@@ -155,11 +297,20 @@ const limits = [
 
     <!-- 5 · Qué no incluye -->
     <section class="band" id="limites">
-      <div class="wrap narrow">
-        <h2>Qué no incluye</h2>
-        <p>Para que no lo descubra en la primera reunión:</p>
-        <ul class="plain">
-          {limits.map((l) => <li>{l}</li>)}
+      <div class="wrap">
+        <div class="narrow reveal">
+          <h2>Qué no incluye</h2>
+          <p>Para que no lo descubra en la primera reunión:</p>
+        </div>
+        <ul class="limits reveal">
+          {
+            limits.map((l) => (
+              <li>
+                <h3>{l.title}</h3>
+                <p>{l.body}</p>
+              </li>
+            ))
+          }
         </ul>
       </div>
     </section>
@@ -167,7 +318,7 @@ const limits = [
     <!-- 6 · Qué es exactamente el piloto -->
     <section class="band" id="piloto">
       <div class="wrap">
-        <div class="narrow">
+        <div class="narrow reveal">
           <h2>El piloto 2027</h2>
           <p>
             Tres colegios, empezando con el curso lectivo en febrero de 2027.
@@ -176,14 +327,26 @@ const limits = [
           </p>
         </div>
 
-        <div class="two-col">
-          <div>
+        <ol class="timeline reveal">
+          {
+            timeline.map((t) => (
+              <li>
+                <p class="tl-when">{t.when}</p>
+                <p class="tl-what">{t.what}</p>
+                <p class="tl-detail">{t.detail}</p>
+              </li>
+            ))
+          }
+        </ol>
+
+        <div class="two-col reveal">
+          <div class="col-card">
             <h3>Qué recibe el colegio</h3>
             <ul class="plain">
               {pilotGives.map((g) => <li>{g}</li>)}
             </ul>
           </div>
-          <div>
+          <div class="col-card">
             <h3>Qué se necesita del colegio</h3>
             <ul class="plain">
               {pilotAsks.map((a) => <li>{a}</li>)}
@@ -191,7 +354,7 @@ const limits = [
           </div>
         </div>
 
-        <div class="narrow">
+        <div class="narrow reveal">
           <p class="aside">
             El piloto no es gratuito. Cubre el costo de la infraestructura,
             porque cada colegio tiene su propia base de datos con sus propios
@@ -205,7 +368,7 @@ const limits = [
 
     <!-- 7 · ¿Quién es usted? -->
     <section class="band" id="fundador">
-      <div class="wrap narrow">
+      <div class="wrap narrow reveal">
         <h2>Quién está detrás</h2>
         <p>
           Simple Manage Pro lo construyó Gabriel Zelaya, acá en Costa Rica. No
@@ -222,8 +385,8 @@ const limits = [
     </section>
 
     <!-- 8 · Cómo hablamos -->
-    <section class="band contact">
-      <div class="wrap narrow">
+    <section class="band contact" id="contacto">
+      <div class="wrap narrow reveal">
         <h2>Hablemos</h2>
         <p>
           Si le interesa el piloto 2027, la conversación empieza por WhatsApp o
@@ -266,9 +429,6 @@ const limits = [
   section {
     padding-block: var(--space-6);
   }
-  .hero {
-    padding-block: var(--space-7) var(--space-6);
-  }
 
   .eyebrow {
     text-transform: uppercase;
@@ -280,15 +440,21 @@ const limits = [
   }
 
   h1 {
-    font-size: clamp(2.2rem, 5.5vw, 3.6rem);
-    max-width: 20ch;
+    /* Capped below the old 3.6rem: against the hero's narrower copy column
+       that size broke the sentence over four lines and left "el" hanging at
+       the end of the third. */
+    font-size: clamp(2.1rem, 4.6vw, 3.25rem);
+    font-weight: 700;
+    max-width: 18ch;
   }
   h2 {
     font-size: clamp(1.6rem, 3.2vw, 2.2rem);
+    font-weight: 700;
     margin-bottom: var(--space-3);
   }
   h3 {
     font-size: 1.35rem;
+    font-weight: 600;
     margin-bottom: var(--space-2);
   }
 
@@ -302,6 +468,15 @@ const limits = [
     margin-top: var(--space-3);
     font-size: 0.9rem;
     color: var(--color-info-dark);
+  }
+  /* Capped so it stops short of the composite's column. The floating stat
+     card carries --elev-3, whose 68px blur reaches about 44px past its own
+     left edge and was landing on this line's right end — only 3/255 of
+     darkening, but --color-info-dark clears 4.5:1 by 0.00, so 3/255 is the
+     whole margin and the note dropped to 4.38:1. Shorter microcopy is the
+     better typography anyway; the shadow now falls on empty background. */
+  .hero .note {
+    max-width: 42ch;
   }
 
   .cta-row {
@@ -317,20 +492,244 @@ const limits = [
     border-radius: var(--border-radius-2);
     font-weight: 600;
     text-decoration: none;
-    transition: transform 120ms ease;
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
   }
   .btn:hover {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
   }
   .btn-primary {
-    background: var(--color-primary);
+    background: var(--color-primary-fill);
     color: #fff;
+    box-shadow: var(--elev-1);
+  }
+  .btn-primary:hover {
+    box-shadow: var(--elev-2);
   }
   .btn-quiet {
     background: var(--color-white);
     color: var(--color-dark);
     box-shadow: inset 0 0 0 1px var(--color-light);
   }
+
+  /* ── 1 · Hero ──────────────────────────────────────────────────────── */
+
+  .hero {
+    position: relative;
+    isolation: isolate;
+    padding-block: var(--space-6) var(--space-7);
+    overflow: hidden;
+  }
+
+  .mesh {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* The veil, and the reason the hero can have a gradient at all.
+     --color-dark-variant clears 4.5:1 on --color-background by 0.04, so it has
+     no headroom: ANY decorative tint under the lede fails, and dimming the
+     wash until it passes would just be a wash nobody can see. So the text does
+     not sit on the gradient at all. Opaque out to 50% — the copy column never
+     passes 48% of the viewport at any width, since .wrap is centred and capped
+     — then released so the colour survives behind the composite, where nothing
+     is set in type. Measured stops, not guessed ones. */
+  .mesh::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      var(--color-background) 0 50%,
+      transparent 84%
+    );
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    /* Large, low-opacity and heavily blurred: the effect should read as light
+       behind the page, not as three coloured circles. */
+    filter: blur(90px);
+    /* Measured, not chosen. At 0.5 the wash pushed the hero background to
+       #ada3f2, which drops the eyebrow to 2.52:1 and the lede to 2.17:1
+       against a 4.5:1 floor — the near-black h1 was the only text still
+       passing. Opacity here plus the veil below keeps every tinted colour on
+       the audited surface it was measured against. */
+    opacity: 0.34;
+    will-change: transform;
+  }
+  .b1 {
+    width: 46rem;
+    height: 46rem;
+    top: -22rem;
+    right: -14rem;
+    background: var(--color-primary);
+    animation: drift-a 26s var(--ease-out) infinite alternate;
+  }
+  .b2 {
+    width: 34rem;
+    height: 34rem;
+    top: -6rem;
+    left: -16rem;
+    background: var(--color-primary-accent);
+    animation: drift-b 32s var(--ease-out) infinite alternate;
+  }
+  /* The brand crimson, at a fraction of the others' weight. Enough that the
+     mark in the header belongs to the same page; not enough to compete with
+     the periwinkle the product actually runs on. */
+  .b3 {
+    width: 26rem;
+    height: 26rem;
+    top: 16rem;
+    right: 22%;
+    background: var(--color-brand);
+    opacity: 0.14;
+    animation: drift-c 38s var(--ease-out) infinite alternate;
+  }
+
+  /* Fades out downward so the hero dissolves into the page instead of ending
+     on a hard edge. */
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--color-light) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-light) 1px, transparent 1px);
+    background-size: 4.5rem 4.5rem;
+    mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.5),
+      transparent 65%
+    );
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.5),
+      transparent 65%
+    );
+  }
+
+  @keyframes drift-a {
+    to {
+      transform: translate3d(-6rem, 4rem, 0) scale(1.12);
+    }
+  }
+  @keyframes drift-b {
+    to {
+      transform: translate3d(5rem, 6rem, 0) scale(1.18);
+    }
+  }
+  @keyframes drift-c {
+    to {
+      transform: translate3d(-8rem, -3rem, 0) scale(1.25);
+    }
+  }
+
+  .hero-grid {
+    display: grid;
+    gap: var(--space-5);
+    align-items: center;
+  }
+
+  .hero-copy {
+    /* Entrance, not a scroll reveal: this is above the fold on every screen,
+       so an IntersectionObserver would fire immediately anyway. */
+    animation: rise var(--dur-slow) var(--ease-out) both;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(1.2rem);
+    }
+  }
+
+  /* ── Hero composite ────────────────────────────────────────────────── */
+
+  .composite {
+    position: relative;
+    perspective: 1600px;
+    animation: rise var(--dur-slow) 120ms var(--ease-out) both;
+  }
+
+  /* Glow behind the frame. Separate from the hero veil on purpose: this one
+     sits under an opaque screenshot rather than under type, so it carries the
+     colour on mobile — where the veil has to hold the wash back until the
+     copy is finished — without going anywhere near a contrast budget. */
+  .composite::before {
+    content: "";
+    position: absolute;
+    inset: -12% -8% -16%;
+    z-index: -1;
+    background: radial-gradient(
+      60% 55% at 50% 55%,
+      color-mix(in srgb, var(--color-primary) 42%, transparent),
+      transparent 72%
+    );
+    filter: blur(38px);
+    pointer-events: none;
+  }
+
+  .plane {
+    transition: transform var(--dur-slow) var(--ease-out);
+    transform-style: preserve-3d;
+  }
+
+  .plane-main {
+    /* The tilt is what separates "a screenshot on a page" from "a product
+       photographed". Kept shallow: past about 16° the gradebook's rows start
+       to shear badly enough that they stop reading as rows. */
+    transform: rotateY(-13deg) rotateX(4deg) rotateZ(0.6deg);
+  }
+
+  .frame {
+    border-radius: var(--card-border-radius);
+    overflow: hidden;
+    background: var(--color-white);
+    box-shadow: var(--elev-3);
+    outline: 1px solid var(--color-light);
+  }
+  .frame-bar {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-light);
+  }
+  .frame-bar span {
+    width: 0.62rem;
+    height: 0.62rem;
+    border-radius: 50%;
+    background: var(--color-light);
+  }
+  .frame :global(picture) {
+    display: block;
+  }
+  .frame :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .plane-front {
+    position: absolute;
+    left: -2.5rem;
+    bottom: -2.5rem;
+    width: 190px;
+    border-radius: var(--border-radius-2);
+    overflow: hidden;
+    box-shadow: var(--elev-3);
+    outline: 1px solid var(--color-light);
+    transform: rotateY(-13deg) rotateX(4deg) translateZ(70px);
+  }
+  .plane-front :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ── 2 · Pain / contrast ───────────────────────────────────────────── */
 
   .band p,
   .band li {
@@ -344,6 +743,102 @@ const limits = [
     color: var(--color-dark);
   }
 
+  .contrast {
+    display: grid;
+    gap: var(--space-3);
+    align-items: center;
+    margin-block: var(--space-5);
+  }
+  .side-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-info-dark);
+    margin-bottom: var(--space-2);
+  }
+
+  .scatter {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .scatter li {
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--border-radius-2);
+    padding: 0.6rem 0.85rem;
+    font-size: 0.92rem;
+    box-shadow: var(--elev-1);
+    /* Each row sits at its own small angle. The point is legibility of the
+       mess, not the mess itself — they stay readable, just visibly unaligned. */
+    transform: rotate(var(--tilt, 0deg));
+  }
+  .scatter li:nth-child(1) { --tilt: -1.4deg; }
+  .scatter li:nth-child(2) { --tilt: 0.9deg; }
+  .scatter li:nth-child(3) { --tilt: -0.6deg; }
+  .scatter li:nth-child(4) { --tilt: 1.5deg; }
+  .scatter li:nth-child(5) { --tilt: -1.1deg; }
+  .scatter li:nth-child(6) { --tilt: 0.7deg; }
+
+  .scatter-name {
+    display: block;
+    color: var(--color-dark);
+    font-weight: 500;
+  }
+  .scatter-meta {
+    display: block;
+    color: var(--color-info-dark);
+    font-size: 0.82rem;
+  }
+
+  .arrow {
+    display: grid;
+    place-items: center;
+    color: var(--color-primary);
+  }
+  .arrow svg {
+    width: 2.4rem;
+    height: 1.6rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .consolidated {
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--card-border-radius);
+    padding: var(--space-4);
+    box-shadow: var(--elev-2);
+    position: relative;
+    overflow: hidden;
+  }
+  .consolidated::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: linear-gradient(
+      90deg,
+      var(--color-primary),
+      var(--color-primary-accent)
+    );
+  }
+  .consolidated-title {
+    font-weight: 600;
+    color: var(--color-dark);
+    font-size: 1.15rem;
+    margin-bottom: var(--space-2);
+  }
+  .consolidated-body {
+    font-size: 0.98rem;
+  }
+
   /* Set apart from the argument around it: a correction of an assumption the
      reader arrived with, rather than the next step in the pitch. */
   .aside {
@@ -352,6 +847,14 @@ const limits = [
     border-radius: var(--border-radius-2);
     background: var(--color-primary-light);
     font-size: 1rem;
+  }
+  /* The tint costs about 0.6 of a contrast point, which takes the muted body
+     colour under the line (3.89:1). Set on the darker tier instead — which
+     also suits a callout the reader is meant to stop on. Specificity beats
+     the `.band p` rule this would otherwise inherit. */
+  .band .aside,
+  .aside {
+    color: var(--color-dark);
   }
 
   .plain {
@@ -366,11 +869,7 @@ const limits = [
     border-left: 2px solid var(--color-light);
   }
 
-  .two-col {
-    display: grid;
-    gap: var(--space-5);
-    margin-top: var(--space-5);
-  }
+  /* ── 3 · Portals ───────────────────────────────────────────────────── */
 
   .section-title {
     margin-bottom: var(--space-5);
@@ -398,14 +897,100 @@ const limits = [
     margin: 0;
     border-radius: var(--card-border-radius);
     overflow: hidden;
-    box-shadow: var(--box-shadow);
+    box-shadow: var(--elev-3);
     outline: 1px solid var(--color-light);
+  }
+  .shot :global(picture) {
+    display: block;
   }
   .shot :global(img) {
     display: block;
     width: 100%;
     height: auto;
   }
+
+  /* ── 5 · Limits ────────────────────────────────────────────────────── */
+
+  .limits {
+    list-style: none;
+    margin: var(--space-4) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+  .limits li {
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-left: 3px solid var(--color-info-dark);
+    border-radius: var(--border-radius-2);
+    padding: var(--space-3);
+  }
+  .limits h3 {
+    font-size: 1.05rem;
+    color: var(--color-dark);
+    margin-bottom: 0.35rem;
+  }
+  .limits p {
+    font-size: 0.96rem;
+  }
+
+  /* ── 6 · Pilot ─────────────────────────────────────────────────────── */
+
+  .timeline {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+    counter-reset: step;
+  }
+  .timeline li {
+    position: relative;
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--color-light);
+  }
+  .timeline li::before {
+    content: "";
+    position: absolute;
+    left: -0.44rem;
+    top: 0.45rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: var(--color-primary);
+    outline: 3px solid var(--color-background);
+  }
+  .tl-when {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-primary-text);
+  }
+  .tl-what {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--color-dark);
+    margin-top: 0.15rem;
+  }
+  .tl-detail {
+    margin-top: 0.3rem !important;
+    font-size: 0.98rem;
+  }
+
+  .two-col {
+    display: grid;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+  }
+  .col-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--card-border-radius);
+    padding: var(--space-4);
+  }
+
+  /* ── 8 · Footer ────────────────────────────────────────────────────── */
 
   .footer {
     padding-block: var(--space-5);
@@ -417,15 +1002,239 @@ const limits = [
     margin-top: var(--space-1);
   }
 
-  /* nth-of-type, not nth-child: the section's h2 is also a child of .wrap and
-     would shift the parity of every portal below it. */
-  @media (min-width: 900px) {
-    .portal:nth-of-type(even) .portal-copy {
-      margin-left: auto;
-      text-align: right;
+  /* ── Scroll reveals ────────────────────────────────────────────────── */
+
+  /* Applied by JS on load, so a visitor with JS disabled never gets a page of
+     invisible sections — without this class everything is simply visible. */
+  :global(.js) .reveal {
+    opacity: 0;
+    transform: translateY(1.4rem);
+    transition:
+      opacity var(--dur-slow) var(--ease-out),
+      transform var(--dur-slow) var(--ease-out);
+  }
+  :global(.js) .reveal.is-in {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* ── Breakpoints ───────────────────────────────────────────────────── */
+
+  @media (min-width: 760px) {
+    .contrast {
+      grid-template-columns: 1fr auto 1fr;
+    }
+    .scatter {
+      grid-template-columns: 1fr 1fr;
+    }
+    .limits {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .timeline {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-3);
+    }
+    .timeline li {
+      padding-left: 0;
+      padding-top: var(--space-3);
+      border-left: 0;
+      border-top: 2px solid var(--color-light);
+    }
+    .timeline li::before {
+      left: 0;
+      top: -0.44rem;
     }
     .two-col {
       grid-template-columns: 1fr 1fr;
     }
   }
+
+  @media (min-width: 1000px) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      gap: var(--space-5);
+    }
+    /* Bleeds toward the viewport edge so the frame reads as a window onto
+       something larger than the column it sits in. */
+    .composite {
+      margin-right: calc(var(--space-5) * -1);
+    }
+  }
+
+  @media (min-width: 900px) {
+    /* nth-of-type, not nth-child: the section's h2 is also a child of .wrap
+       and would shift the parity of every portal below it. */
+    .portal:nth-of-type(even) .portal-copy {
+      margin-left: auto;
+      text-align: right;
+    }
+  }
+
+  /* Below the composite breakpoint the tilt and the floating plane are both
+     liabilities: a sheared gradebook at 360px is unreadable, and the strip
+     would cover it. Flat, full width, no overlap. */
+  @media (max-width: 999px) {
+    /* Stacked layout: the copy spans the full width, so the veil turns
+       vertical. Copy runs out at 50% of the hero's height and the composite
+       starts at 55%, so the wash is held back until 54% and is fully itself by
+       the time the product frame is on screen — the glow lands behind the
+       screenshot instead of behind the sentence. Blobs shrink too: at 46rem
+       they are wider than the phone and stop reading as light behind the page. */
+    .mesh::after {
+      background: linear-gradient(
+        to bottom,
+        var(--color-background) 0 54%,
+        transparent 76%
+      );
+    }
+    .blob {
+      opacity: 0.3;
+      filter: blur(64px);
+    }
+    .b1 {
+      width: 26rem;
+      height: 26rem;
+      top: -12rem;
+      right: -8rem;
+    }
+    .b2 {
+      width: 20rem;
+      height: 20rem;
+      left: -9rem;
+    }
+    .b3 {
+      width: 16rem;
+      height: 16rem;
+      top: 22rem;
+    }
+
+    /* Full-bleed tap targets. Two buttons at their content widths read as
+       ragged on a narrow column, and the demo is the whole point of the hero. */
+    .cta-row .btn {
+      flex: 1 1 100%;
+      text-align: center;
+    }
+
+    .plane-main {
+      transform: none;
+    }
+    .plane-front {
+      position: static;
+      width: 168px;
+      transform: none;
+      margin: calc(var(--space-3) * -1) 0 0 auto;
+    }
+    .composite {
+      perspective: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob {
+      animation: none;
+    }
+    .hero-copy,
+    .composite {
+      animation: none;
+    }
+    .plane-main,
+    .plane-front {
+      transform: none;
+    }
+    .plane-front {
+      transform: translateZ(0);
+    }
+    :global(.js) .reveal {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
 </style>
+
+<script>
+  // Progressive enhancement in the literal sense: the reveal styles are gated
+  // behind .js, so this class going on is what arms them. Without JS the page
+  // renders complete and static.
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+
+  if (!reduced.matches) {
+    document.documentElement.classList.add("js");
+
+    // Deliberately a scroll sweep rather than an IntersectionObserver.
+    //
+    // IO only reports at the moments an element CROSSES its threshold. Miss
+    // that window — a fling scroll on a phone, a jumped scroll position, a
+    // background tab throttling frames — and the element is never reported
+    // again, so a section that is opacity:0 until told otherwise stays
+    // invisible for the rest of the visit. That is exactly what happened to
+    // the "Hoy → Con Simple Manage Pro" block under a 400px-per-tick scroll,
+    // and losing a whole section of the argument is far worse than losing an
+    // animation.
+    //
+    // Re-testing position on every scroll cannot miss: it asks "is it in view
+    // NOW", not "did it cross just now". The list only shrinks, and the
+    // listener detaches once it empties.
+    let pending = [...document.querySelectorAll<HTMLElement>(".reveal")];
+    let queued = false;
+
+    const sweep = () => {
+      queued = false;
+      const limit = innerHeight * 0.92; // reveal just before fully in view
+      pending = pending.filter((el) => {
+        if (el.getBoundingClientRect().top > limit) return true;
+        el.classList.add("is-in");
+        return false;
+      });
+      if (!pending.length) removeEventListener("scroll", onScroll);
+    };
+
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(sweep);
+    };
+
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("resize", onScroll, { passive: true });
+    sweep();
+
+    // Pointer parallax on the hero composite. Fine pointers only — on a
+    // touchscreen there is no hover state to respond to, and the planes would
+    // simply never move.
+    const composite = document.querySelector<HTMLElement>("[data-tilt]");
+    const fine = matchMedia("(pointer: fine)");
+
+    if (composite && fine.matches) {
+      const main = composite.querySelector<HTMLElement>(".plane-main");
+      const front = composite.querySelector<HTMLElement>(".plane-front");
+      let frame = 0;
+
+      const move = (ev: PointerEvent) => {
+        if (frame) return; // coalesce to one write per animation frame
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          if (innerWidth < 1000) return; // the flat mobile layout owns the transform
+          const r = composite.getBoundingClientRect();
+          // −0.5…0.5 from the composite's own centre.
+          const px = (ev.clientX - r.left) / r.width - 0.5;
+          const py = (ev.clientY - r.top) / r.height - 0.5;
+          const ry = -13 + px * 7;
+          const rx = 4 - py * 5;
+          if (main)
+            main.style.transform = `rotateY(${ry}deg) rotateX(${rx}deg) rotateZ(0.6deg)`;
+          if (front)
+            front.style.transform = `rotateY(${ry}deg) rotateX(${rx}deg) translateZ(70px)`;
+        });
+      };
+
+      const reset = () => {
+        if (main) main.style.transform = "";
+        if (front) front.style.transform = "";
+      };
+
+      addEventListener("pointermove", move, { passive: true });
+      composite.addEventListener("pointerleave", reset);
+    }
+  }
+</script>

@@ -1,5 +1,6 @@
 ---
 import "../styles/tokens.css";
+import Header from "../components/Header.astro";
 
 interface Props {
   title: string;
@@ -33,9 +34,51 @@ const ogImage = new URL("/og.png", Astro.site);
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Simple Manage Pro — el sistema con el que su colegio lleva el curso lectivo." />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <!-- The app's own icon set, copied rather than relinked: the landing page
+         is a separate Vercel project on the apex domain, so it cannot reach
+         the demo subdomain's /public. The previous /favicon.svg never existed
+         in either repo — the app has no SVG mark, only this raster set. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#f6f6f9"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#181a1e"
+    />
+
+    <!-- Only the three weights that render above the fold. 700 is the h1,
+         600 the nav and eyebrows, 400 the lede. 500/800 load normally. -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/poppins-latin-400-normal.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/poppins-latin-600-normal.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/poppins-latin-700-normal.woff2"
+      crossorigin
+    />
 
     <script is:inline>
       // Set before first paint so a returning visitor never sees a flash of
@@ -47,6 +90,32 @@ const ogImage = new URL("/og.png", Astro.site);
     </script>
   </head>
   <body>
+    <a class="skip" href="#contenido">Saltar al contenido</a>
+    <Header />
     <slot />
+
+    <style>
+      /* Visible only on keyboard focus. Placed before the sticky header in
+         the DOM so it is the first stop, and given a z-index above it so it
+         is not painted underneath. */
+      .skip {
+        position: fixed;
+        top: var(--space-2);
+        left: var(--space-2);
+        z-index: 100;
+        padding: 0.7rem 1.1rem;
+        border-radius: var(--border-radius-2);
+        background: var(--color-white);
+        color: var(--color-dark);
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: var(--elev-2);
+        transform: translateY(calc(-100% - var(--space-3)));
+        transition: transform var(--dur-fast) var(--ease-out);
+      }
+      .skip:focus-visible {
+        transform: translateY(0);
+      }
+    </style>
   </body>
 </html>
