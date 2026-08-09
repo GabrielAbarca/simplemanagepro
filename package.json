@@ -8,7 +8,11 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "capture": "node scripts/capture-screenshots.mjs"
+    "capture": "node scripts/capture-screenshots.mjs",
+    "derive": "node scripts/make-derived.mjs",
+    "og": "node scripts/make-og.mjs",
+    "audit:contrast": "node scripts/contrast-audit.mjs",
+    "review": "node scripts/review-shots.mjs"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
