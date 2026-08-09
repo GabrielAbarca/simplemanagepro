@@ -57,12 +57,10 @@ const PORTALS = [
     steps: [
       { click: '[data-page="myclasses"]', wait: ".class-card" },
       { click: ".class-card >> nth=1", wait: '[data-tab="gradebook"]' },
-      { click: '[data-tab="gradebook"]', wait: "#gradebook-period" },
-      // The gradebook defaults to the CURRENT period (teacher.js:2143), which
-      // in the second half of the curso lectivo is II Periodo — and the demo
-      // only carries grades for I Periodo, so the default view is the empty
-      // state. Select the first period to capture an actual gradebook.
-      { select: "#gradebook-period", index: 0, wait: "#view-class table" },
+      // No period is selected here on purpose. The gradebook defaults to the
+      // current period (teacher.js:2143) and the demo now carries grades in
+      // both, so this captures exactly what a visitor lands on.
+      { click: '[data-tab="gradebook"]', wait: "#view-class table" },
     ],
   },
   { file: "student", path: "/", ready: ".grade-overview, #grades-table, main" },
