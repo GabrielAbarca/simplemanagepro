@@ -4,6 +4,59 @@
    product reads as a template with someone else's screenshots pasted in.
    Layout diverges on purpose: the console is dense, this page is not. */
 
+/* Poppins — the same self-hosted files the app ships. The stack below named
+   "Poppins" from the first commit but nothing ever loaded it, so the page
+   silently rendered in system-ui: the one thing token inheritance was supposed
+   to guarantee was the thing it wasn't delivering.
+   Latin subset only. U+0000-00FF covers every Spanish accent (á é í ó ú ñ ü
+   ¿ ¡) and the page is Spanish-only (BRIEF §9), so latin-ext would never be
+   fetched — shipping it would be five requests that can't fire. */
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-500-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-600-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-700-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-800-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+
 :root {
   color-scheme: light;
 
@@ -23,11 +76,50 @@
   --color-light: rgba(132, 139, 200, 0.18);
   --color-primary-text: #4455e6;
 
+  /* The colour a button is FILLED with, as opposed to the one text is set in.
+     --color-primary carries white at only 3.48:1, so every primary CTA on the
+     page was failing 1.4.3 until this came over from the app alongside the
+     rest of the palette. 4.53:1 with #fff.
+     Not overridden in dark: a fill carries its own white text, so its contrast
+     is a property of the fill, not of the theme. */
+  --color-primary-fill: #5a69e9;
+
+  /* Brand accent — the wordmark's crimson and the logo's folded ribbon.
+     Deliberately distinct from --color-primary: periwinkle is the product's
+     system colour (every button inside the console), crimson is the brand's
+     (the mark, the wordmark's second half). The page uses periwinkle for
+     anything that behaves like the product and crimson only for identity, so
+     a visitor never learns that red means "action" here and something else
+     there. Value is the app's audited --color-danger-text, not a new red. */
+  --color-brand: #d30011;
+  --color-brand-deep: #8f0c1e;
+
+  /* The app's violet, used here only in gradients and the hero wash — never
+     as a text or fill colour, so it needs no contrast audit. */
+  --color-primary-accent: #a78bfa;
+
   --card-border-radius: 1.6rem;
   --border-radius-1: 0.4rem;
   --border-radius-2: 0.8rem;
 
   --box-shadow: 0 2rem 3rem var(--color-light);
+
+  /* Elevation — the hero composite stacks three planes, and the app's single
+     tint-based --box-shadow can't separate them. Neutral-tinted so the frames
+     read as lit from above rather than glowing periwinkle. */
+  --elev-1:
+    0 1px 2px rgba(24, 26, 30, 0.06), 0 2px 8px rgba(24, 26, 30, 0.05);
+  --elev-2:
+    0 4px 12px rgba(24, 26, 30, 0.08), 0 14px 34px rgba(24, 26, 30, 0.08);
+  --elev-3:
+    0 12px 28px rgba(24, 26, 30, 0.12), 0 36px 68px rgba(24, 26, 30, 0.14);
+
+  /* Motion. One ease and three durations — a landing page that eases six
+     different ways reads as six different pages. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 160ms;
+  --dur-mid: 320ms;
+  --dur-slow: 640ms;
 
   /* Editorial spacing scale — wider than the console's */
   --space-1: 0.5rem;
@@ -56,6 +148,19 @@
     --color-dark-variant: #a3bdcc;
     --color-info-dark: #7d8da1;
     --color-light: rgba(0, 0, 0, 0.4);
+
+    /* Light mode DARKENS a hue to clear 4.5:1 on white; dark mode has to
+       BRIGHTEN it instead. Carrying the light values through unchanged left
+       every link and eyebrow at 3.06:1 on the page and 2.72:1 on a card —
+       a 1.4.3 failure. Same values and same reasoning as the app. */
+    --color-primary-text: #8994ef; /* 6.26:1 page · 5.56:1 card */
+    --color-brand: #ff7782; /* 6.81:1 page — #d30011 was 3.13:1 */
+
+    /* Neutral drop-shadows vanish on a near-black page; depth has to come
+       from a darker-than-background shadow plus a lit top edge. */
+    --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+    --elev-2: 0 4px 12px rgba(0, 0, 0, 0.45), 0 14px 34px rgba(0, 0, 0, 0.4);
+    --elev-3: 0 12px 28px rgba(0, 0, 0, 0.5), 0 36px 68px rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -67,6 +172,16 @@
   --color-dark-variant: #a3bdcc;
   --color-info-dark: #7d8da1;
   --color-light: rgba(0, 0, 0, 0.4);
+
+  /* Repeated verbatim from the media query above — see the note there. An
+     explicit choice has to win in both directions, so neither block can
+     delegate to the other. */
+  --color-primary-text: #8994ef;
+  --color-brand: #ff7782;
+
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --elev-2: 0 4px 12px rgba(0, 0, 0, 0.45), 0 14px 34px rgba(0, 0, 0, 0.4);
+  --elev-3: 0 12px 28px rgba(0, 0, 0, 0.5), 0 36px 68px rgba(0, 0, 0, 0.5);
 }
 
 *,
