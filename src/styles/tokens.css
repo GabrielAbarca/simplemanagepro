@@ -1,0 +1,124 @@
+/* Design tokens inherited from the app (SMP-Web-Page, src/css/style.css).
+   Screenshots are this page's dominant visual content, so the page shares the
+   product's palette, radii and type — a landing page styled unlike its own
+   product reads as a template with someone else's screenshots pasted in.
+   Layout diverges on purpose: the console is dense, this page is not. */
+
+:root {
+  color-scheme: light;
+
+  /* Brand — identical values to the app */
+  --color-primary: #7380ec;
+  --color-primary-light: rgba(115, 128, 236, 0.15);
+  --color-danger: #ff7782;
+  --color-success: #41f1b6;
+  --color-warning: #ffbb55;
+
+  /* Surfaces and text. The app audited these to 4.5:1; do not "tidy" them. */
+  --color-white: #fff;
+  --color-background: #f6f6f9;
+  --color-dark: #363949;
+  --color-dark-variant: #667281;
+  --color-info-dark: #627388;
+  --color-light: rgba(132, 139, 200, 0.18);
+  --color-primary-text: #4455e6;
+
+  --card-border-radius: 1.6rem;
+  --border-radius-1: 0.4rem;
+  --border-radius-2: 0.8rem;
+
+  --box-shadow: 0 2rem 3rem var(--color-light);
+
+  /* Editorial spacing scale — wider than the console's */
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.6rem;
+  --space-4: 2.4rem;
+  --space-5: 4rem;
+  --space-6: 6.4rem;
+  --space-7: 9.6rem;
+
+  --measure: 62ch;
+  --page-max: 1180px;
+
+  --font-sans:
+    "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Dark values match the app's .dark-theme-variables. Honour the OS by
+   default, but let an explicit choice win in both directions. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-background: #181a1e;
+    --color-white: #202528;
+    --color-dark: #edeffd;
+    --color-dark-variant: #a3bdcc;
+    --color-info-dark: #7d8da1;
+    --color-light: rgba(0, 0, 0, 0.4);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-background: #181a1e;
+  --color-white: #202528;
+  --color-dark: #edeffd;
+  --color-dark-variant: #a3bdcc;
+  --color-info-dark: #7d8da1;
+  --color-light: rgba(0, 0, 0, 0.4);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-dark);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 0;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+a {
+  color: var(--color-primary-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  border-radius: var(--border-radius-1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.astro/
+
+# Build output and local env
+.env
+.env.production
+.vercel/
+
+# OS noise
+.DS_Store
+Thumbs.db
