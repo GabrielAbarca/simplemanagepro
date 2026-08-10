@@ -1,0 +1,388 @@
+---
+import ThemedShot from "../ThemedShot.astro";
+import { DEMO_URL } from "../../config";
+
+import adminStats from "../../assets/screenshots/admin-stats.png";
+import adminStatsDark from "../../assets/screenshots/admin-stats-dark.png";
+import gradebookShot from "../../assets/screenshots/teacher-gradebook.png";
+import gradebookShotDark from "../../assets/screenshots/teacher-gradebook-dark.png";
+---
+
+<section class="hero">
+  <!-- Decorative only: three drifting radial washes plus a fine grid.
+       aria-hidden and pointer-events:none so it is invisible to both
+       assistive tech and the cursor. -->
+  <div class="mesh" aria-hidden="true">
+    <span class="blob b1"></span>
+    <span class="blob b2"></span>
+    <span class="blob b3"></span>
+    <span class="grid"></span>
+  </div>
+
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">Hecho para Costa Rica</p>
+      <h1>El sistema con el que su colegio lleva el curso lectivo.</h1>
+      <p class="lede">
+        Notas, asistencia, horarios y expedientes en un solo lugar: para la
+        dirección, para los docentes y para los estudiantes.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
+        <a class="btn btn-quiet" href="/piloto">Conocer el piloto 2027</a>
+      </div>
+      <p class="note">
+        Es un colegio de ejemplo, con datos de ejemplo. Nada de lo que haga ahí
+        se guarda.
+      </p>
+    </div>
+
+    <div class="composite" data-tilt>
+      <div class="plane plane-main">
+        <div class="frame">
+          <div class="frame-bar" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <ThemedShot
+            light={gradebookShot}
+            dark={gradebookShotDark}
+            alt="Libro de notas de Matemáticas: cada estudiante con su nota del periodo y sus tareas calificadas."
+            widths={[720, 1080, 1440]}
+            sizes="(min-width: 1000px) 640px, calc(100vw - 3.2rem)"
+            loading="eager"
+            priority={true}
+          />
+        </div>
+      </div>
+
+      <div class="plane plane-front">
+        <ThemedShot
+          light={adminStats}
+          dark={adminStatsDark}
+          alt="Resumen de la consola de dirección: matrícula total 90, 8 docentes, 6 de 10 aulas en uso."
+          widths={[270, 540]}
+          sizes="190px"
+          loading="eager"
+          priority={true}
+        />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    padding-block: var(--space-6) var(--space-7);
+    overflow: hidden;
+  }
+
+  .mesh {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* The veil, and the reason the hero can have a gradient at all.
+     --color-dark-variant has almost no headroom over 4.5:1, so a decorative
+     tint under the lede fails and dimming the wash until it passes would just
+     be a wash nobody can see. So the text does not sit on the gradient at all.
+     Opaque out to 50% — the copy column never passes 48% of the viewport at
+     any width, since .wrap is centred and capped — then released so the colour
+     survives behind the composite, where nothing is set in type. */
+  .mesh::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      var(--color-background) 0 50%,
+      transparent 84%
+    );
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    /* Large, low-opacity and heavily blurred: the effect should read as light
+       behind the page, not as three coloured circles. */
+    filter: blur(90px);
+    opacity: 0.34;
+    will-change: transform;
+  }
+  .b1 {
+    width: 46rem;
+    height: 46rem;
+    top: -22rem;
+    right: -14rem;
+    background: var(--color-primary);
+    animation: drift-a 26s var(--ease-out) infinite alternate;
+  }
+  .b2 {
+    width: 34rem;
+    height: 34rem;
+    top: -6rem;
+    left: -16rem;
+    background: var(--color-primary-accent);
+    animation: drift-b 32s var(--ease-out) infinite alternate;
+  }
+  /* The brand crimson, at a fraction of the others' weight. Enough that the
+     mark in the header belongs to the same page; not enough to compete with
+     the periwinkle the product actually runs on. */
+  .b3 {
+    width: 26rem;
+    height: 26rem;
+    top: 16rem;
+    right: 22%;
+    background: var(--color-brand);
+    opacity: 0.14;
+    animation: drift-c 38s var(--ease-out) infinite alternate;
+  }
+
+  /* Fades out downward so the hero dissolves into the page instead of ending
+     on a hard edge. */
+  .grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--color-light) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-light) 1px, transparent 1px);
+    background-size: 4.5rem 4.5rem;
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent 65%);
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.5),
+      transparent 65%
+    );
+  }
+
+  @keyframes drift-a {
+    to {
+      transform: translate3d(-6rem, 4rem, 0) scale(1.12);
+    }
+  }
+  @keyframes drift-b {
+    to {
+      transform: translate3d(5rem, 6rem, 0) scale(1.18);
+    }
+  }
+  @keyframes drift-c {
+    to {
+      transform: translate3d(-8rem, -3rem, 0) scale(1.25);
+    }
+  }
+
+  .hero-grid {
+    display: grid;
+    gap: var(--space-5);
+    align-items: center;
+  }
+
+  .hero-copy {
+    /* Entrance, not a scroll reveal: this is above the fold on every screen,
+       so an IntersectionObserver would fire immediately anyway. */
+    animation: rise var(--dur-slow) var(--ease-out) both;
+  }
+  .hero h1 {
+    max-width: 18ch;
+  }
+  .hero .note {
+    max-width: 42ch;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(1.2rem);
+    }
+  }
+
+  .composite {
+    position: relative;
+    perspective: 1600px;
+    animation: rise var(--dur-slow) 120ms var(--ease-out) both;
+  }
+
+  /* Glow behind the frame. Separate from the hero veil on purpose: this one
+     sits under an opaque screenshot rather than under type, so it carries the
+     colour on mobile without going anywhere near a contrast budget. */
+  .composite::before {
+    content: "";
+    position: absolute;
+    inset: -12% -8% -16%;
+    z-index: -1;
+    background: radial-gradient(
+      60% 55% at 50% 55%,
+      color-mix(in srgb, var(--color-primary) 42%, transparent),
+      transparent 72%
+    );
+    filter: blur(38px);
+    pointer-events: none;
+  }
+
+  .plane {
+    transition: transform var(--dur-slow) var(--ease-out);
+    transform-style: preserve-3d;
+  }
+
+  .plane-main {
+    transform: rotateY(-13deg) rotateX(4deg) rotateZ(0.6deg);
+  }
+
+  .frame {
+    border-radius: var(--card-border-radius);
+    overflow: hidden;
+    background: var(--color-white);
+    box-shadow: var(--elev-3);
+    outline: 1px solid var(--color-light);
+  }
+  .frame-bar {
+    display: flex;
+    gap: 0.4rem;
+    padding: 0.7rem 0.9rem;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-light);
+  }
+  .frame-bar span {
+    width: 0.62rem;
+    height: 0.62rem;
+    border-radius: 50%;
+    background: var(--color-light);
+  }
+  .frame :global(picture),
+  .frame :global(img) {
+    display: block;
+  }
+  .frame :global(img) {
+    width: 100%;
+    height: auto;
+  }
+
+  .plane-front {
+    position: absolute;
+    left: -2.5rem;
+    bottom: -2.5rem;
+    width: 190px;
+    border-radius: var(--border-radius-2);
+    overflow: hidden;
+    box-shadow: var(--elev-3);
+    outline: 1px solid var(--color-light);
+    transform: rotateY(-13deg) rotateX(4deg) translateZ(70px);
+  }
+  .plane-front :global(img) {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  @media (min-width: 1000px) {
+    .hero-grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+      gap: var(--space-5);
+    }
+    .composite {
+      margin-right: calc(var(--space-5) * -1);
+    }
+  }
+
+  /* Below the composite breakpoint the tilt and the floating plane are both
+     liabilities: a sheared gradebook at 360px is unreadable, and the strip
+     would cover it. Flat, full width, no overlap. */
+  @media (max-width: 999px) {
+    .mesh::after {
+      background: linear-gradient(
+        to bottom,
+        var(--color-background) 0 54%,
+        transparent 76%
+      );
+    }
+    .blob {
+      opacity: 0.3;
+      filter: blur(64px);
+    }
+    .b1 {
+      width: 26rem;
+      height: 26rem;
+      top: -12rem;
+      right: -8rem;
+    }
+    .b2 {
+      width: 20rem;
+      height: 20rem;
+      left: -9rem;
+    }
+    .b3 {
+      width: 16rem;
+      height: 16rem;
+      top: 22rem;
+    }
+    .plane-main {
+      transform: none;
+    }
+    .plane-front {
+      position: static;
+      width: 168px;
+      transform: none;
+      margin: calc(var(--space-3) * -1) 0 0 auto;
+    }
+    .composite {
+      perspective: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .blob,
+    .hero-copy,
+    .composite {
+      animation: none;
+    }
+    .plane-main {
+      transform: none;
+    }
+    .plane-front {
+      transform: translateZ(0);
+    }
+  }
+</style>
+
+<script>
+  // Pointer parallax on the hero composite. Fine pointers only: on a
+  // touchscreen there is no hover state to respond to, so the planes would
+  // simply never move.
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+  const composite = document.querySelector<HTMLElement>("[data-tilt]");
+  const fine = matchMedia("(pointer: fine)");
+
+  if (composite && fine.matches && !reduced.matches) {
+    const main = composite.querySelector<HTMLElement>(".plane-main");
+    const front = composite.querySelector<HTMLElement>(".plane-front");
+    let frame = 0;
+
+    const move = (ev: PointerEvent) => {
+      if (frame) return; // coalesce to one write per animation frame
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        if (innerWidth < 1000) return; // the flat mobile layout owns the transform
+        const r = composite.getBoundingClientRect();
+        // −0.5…0.5 from the composite's own centre.
+        const px = (ev.clientX - r.left) / r.width - 0.5;
+        const py = (ev.clientY - r.top) / r.height - 0.5;
+        const ry = -13 + px * 7;
+        const rx = 4 - py * 5;
+        if (main)
+          main.style.transform = `rotateY(${ry}deg) rotateX(${rx}deg) rotateZ(0.6deg)`;
+        if (front)
+          front.style.transform = `rotateY(${ry}deg) rotateX(${rx}deg) translateZ(70px)`;
+      });
+    };
+
+    const reset = () => {
+      if (main) main.style.transform = "";
+      if (front) front.style.transform = "";
+    };
+
+    addEventListener("pointermove", move, { passive: true });
+    composite.addEventListener("pointerleave", reset);
+  }
+</script>

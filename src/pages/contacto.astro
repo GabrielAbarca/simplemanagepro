@@ -1,0 +1,114 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { breadcrumbLd } from "../lib/schema";
+import { DEMO_URL, EMAIL, waHref } from "../config";
+---
+
+<Layout
+  title="Hablemos del piloto 2027"
+  description="Si le interesa el piloto 2027 para su colegio, la conversación empieza por WhatsApp o por correo. Sin formularios, sin planes y sin tarjeta de crédito."
+>
+  <script
+    slot="head"
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(breadcrumbLd("Contacto", "/contacto"))}
+  />
+
+  <section class="page-head">
+    <div class="wrap narrow">
+      <p class="eyebrow">Piloto 2027</p>
+      <h1>¿Su colegio podría ser uno de los tres?</h1>
+      <p class="lede">
+        La conversación empieza por WhatsApp o por correo. La decisión no se
+        toma desde acá: se toma después de ver el sistema con la estructura de
+        su colegio.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href={waHref}>Escribir por WhatsApp</a>
+        <a class="btn btn-quiet" href={`mailto:${EMAIL}`}>Escribir un correo</a>
+      </div>
+      <p class="note">
+        No hay formulario, ni plan que escoger, ni tarjeta de crédito.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <ul class="channels reveal">
+        <li>
+          <h2>WhatsApp</h2>
+          <p>
+            Lo más rápido. El mensaje va prellenado y usted lo edita antes de
+            enviarlo.
+          </p>
+          <a href={waHref}>Abrir WhatsApp</a>
+        </li>
+        <li>
+          <h2>Correo</h2>
+          <p>
+            Para cuando conviene dejar constancia escrita de lo conversado.
+          </p>
+          <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
+        </li>
+        <li>
+          <h2>Antes de escribir</h2>
+          <p>
+            Si prefiere ver el sistema primero, la demo está abierta y no pide
+            ningún dato.
+          </p>
+          <a href={DEMO_URL}>Ver la demo</a>
+        </li>
+      </ul>
+
+      <div class="narrow reveal">
+        <p class="aside">
+          Conviene tener a mano el tamaño aproximado del colegio: cuántas
+          secciones, cuántos docentes y cuántos estudiantes matriculados. Con
+          eso la primera conversación ya es concreta.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .page-head {
+    padding-block: var(--space-6) var(--space-5);
+  }
+
+  .channels {
+    list-style: none;
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+  .channels li {
+    padding: var(--space-4);
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--card-border-radius);
+  }
+  .channels h2 {
+    font-size: 1.2rem;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-2);
+  }
+  .channels p {
+    color: var(--color-dark-variant);
+    font-size: 0.98rem;
+    margin-bottom: var(--space-2);
+  }
+  .channels a {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  @media (min-width: 760px) {
+    .channels {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

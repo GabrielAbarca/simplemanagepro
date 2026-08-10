@@ -1,0 +1,104 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CierreCta from "../components/sections/CierreCta.astro";
+import { breadcrumbLd } from "../lib/schema";
+---
+
+<Layout
+  title="Quiénes somos"
+  description="Simple Manage Pro se construye en Costa Rica, con la estructura del sistema educativo costarricense por defecto: curso lectivo, periodos, secciones y expedientes."
+>
+  <script
+    slot="head"
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(breadcrumbLd("Nosotros", "/nosotros"))}
+  />
+
+  <section class="page-head">
+    <div class="wrap narrow">
+      <p class="eyebrow">Hecho para Costa Rica</p>
+      <h1>Software escolar que ya habla como su colegio.</h1>
+      <p class="lede">
+        La mayoría del software escolar llega traducido de otro país y le pide
+        al colegio que se acomode. Simple Manage Pro empieza por la estructura
+        que el colegio ya usa.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="two-col reveal">
+        <div class="col-card">
+          <h2>Misión</h2>
+          <p>
+            Que un colegio costarricense pueda llevar su curso lectivo completo
+            en un solo sistema, sin adaptar su forma de trabajar a un software
+            pensado para otro país.
+          </p>
+        </div>
+        <div class="col-card">
+          <h2>Visión</h2>
+          <p>
+            Que la estructura del sistema educativo costarricense, sus periodos,
+            sus niveles, sus secciones y sus expedientes, sea lo normal en el
+            software que usan los colegios del país, y no una configuración
+            especial que alguien tiene que armar.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap narrow reveal">
+      <h2>Cómo trabajamos</h2>
+      <p>
+        Simple Manage Pro lo construyó <strong>Gabriel Zelaya</strong>, acá en
+        Costa Rica. Cuando usted escriba por WhatsApp, le contesta quien
+        construyó el sistema y puede cambiarlo.
+      </p>
+      <p>
+        Por eso el piloto es de tres colegios y no de treinta: cada colegio se
+        configura con su propia estructura y corre sobre su propia base de
+        datos, y eso se hace bien de tres en tres.
+      </p>
+      <p class="aside">
+        El vocabulario del sistema es el del colegio, no el de un manual
+        traducido: curso lectivo, periodos, niveles, secciones, matrícula,
+        expediente.
+      </p>
+    </div>
+  </section>
+
+  <CierreCta />
+</Layout>
+
+<style>
+  .page-head {
+    padding-block: var(--space-6) var(--space-5);
+  }
+
+  .two-col {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .col-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--card-border-radius);
+    padding: var(--space-4);
+  }
+  .col-card h2 {
+    font-size: 1.3rem;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-2);
+  }
+
+  @media (min-width: 760px) {
+    .two-col {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

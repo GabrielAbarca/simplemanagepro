@@ -1,0 +1,222 @@
+/* Shared layout and component primitives.
+ *
+ * These lived in index.astro's scoped <style> while the site was one document.
+ * Astro scopes component styles, so nothing in there could be reached by a
+ * second route — this file is what makes /portales, /piloto, /nosotros and
+ * /contacto stylable at all. Section-specific CSS stays with its section
+ * component; only what more than one route needs belongs here.
+ *
+ * Loaded after tokens.css, which owns colour, type, spacing and the reset.
+ */
+
+/* ── Layout ─────────────────────────────────────────────────────────────── */
+
+.wrap {
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--space-3);
+}
+
+.narrow {
+  max-width: 70ch;
+}
+
+section {
+  padding-block: var(--space-6);
+}
+
+/* ── Typography ─────────────────────────────────────────────────────────── */
+
+h1 {
+  font-size: clamp(2.3rem, 5vw, 3.6rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  font-size: clamp(1.7rem, 3.4vw, 2.45rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  margin-bottom: var(--space-3);
+}
+
+h3 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-primary-text);
+  margin-bottom: var(--space-2);
+}
+
+.lede {
+  font-size: clamp(1.05rem, 1.6vw, 1.25rem);
+  color: var(--color-dark-variant);
+  max-width: var(--measure);
+  margin-top: var(--space-3);
+}
+
+.note {
+  margin-top: var(--space-3);
+  font-size: 0.9rem;
+  color: var(--color-info-dark);
+}
+
+.section-title {
+  margin-bottom: var(--space-5);
+}
+
+/* ── Bands ──────────────────────────────────────────────────────────────── */
+
+.band p,
+.band li {
+  color: var(--color-dark-variant);
+  font-size: 1.05rem;
+}
+
+.band p + p {
+  margin-top: var(--space-3);
+}
+
+.band strong {
+  color: var(--color-dark);
+}
+
+/* Set apart from the argument around it: a correction of an assumption the
+   reader arrived with, rather than the next step in the pitch. */
+.aside {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  border-radius: var(--border-radius-2);
+  background: var(--color-primary-light);
+  font-size: 1rem;
+}
+
+/* The tint costs about 0.6 of a contrast point. Set on the darker tier so the
+   callout stays over the line, which also suits text the reader should stop
+   on. Listed twice so this beats the `.band p` rule it would inherit. */
+.band .aside,
+.aside {
+  color: var(--color-dark);
+}
+
+.plain {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-3) 0 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.plain li {
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--color-light);
+}
+
+/* ── Buttons ────────────────────────────────────────────────────────────── */
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.85rem 1.5rem;
+  border-radius: var(--border-radius-2);
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* White on --color-primary is 3.48:1. --color-primary-fill exists for exactly
+   this and clears 4.53:1. Never swap one for the other on a filled control. */
+.btn-primary {
+  background: var(--color-primary-fill);
+  color: #fff;
+  box-shadow: var(--elev-1);
+}
+
+.btn-primary:hover {
+  box-shadow: var(--elev-2);
+}
+
+.btn-quiet {
+  background: var(--color-white);
+  color: var(--color-dark);
+  box-shadow: inset 0 0 0 1px var(--color-light);
+}
+
+/* ── Screenshots ────────────────────────────────────────────────────────── */
+
+.shot {
+  margin: 0;
+  border-radius: var(--card-border-radius);
+  overflow: hidden;
+  box-shadow: var(--elev-3);
+  outline: 1px solid var(--color-light);
+}
+
+.shot picture,
+.shot img {
+  display: block;
+}
+
+.shot img {
+  width: 100%;
+  height: auto;
+}
+
+/* ── Scroll reveals ─────────────────────────────────────────────────────── */
+
+/* Gated behind .js, which the layout script adds on load, so a visitor with
+   JavaScript disabled never gets a page of invisible sections. */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(1.4rem);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+}
+
+.js .reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* ── Breakpoints ────────────────────────────────────────────────────────── */
+
+@media (max-width: 999px) {
+  /* Full-bleed tap targets. Two buttons at their content widths read as ragged
+     on a narrow column, and the demo is the whole point of the hero. */
+  .cta-row .btn {
+    flex: 1 1 100%;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn:hover {
+    transform: none;
+  }
+
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

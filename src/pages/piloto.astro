@@ -1,0 +1,150 @@
+---
+import Layout from "../layouts/Layout.astro";
+import CierreCta from "../components/sections/CierreCta.astro";
+import { pilotGives, pilotAsks, faq } from "../data/site";
+import { breadcrumbLd, faqLd } from "../lib/schema";
+---
+
+<Layout
+  title="El piloto 2027 para tres colegios"
+  description="Tres colegios empiezan el curso lectivo 2027 con el sistema ya configurado: su estructura, su matrícula y su propia base de datos. Qué incluye y qué se necesita."
+>
+  <script
+    slot="head"
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(breadcrumbLd("Piloto 2027", "/piloto"))}
+  />
+  <script
+    slot="head"
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(faqLd(faq))}
+  />
+
+  <section class="page-head">
+    <div class="wrap narrow">
+      <p class="eyebrow">Febrero de 2027</p>
+      <h1>El piloto 2027</h1>
+      <p class="lede">
+        Tres colegios, empezando con el curso lectivo en febrero de 2027. Cada
+        uno con su propia base de datos, configurada con la estructura de su
+        colegio.
+      </p>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="two-col reveal">
+        <div class="col-card">
+          <h2>Qué recibe el colegio</h2>
+          <ul class="plain">
+            {pilotGives.map((g) => <li>{g}</li>)}
+          </ul>
+        </div>
+        <div class="col-card">
+          <h2>Qué se necesita del colegio</h2>
+          <ul class="plain">
+            {pilotAsks.map((a) => <li>{a}</li>)}
+          </ul>
+        </div>
+      </div>
+
+      <div class="narrow reveal">
+        <p class="aside">
+          El piloto no es gratuito. Cubre el costo de la infraestructura, porque
+          cada colegio tiene su propia base de datos con sus propios respaldos.
+          El monto depende del tamaño del colegio y se conversa directamente. No
+          hay planes, ni tarjeta de crédito, ni contrato anual firmado desde una
+          página web.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRIEF §7 keeps this block as a trust device and none of the three facts
+       is softened here. What changed is the framing: a list of deficits headed
+       "para que no lo descubra en la primera reunión" announces bad news before
+       the reader has asked for it, while the same content as the director's own
+       questions, answered straight, reads as candor. It also moved off the home
+       page, where it was part of the first impression. -->
+  <section class="band" id="respuestas">
+    <div class="wrap">
+      <div class="narrow reveal">
+        <h2>Respuestas directas</h2>
+        <p>
+          Tres preguntas que conviene resolver antes de seguir, contestadas acá
+          y no en la primera reunión.
+        </p>
+      </div>
+
+      <dl class="faq reveal">
+        {
+          faq.map((f) => (
+            <div class="faq-item">
+              <dt>{f.q}</dt>
+              <dd>{f.a}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <CierreCta />
+</Layout>
+
+<style>
+  .page-head {
+    padding-block: var(--space-6) var(--space-5);
+  }
+
+  .two-col {
+    display: grid;
+    gap: var(--space-3);
+  }
+  .col-card {
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--card-border-radius);
+    padding: var(--space-4);
+  }
+  .col-card h2 {
+    font-size: 1.3rem;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-2);
+  }
+
+  .faq {
+    margin: var(--space-4) 0 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+  .faq-item {
+    padding: var(--space-3);
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--border-radius-2);
+  }
+  .faq dt {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--color-dark);
+    margin-bottom: 0.35rem;
+  }
+  .faq dd {
+    margin: 0;
+    color: var(--color-dark-variant);
+    font-size: 0.98rem;
+  }
+
+  @media (min-width: 760px) {
+    .two-col {
+      grid-template-columns: 1fr 1fr;
+    }
+    .faq {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

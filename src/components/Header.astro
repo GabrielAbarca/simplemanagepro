@@ -1,28 +1,39 @@
 ---
-const DEMO_URL = "https://demo.simplemanagepro.com";
+import { NAV, DEMO_URL } from "../config";
 
-// Four anchors, so no hamburger: below 900px the list is simply dropped and
-// the header keeps the mark, the theme control and the demo. A one-page
-// document that a visitor can reach the end of by scrolling does not need a
-// menu that has to be opened before it can be read.
-const nav = [
-  { href: "#portales", label: "Portales" },
-  { href: "#datos", label: "Datos" },
-  { href: "#piloto", label: "Piloto 2027" },
-  { href: "#contacto", label: "Contacto" },
-];
+// Normalised so /piloto and /piloto/ both mark the same link current, whatever
+// build.format produces.
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`);
 ---
 
 <header class="site-header">
   <div class="bar">
-    <a class="brand" href="#contenido" aria-label="Simple Manage Pro — inicio">
-      <img src="/apple-touch-icon.png" alt="" width="30" height="30" />
-      <span class="wordmark">Simple <b>Manage Pro</b></span>
+    <a class="brand" href="/" aria-label="Simple Manage Pro, inicio">
+      <img
+        src="/brand-mark.png"
+        alt=""
+        width="30"
+        height="30"
+        decoding="async"
+      />
+      <span class="wordmark">
+        <span class="wm-1">SIMPLE</span> <span class="wm-2">MANAGE PRO</span>
+      </span>
     </a>
 
-    <nav class="nav" aria-label="Secciones de la página">
+    <nav class="nav" aria-label="Principal">
       <ul>
-        {nav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+        {
+          NAV.map((n) => (
+            <li>
+              <a href={n.href} aria-current={isActive(n.href) ? "page" : undefined}>
+                {n.label}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
 
@@ -45,6 +56,41 @@ const nav = [
       </button>
 
       <a class="header-cta" href={DEMO_URL}>Ver la demo</a>
+
+      <!-- A <details> disclosure rather than a JS-driven panel: this is the
+           only navigation on a phone, and the page's primary channel is a
+           WhatsApp forward. The browser gives open/close state, keyboard
+           support and aria-expanded for free, so the menu still works with
+           JavaScript disabled. Navigation reloads the document, which closes
+           it, so there is nothing to reset. -->
+      <details class="menu">
+        <summary aria-label="Abrir el menú">
+          <svg class="i-bars" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17"></path>
+          </svg>
+          <svg class="i-x" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5.5 5.5l13 13M18.5 5.5l-13 13"></path>
+          </svg>
+        </summary>
+
+        <nav class="menu-panel" aria-label="Principal, móvil">
+          <ul>
+            {
+              NAV.map((n) => (
+                <li>
+                  <a
+                    href={n.href}
+                    aria-current={isActive(n.href) ? "page" : undefined}
+                  >
+                    {n.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          <a class="menu-cta" href={DEMO_URL}>Ver la demo</a>
+        </nav>
+      </details>
     </div>
   </div>
 </header>
@@ -89,14 +135,20 @@ const nav = [
   .brand img {
     border-radius: var(--border-radius-1);
   }
+
+  /* Caps, matching the product's own sidebar, which is visible inside the
+     screenshots further down the page. Caps need positive tracking to stop
+     reading as a solid block; lowercase does not. */
   .wordmark {
-    font-weight: 600;
-    font-size: 1rem;
-    letter-spacing: -0.01em;
+    font-weight: 700;
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
     white-space: nowrap;
   }
-  .wordmark b {
-    font-weight: 700;
+  .wm-1 {
+    color: var(--color-dark);
+  }
+  .wm-2 {
     color: var(--color-brand);
   }
 
@@ -122,6 +174,10 @@ const nav = [
       border-color var(--dur-fast) var(--ease-out);
   }
   .nav a:hover {
+    color: var(--color-dark);
+    border-bottom-color: var(--color-primary);
+  }
+  .nav a[aria-current="page"] {
     color: var(--color-dark);
     border-bottom-color: var(--color-primary);
   }
@@ -203,28 +259,117 @@ const nav = [
     box-shadow: var(--elev-2);
   }
 
+  /* ── Mobile disclosure ──────────────────────────────────────────────── */
+
+  .menu {
+    display: none;
+  }
+  .menu summary {
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 1px solid var(--color-light);
+    border-radius: var(--border-radius-2);
+    color: var(--color-dark-variant);
+    cursor: pointer;
+    list-style: none;
+  }
+  .menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .menu summary svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    grid-area: 1 / 1;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+  }
+  .menu .i-x {
+    display: none;
+  }
+  .menu[open] .i-bars {
+    display: none;
+  }
+  .menu[open] .i-x {
+    display: block;
+  }
+
+  .menu-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: var(--space-3);
+    background: var(--color-background);
+    border-bottom: 1px solid var(--color-light);
+    box-shadow: var(--elev-2);
+  }
+  .menu-panel ul {
+    list-style: none;
+    margin: 0 0 var(--space-3);
+    padding: 0;
+    display: grid;
+    gap: 0.15rem;
+  }
+  .menu-panel a {
+    display: block;
+    padding: 0.8rem 0.6rem;
+    border-radius: var(--border-radius-2);
+    color: var(--color-dark);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .menu-panel a:hover {
+    background: var(--color-white);
+  }
+  .menu-panel a[aria-current="page"] {
+    color: var(--color-primary-text);
+    background: var(--color-primary-light);
+  }
+  .menu-cta {
+    display: block;
+    padding: 0.85rem 1.2rem;
+    border-radius: var(--border-radius-2);
+    background: var(--color-primary-fill);
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  /* ── Breakpoints ────────────────────────────────────────────────────── */
+
   @media (max-width: 899px) {
     .nav {
       display: none;
     }
+    .menu {
+      display: block;
+    }
   }
-  /* The product name is the first impression for someone opening a forwarded
-     WhatsApp link, so it survives as far down as it fits — tightened rather
-     than dropped. Below 360px the row genuinely runs out of room and the mark
-     alone carries it. */
-  @media (max-width: 560px) {
+
+  /* The bar runs out of room before the wordmark does. The demo CTA is the
+     first thing to go, because the mobile menu carries a full-width copy of it
+     and every page's hero carries another. The product name stays: it is the
+     first impression for someone opening a forwarded WhatsApp link. */
+  @media (max-width: 559px) {
     .bar {
       gap: var(--space-2);
       padding-inline: var(--space-2);
     }
-    .wordmark {
-      font-size: 0.92rem;
-    }
     .header-cta {
-      padding: 0.55rem 0.85rem;
+      display: none;
     }
   }
-  @media (max-width: 359px) {
+  @media (max-width: 389px) {
+    .wordmark {
+      font-size: 0.82rem;
+    }
+  }
+  @media (max-width: 339px) {
     .wordmark {
       display: none;
     }
@@ -296,5 +441,20 @@ const nav = [
     };
     addEventListener("scroll", onScroll, { passive: true });
     onScroll();
+  }
+
+  // Enhancements only. The disclosure already opens, closes and traps focus
+  // correctly without any of this.
+  const menu = document.querySelector<HTMLDetailsElement>(".menu");
+  if (menu) {
+    addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && menu.open) {
+        menu.open = false;
+        menu.querySelector("summary")?.focus();
+      }
+    });
+    document.addEventListener("click", (ev) => {
+      if (menu.open && !menu.contains(ev.target as Node)) menu.open = false;
+    });
   }
 </script>

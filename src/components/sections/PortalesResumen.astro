@@ -1,0 +1,88 @@
+---
+import { portals } from "../../data/site";
+---
+
+<section class="band portals-summary">
+  <div class="wrap">
+    <div class="narrow reveal">
+      <h2>Tres portales, un solo sistema</h2>
+      <p>
+        La dirección configura el colegio, los docentes llevan sus clases y los
+        estudiantes consultan lo suyo. Todo sobre la misma información.
+      </p>
+    </div>
+
+    <ul class="lineup reveal">
+      {
+        portals.map((p) => (
+          <li>
+            <a href={`/portales#${p.id}`}>
+              <span class="lineup-label">{p.label}</span>
+              <span class="lineup-body">{p.short}</span>
+              <span class="lineup-more" aria-hidden="true">
+                Ver el portal
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .lineup {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .lineup a {
+    display: grid;
+    gap: 0.5rem;
+    height: 100%;
+    padding: var(--space-4);
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--card-border-radius);
+    text-decoration: none;
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .lineup a:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--elev-2);
+  }
+
+  .lineup-label {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--color-dark);
+  }
+  .lineup-body {
+    color: var(--color-dark-variant);
+    font-size: 0.98rem;
+  }
+  .lineup-more {
+    margin-top: auto;
+    padding-top: var(--space-2);
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-primary-text);
+  }
+
+  @media (min-width: 860px) {
+    .lineup {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lineup a:hover {
+      transform: none;
+    }
+  }
+</style>

@@ -1,0 +1,123 @@
+---
+import Layout from "../layouts/Layout.astro";
+import ThemedShot from "../components/ThemedShot.astro";
+import CierreCta from "../components/sections/CierreCta.astro";
+import { portals } from "../data/site";
+import { breadcrumbLd } from "../lib/schema";
+import { DEMO_URL } from "../config";
+---
+
+<Layout
+  title="Los tres portales: dirección, docentes y estudiantes"
+  description="Una consola para la dirección, una para cada docente y un portal para el estudiante. Notas, asistencia, horarios y matrícula sobre la misma información."
+>
+  <script
+    slot="head"
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(breadcrumbLd("Portales", "/portales"))}
+  />
+
+  <section class="page-head">
+    <div class="wrap narrow">
+      <p class="eyebrow">El producto</p>
+      <h1>Tres portales, un solo sistema</h1>
+      <p class="lede">
+        La dirección configura el colegio, los docentes llevan sus clases y los
+        estudiantes consultan lo suyo. Cada quien ve lo que le toca, y todos
+        sobre la misma información.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
+      </div>
+      <p class="note">
+        Es un colegio de ejemplo, con datos de ejemplo. Nada de lo que haga ahí
+        se guarda.
+      </p>
+    </div>
+  </section>
+
+  {
+    portals.map((p) => (
+      <section class="portal band" id={p.id}>
+        <div class="wrap">
+          <div class="portal-copy reveal">
+            <p class="portal-label">{p.label}</p>
+            <h2>{p.title}</h2>
+            <p>{p.body}</p>
+          </div>
+
+          <figure class="shot reveal">
+            <ThemedShot
+              light={p.image}
+              dark={p.imageDark}
+              alt={p.alt}
+              widths={[720, 1080, 1440]}
+              sizes="(min-width: 1180px) 1148px, calc(100vw - 3.2rem)"
+            />
+          </figure>
+
+          {p.extraImage && p.extraImageDark && (
+            <figure class="shot shot-extra reveal">
+              <ThemedShot
+                light={p.extraImage}
+                dark={p.extraImageDark}
+                alt={p.extraAlt ?? ""}
+                widths={[720, 1080, 1440]}
+                sizes="(min-width: 1180px) 1148px, calc(100vw - 3.2rem)"
+              />
+            </figure>
+          )}
+        </div>
+      </section>
+    ))
+  }
+
+  <CierreCta />
+</Layout>
+
+<style>
+  .page-head {
+    padding-block: var(--space-6) var(--space-5);
+  }
+
+  /* Stacked, not side-by-side. These are dense console screenshots: in a
+     two-column split the image lands at ~600px and the gradebook's rows stop
+     being readable, which defeats the only job this page has. Copy on a
+     measure-limited column, screenshot at the full container width.
+
+     Every portal is laid out identically. The previous right-aligned copy on
+     even portals broke the pattern for no reason and pulled attention to the
+     asymmetry rather than to the console being described. */
+  .portal {
+    padding-block: var(--space-5);
+  }
+
+  .portal-copy {
+    max-width: var(--measure);
+    margin-bottom: var(--space-4);
+  }
+
+  /* The portal's own name, not a small eyebrow. The reader has to know which
+     console they are looking at before they read the claim about it, and when
+     this was set at eyebrow scale the claim won every time. */
+  .portal-label {
+    display: inline-block;
+    margin-bottom: var(--space-2);
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--border-radius-1);
+    background: var(--color-primary-light);
+    color: var(--color-primary-text);
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  .portal h2 {
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+  }
+
+  .shot-extra {
+    margin-top: var(--space-3);
+  }
+</style>

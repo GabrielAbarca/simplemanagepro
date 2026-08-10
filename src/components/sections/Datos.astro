@@ -1,0 +1,120 @@
+---
+import { PRIVACY_URL } from "../../config";
+
+// Three vaults, one of them the reader's own. The section used to be three
+// paragraphs with nothing to look at, which is a waste of the strongest single
+// fact in the product: schools are not neighbours in a shared database.
+const vaults = [
+  { name: "Colegio A", own: false },
+  { name: "Su colegio", own: true },
+  { name: "Colegio B", own: false },
+];
+---
+
+<section class="band" id="datos">
+  <div class="wrap">
+    <div class="narrow reveal">
+      <h2>Los datos de su colegio no se mezclan con los de nadie.</h2>
+      <p>
+        Cada colegio recibe <strong>su propia base de datos</strong>. No es una
+        carpeta aparte dentro de un sistema compartido: es una base distinta, y
+        ninguna consulta puede cruzar de un colegio a otro. Se cifran en
+        tránsito y en reposo.
+      </p>
+    </div>
+
+    <div class="vaults reveal" aria-hidden="true">
+      {
+        vaults.map((v) => (
+          <div class:list={["vault", v.own && "is-own"]}>
+            <svg class="db" viewBox="0 0 40 44">
+              <ellipse cx="20" cy="9" rx="15" ry="6" />
+              <path d="M5 9v26c0 3.3 6.7 6 15 6s15-2.7 15-6V9" />
+              <path d="M5 18c0 3.3 6.7 6 15 6s15-2.7 15-6" />
+              <path d="M5 27c0 3.3 6.7 6 15 6s15-2.7 15-6" />
+            </svg>
+            <span class="vault-name">{v.name}</span>
+          </div>
+        ))
+      }
+    </div>
+    <p class="vaults-caption reveal">
+      Tres colegios, tres bases de datos. Ninguna consulta cruza de una a otra.
+    </p>
+
+    <div class="narrow reveal">
+      <p>
+        La región de alojamiento es Estados Unidos, lo que significa que los
+        expedientes se almacenan fuera de Costa Rica. Está dicho acá porque es
+        de lo primero que un colegio debería preguntar, y porque se trata de
+        expedientes de personas menores de edad.
+      </p>
+      <p>
+        <a href={PRIVACY_URL}>Leer la política de privacidad completa</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .vaults {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+
+  .vault {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-2);
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--card-border-radius);
+    /* The gap between the cards is the argument. Nothing bridges them. */
+  }
+
+  .vault.is-own {
+    border-color: color-mix(in srgb, var(--color-primary) 55%, transparent);
+    box-shadow: var(--elev-2);
+  }
+
+  .db {
+    width: 2.2rem;
+    height: 2.4rem;
+    fill: none;
+    stroke: var(--color-info-dark);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .is-own .db {
+    stroke: var(--color-primary);
+  }
+
+  .vault-name {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--color-dark-variant);
+    text-align: center;
+  }
+  .is-own .vault-name {
+    color: var(--color-dark);
+  }
+
+  .vaults-caption {
+    margin-top: var(--space-3);
+    margin-bottom: var(--space-5);
+    font-size: 0.9rem;
+    color: var(--color-info-dark);
+    text-align: center;
+  }
+
+  @media (min-width: 760px) {
+    .vaults {
+      gap: var(--space-4);
+      max-width: 46rem;
+      margin-inline: auto;
+    }
+  }
+</style>
