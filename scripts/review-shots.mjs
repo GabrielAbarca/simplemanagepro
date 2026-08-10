@@ -7,9 +7,16 @@
 
 import { chromium } from "playwright";
 import { mkdir } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { selectedRoutes } from "./routes.mjs";
 
-const OUT = process.env.REVIEW_OUT || "/tmp/review";
+// os.tmpdir(), not a literal "/tmp". Node on Windows resolves "/tmp/review"
+// against the current drive as C:\tmp\review, while the shell that launches it
+// translates the same string to the real temp directory — so the script wrote
+// its captures somewhere other than where they were being read from, and a
+// review looked like it had changed nothing.
+const OUT = process.env.REVIEW_OUT || path.join(os.tmpdir(), "review");
 const BASE = process.env.REVIEW_URL || "http://localhost:4321";
 const ROUTES = selectedRoutes();
 

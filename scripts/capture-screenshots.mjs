@@ -24,6 +24,23 @@ const OUT = path.resolve(process.cwd(), "src/assets/screenshots");
 const VIEWPORT = { width: 1440, height: 900 };
 const SCALE = 2;
 
+/**
+ * Second pass, for the hero's product fragments on a phone.
+ *
+ * The desktop capture cannot serve them. A fragment is only legible when it is
+ * displayed at roughly the CSS size the app drew it at, and the narrowest
+ * useful desktop crop (student name plus nota) is 1360 source px = 680 CSS px,
+ * against about 358px of usable width on a 390px screen. That is 0.53x, which
+ * is the same illegibility the desktop hero already had.
+ *
+ * Shooting the console at 390px instead lets the app lay itself out for a
+ * phone, so a crop that fits the column is a crop of a phone-sized UI at 1:1.
+ * 3x because a 390px viewport at 2x cannot fill a 3x device.
+ */
+const MOBILE_VIEWPORT = { width: 390, height: 844 };
+const MOBILE_SCALE = 3;
+const MOBILE_PORTALS = ["admin", "teacher-gradebook"];
+
 /** Light keeps the plain filename; dark takes a suffix. */
 const THEMES = [
   { name: "light", suffix: "" },
@@ -66,11 +83,13 @@ const PORTALS = [
   { file: "student", path: "/", ready: ".grade-overview, #grades-table, main" },
 ];
 
-async function capture(browser, theme) {
+async function capture(browser, theme, mobile = false) {
   const context = await browser.newContext({
-    viewport: VIEWPORT,
-    deviceScaleFactor: SCALE,
+    viewport: mobile ? MOBILE_VIEWPORT : VIEWPORT,
+    deviceScaleFactor: mobile ? MOBILE_SCALE : SCALE,
     locale: "es-CR",
+    isMobile: mobile,
+    hasTouch: mobile,
   });
 
   // The page's inline <head> guard reads this before first paint, so seeding
@@ -87,7 +106,11 @@ async function capture(browser, theme) {
   await page.locator("form").first().evaluate((f) => f.requestSubmit());
   await page.waitForURL(/\/admin\b/, { timeout: 30_000 });
 
-  for (const portal of PORTALS) {
+  const wanted = mobile
+    ? PORTALS.filter((p) => MOBILE_PORTALS.includes(p.file))
+    : PORTALS;
+
+  for (const portal of wanted) {
     await page.goto(`${BASE}${portal.path}`, { waitUntil: "networkidle" });
     await page
       .locator(portal.ready)
@@ -95,7 +118,16 @@ async function capture(browser, theme) {
       .waitFor({ state: "visible", timeout: 30_000 })
       .catch(() => {});
 
-    for (const step of portal.steps ?? []) {
+    // At 390px the console's sidebar collapses behind #menu-btn, so every
+    // step that navigates via a sidebar link has to open it first. Closing it
+    // again matters: an open drawer covers the content being captured.
+    const steps = portal.steps ?? [];
+    if (mobile && steps.length) {
+      await page.locator("#menu-btn").click().catch(() => {});
+      await page.waitForTimeout(400);
+    }
+
+    for (const step of steps) {
       if (step.select) {
         await page.locator(step.select).selectOption({ index: step.index });
       } else {
@@ -106,6 +138,11 @@ async function capture(browser, theme) {
         .first()
         .waitFor({ state: "visible", timeout: 30_000 })
         .catch(() => console.warn(`    (never saw ${step.wait} on ${portal.file})`));
+    }
+
+    if (mobile) {
+      await page.locator("#close-btn").click().catch(() => {});
+      await page.waitForTimeout(300);
     }
 
     // The readiness selectors above are per-portal guesses; this is the check
@@ -128,9 +165,12 @@ async function capture(browser, theme) {
     // Let entrance transitions land before the shutter.
     await page.waitForTimeout(900);
 
-    const file = path.join(OUT, `${portal.file}${theme.suffix}.png`);
+    const prefix = mobile ? "m-" : "";
+    const file = path.join(OUT, `${prefix}${portal.file}${theme.suffix}.png`);
     await page.screenshot({ path: file });
-    console.log(`  ${theme.name.padEnd(5)} ${portal.file} → ${path.relative(process.cwd(), file)}`);
+    console.log(
+      `  ${theme.name.padEnd(5)} ${prefix}${portal.file} → ${path.relative(process.cwd(), file)}`,
+    );
   }
 
   await context.close();
@@ -138,7 +178,14 @@ async function capture(browser, theme) {
 
 const browser = await chromium.launch();
 await mkdir(OUT, { recursive: true });
+
 console.log(`Capturing ${BASE} at ${VIEWPORT.width}x${VIEWPORT.height} @${SCALE}x`);
 for (const theme of THEMES) await capture(browser, theme);
+
+console.log(
+  `Capturing ${MOBILE_VIEWPORT.width}x${MOBILE_VIEWPORT.height} @${MOBILE_SCALE}x for the hero fragments`,
+);
+for (const theme of THEMES) await capture(browser, theme, true);
+
 await browser.close();
 console.log("Done.");

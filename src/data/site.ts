@@ -49,7 +49,7 @@ export const portals: Portal[] = [
     body: "Categorías ponderadas, notas por periodo, asistencia por sección, registro disciplinario e informe de progreso listo para imprimir. Al cerrar el periodo, las notas ya están donde tienen que estar.",
     image: gradebookShot,
     imageDark: gradebookShotDark,
-    alt: "Libro de notas de Matemáticas, Duodécimo Sección 1, mostrando la nota de cada estudiante en el I Periodo.",
+    alt: "Libro de notas de Matemáticas, Undécimo Sección 1, mostrando la nota de cada estudiante en el II Periodo.",
     extraImage: teacherShot,
     extraImageDark: teacherShotDark,
     extraAlt:

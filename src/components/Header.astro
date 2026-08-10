@@ -401,13 +401,21 @@ const isActive = (href: string) =>
   // page carries its own toggle, so an explicit choice has to rewrite the
   // query itself. "not all" never matches, "all" always does — which is how
   // the screenshots follow the toggle instead of the operating system.
-  // Only the dark source is touched; the light one is the fallback either way.
+  // Only the dark sources are touched; the light ones are the fallback either
+  // way.
+  //
+  // The attribute's VALUE is any condition that has to survive the rewrite.
+  // The hero's fragment also switches on viewport, so its mobile dark source
+  // carries "(max-width: 999px)" and must keep it when dark is selected —
+  // rewriting that one to a bare "all" would hand the phone crop to desktop.
+  // Blank means the source has no condition beyond the theme.
   const syncShots = () => {
     const dark = isDark();
     document
       .querySelectorAll<HTMLSourceElement>("[data-dark-source]")
       .forEach((s) => {
-        s.media = dark ? "all" : "not all";
+        const extra = s.getAttribute("data-dark-source") || "";
+        s.media = dark ? extra || "all" : "not all";
       });
   };
 
