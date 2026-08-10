@@ -71,8 +71,23 @@
   --color-white: #fff;
   --color-background: #f6f6f9;
   --color-dark: #363949;
-  --color-dark-variant: #667281;
-  --color-info-dark: #627388;
+
+  /* Darkened away from the app's #667281 / #627388, deliberately, and the one
+     token divergence this page takes from the product.
+
+     The app's values clear 4.5:1 on a flat surface by 0.09 and 0.07. That is
+     enough for a console, which is flat everywhere, and not enough for a
+     marketing page, where anything decorative behind text spends the margin
+     immediately: the hero's own wash tints the background to #f4f4f7 and drops
+     them to 4.46:1 and 4.42:1. The previous pass answered that by keeping all
+     decoration off the type, which is why the page had a gradient in exactly
+     one place and flat bands everywhere else.
+
+     Both now clear 6:1 on #f6f6f9, so roughly 1.5 points are available for
+     tint, glow and gradient behind body copy. Run `npm run audit:contrast`
+     after changing either. */
+  --color-dark-variant: #515c6b; /* 6.34:1 on --color-background */
+  --color-info-dark: #4e5c70; /* 6.35:1 on --color-background */
   --color-light: rgba(132, 139, 200, 0.18);
   --color-primary-text: #4455e6;
 
@@ -146,7 +161,7 @@
     --color-white: #202528;
     --color-dark: #edeffd;
     --color-dark-variant: #a3bdcc;
-    --color-info-dark: #7d8da1;
+    --color-info-dark: #8f9eb1; /* 6.38:1 on the dark page; was 5.14:1 */
     --color-light: rgba(0, 0, 0, 0.4);
 
     /* Light mode DARKENS a hue to clear 4.5:1 on white; dark mode has to
@@ -170,7 +185,7 @@
   --color-white: #202528;
   --color-dark: #edeffd;
   --color-dark-variant: #a3bdcc;
-  --color-info-dark: #7d8da1;
+  --color-info-dark: #8f9eb1; /* 6.38:1 on the dark page; was 5.14:1 */
   --color-light: rgba(0, 0, 0, 0.4);
 
   /* Repeated verbatim from the media query above — see the note there. An
