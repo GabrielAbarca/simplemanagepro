@@ -227,12 +227,17 @@ const GLYPHS: Record<Patchwork, string[]> = {
 
   @media (min-width: 760px) {
     .contrast {
-      grid-template-columns: 1fr 8rem 1fr;
+      grid-template-columns: 1fr 9.5rem 1fr;
     }
     .scatter {
       grid-template-columns: 1fr 1fr;
     }
+    /* Stretched to the row, not centred in it. At a fixed height the wedge was
+       shorter than the stack it is supposed to be gathering, so it read as a
+       triangle sitting between two columns rather than as six things
+       narrowing into one. */
     .funnel {
+      align-self: stretch;
       min-height: 11rem;
     }
     .wedge {
