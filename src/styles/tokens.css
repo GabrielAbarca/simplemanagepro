@@ -113,6 +113,25 @@
      as a text or fill colour, so it needs no contrast audit. */
   --color-primary-accent: #a78bfa;
 
+  /* One hue per portal, so the three consoles are the same three objects
+     wherever they appear: the home lineup, the /portales hero ornament, each
+     portal's badge and its folded corner. Without this the three read as three
+     copies of one card, which is exactly the complaint they drew.
+
+     FILLS, not text. Each is dark enough to carry #fff above 4.5:1, and a
+     fill's contrast is a property of the fill rather than of the theme, so
+     none of them is overridden in dark — same reasoning as
+     --color-primary-fill. Never set one as `color` on the page background:
+     periwinkle is already borderline there, which is what --color-primary-text
+     exists to solve.
+
+     Not crimson. --color-brand is identity only (the mark, the wordmark, the
+     crease); if a portal wore it, red would mean "action" here and "brand"
+     three sections later. */
+  --accent-direccion: #5a69e9; /* 4.53:1 with #fff */
+  --accent-docente: #7c5cd6; /* 4.62:1 with #fff */
+  --accent-estudiante: #0b7a5c; /* 5.09:1 with #fff */
+
   --card-border-radius: 1.6rem;
   --border-radius-1: 0.4rem;
   --border-radius-2: 0.8rem;

@@ -11,11 +11,11 @@
 // card has to be set in Poppins and librsvg would silently fall back to
 // whatever font the machine happens to have.
 //
-// The product visual is the director console's own overview tiles — §8 asks
-// for the director console specifically, and these three numbers are the ones
-// a director reads instantly. It is the cropped strip (see make-derived.mjs),
-// so neither "Bienvenido, Demo Account" nor the Sunday "Sin datos" can appear
-// on the one image that gets forwarded without context.
+// The product visual is the director console, whole and bleeding off the right
+// edge — §8 asks for the director console specifically. It used to be a cropped
+// strip of three overview tiles, which kept "Bienvenido, Demo Account" off the
+// one image that gets forwarded without context. The card now matches the page:
+// a whole console, because a strip of tiles does not read as a product.
 
 import { chromium } from "playwright";
 import path from "node:path";
@@ -84,9 +84,14 @@ const html = `<!doctype html>
   .foot .dot { width: 5px; height: 5px; border-radius: 50%; background: #667281; opacity: .5; }
   .foot .muted { color: #667281; font-weight: 400; }
 
+  /* Bleeds past the right edge. A whole 1280px console shown at 560px is 0.44x,
+     which is far too small to read — and reading is not this image's job. It
+     has to be recognised as a working dashboard in a WhatsApp preview at about
+     a third of this size, and a frame that runs off the edge does that better
+     than a smaller one floating inside the card. */
   .shot {
-    position: absolute; right: 74px; top: 50%;
-    width: 268px; transform: translateY(-50%) rotate(-3deg);
+    position: absolute; right: -100px; top: 50%;
+    width: 560px; transform: translateY(-50%) rotate(-3deg);
     border-radius: 16px; overflow: hidden;
     box-shadow: 0 12px 28px rgba(24,26,30,.12), 0 36px 68px rgba(24,26,30,.16);
     outline: 1px solid rgba(132,139,200,.18);
@@ -113,7 +118,7 @@ const html = `<!doctype html>
 </div>
 
 <div class="shot">
-  <img src="${asset("src/assets/screenshots/admin-stats.png")}" alt="">
+  <img src="${asset("src/assets/screenshots/admin.png")}" alt="">
 </div>
 `;
 

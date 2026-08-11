@@ -2,12 +2,18 @@ import type { ImageMetadata } from "astro";
 
 import adminShot from "../assets/screenshots/admin.png";
 import adminShotDark from "../assets/screenshots/admin-dark.png";
+import adminShotM from "../assets/screenshots/m-admin.png";
+import adminShotMDark from "../assets/screenshots/m-admin-dark.png";
 import teacherShot from "../assets/screenshots/teacher.png";
 import teacherShotDark from "../assets/screenshots/teacher-dark.png";
+import teacherShotM from "../assets/screenshots/m-teacher.png";
+import teacherShotMDark from "../assets/screenshots/m-teacher-dark.png";
 import gradebookShot from "../assets/screenshots/teacher-gradebook.png";
 import gradebookShotDark from "../assets/screenshots/teacher-gradebook-dark.png";
 import studentShot from "../assets/screenshots/student.png";
 import studentShotDark from "../assets/screenshots/student-dark.png";
+import studentShotM from "../assets/screenshots/m-student.png";
+import studentShotMDark from "../assets/screenshots/m-student-dark.png";
 
 export interface Portal {
   id: string;
@@ -19,8 +25,20 @@ export interface Portal {
   /** One line for the home page's condensed lineup. */
   short: string;
   body: string;
+  /** Three concrete things this console does, so a card is not one claim and a
+   *  picture. Kept to three: a fourth turns a card into a feature list. */
+  capabilities: string[];
+  /** Which of the three portal accents this console wears, everywhere it
+   *  appears. See tokens.css for why these are fills and never text. */
+  accent: string;
+  /** Drawn wireframe used where a screenshot would be too small to read. */
+  glyph: "direccion" | "docente" | "estudiante";
   image: ImageMetadata;
   imageDark: ImageMetadata;
+  /** 390@3x capture, so a phone gets a phone-shaped console at 1:1 instead of
+   *  a desktop frame at 0.3x. */
+  mobileImage: ImageMetadata;
+  mobileImageDark: ImageMetadata;
   alt: string;
   /** Second capture, shown only on /portales where there is room for it. */
   extraImage?: ImageMetadata;
@@ -36,8 +54,17 @@ export const portals: Portal[] = [
     short:
       "Curso lectivo, periodos, secciones, materias, docentes y matrícula, en un solo tablero.",
     body: "Curso lectivo y periodos, niveles, secciones, aulas, materias, docentes, horarios, expedientes y matrícula. La matrícula entra directamente desde un archivo de Excel.",
+    capabilities: [
+      "Curso lectivo y periodos, con sus fechas",
+      "Niveles, secciones, aulas y horarios",
+      "Matrícula importada desde su archivo de Excel",
+    ],
+    accent: "var(--accent-direccion)",
+    glyph: "direccion",
     image: adminShot,
     imageDark: adminShotDark,
+    mobileImage: adminShotM,
+    mobileImageDark: adminShotMDark,
     alt: "Consola de administración mostrando el resumen del Colegio Técnico Profesional SMP: matrícula total, docentes, materias, secciones y aulas en uso.",
   },
   {
@@ -47,8 +74,22 @@ export const portals: Portal[] = [
     short:
       "Categorías ponderadas, asistencia por sección e informe de progreso listo para imprimir.",
     body: "Categorías ponderadas, notas por periodo, asistencia por sección, registro disciplinario e informe de progreso listo para imprimir. Al cerrar el periodo, las notas ya están donde tienen que estar.",
+    capabilities: [
+      "Categorías ponderadas por periodo",
+      "Asistencia por sección, también desde el teléfono",
+      "Informe de progreso listo para imprimir",
+    ],
+    accent: "var(--accent-docente)",
+    glyph: "docente",
     image: gradebookShot,
     imageDark: gradebookShotDark,
+    // "Mis clases" rather than the gradebook on phones, and this is a
+    // workaround with an expiry date: the app's custom select collapses to
+    // width 0 below its desktop breakpoint, so the gradebook's periodo control
+    // captures as an empty box. Tracked in SMP-Web-Page; swap this back to the
+    // m-teacher-gradebook pair once it is fixed.
+    mobileImage: teacherShotM,
+    mobileImageDark: teacherShotMDark,
     alt: "Libro de notas de Matemáticas, Undécimo Sección 1, mostrando la nota de cada estudiante en el II Periodo.",
     extraImage: teacherShot,
     extraImageDark: teacherShotDark,
@@ -62,23 +103,38 @@ export const portals: Portal[] = [
     short:
       "Promedio, asistencia, horario semanal y notas por periodo, desde el teléfono.",
     body: "Promedio, porcentaje de asistencia, notas por materia y periodo, horario semanal, docentes y la cartelera de eventos del colegio. Consultable en cualquier momento, desde el teléfono.",
+    capabilities: [
+      "Promedio y porcentaje de asistencia al día",
+      "Notas por materia y por periodo",
+      "Horario semanal y cartelera del colegio",
+    ],
+    accent: "var(--accent-estudiante)",
+    glyph: "estudiante",
     image: studentShot,
     imageDark: studentShotDark,
+    mobileImage: studentShotM,
+    mobileImageDark: studentShotMDark,
     alt: "Portal del estudiante mostrando asistencia, promedio de notas, resumen de calificaciones por periodo y próximos eventos.",
   },
 ];
 
 /** Section 2's visual contrast. Each item is one of the sources that has to be
  *  reconciled by hand at period close, named as an object the director
- *  recognises rather than as an abstraction. */
-export const patchwork = [
-  { label: "Notas de 7° A", meta: "notas_7A_final.xlsx" },
-  { label: "Asistencia", meta: "cuaderno, en papel" },
-  { label: "Notas de 8° B", meta: "copia_de_notas_v3.xlsx" },
-  { label: "Grupo de docentes", meta: "WhatsApp" },
-  { label: "Matrícula 2026", meta: "matricula_ok.xlsx" },
-  { label: "Notas de 9° A", meta: "notas9A_REVISADO.xlsx" },
+ *  recognises rather than as an abstraction.
+ *
+ *  `kind` picks the glyph. Six identical pills said "six things"; six things
+ *  that are visibly a spreadsheet, a paper cuaderno and a chat thread say what
+ *  KIND of mess it is, which is the part the director recognises. */
+export const patchwork: { label: string; meta: string; kind: Patchwork }[] = [
+  { label: "Notas de 7° A", meta: "notas_7A_final.xlsx", kind: "sheet" },
+  { label: "Asistencia", meta: "cuaderno, en papel", kind: "paper" },
+  { label: "Notas de 8° B", meta: "copia_de_notas_v3.xlsx", kind: "sheet" },
+  { label: "Grupo de docentes", meta: "WhatsApp", kind: "chat" },
+  { label: "Matrícula 2026", meta: "matricula_ok.xlsx", kind: "sheet" },
+  { label: "Notas de 9° A", meta: "notas9A_REVISADO.xlsx", kind: "sheet" },
 ];
+
+export type Patchwork = "sheet" | "paper" | "chat";
 
 export const pilotGives = [
   "El sistema configurado con la estructura de su colegio: curso lectivo, periodos, niveles, secciones, materias, docentes y horarios.",
@@ -93,25 +149,77 @@ export const pilotAsks = [
   "Permiso para nombrar al colegio públicamente, si el primer periodo cierra bien.",
 ];
 
-/** The old "Qué no incluye" list, reframed.
+/** The questions a director actually asks before the first meeting.
  *
- *  Same three facts, and none of them softened: BRIEF §7 keeps this as a trust
- *  device and the candor is the whole point. What changed is the framing. A
- *  list of deficits under "para que no lo descubra en la primera reunión"
- *  announces bad news before the reader has asked; the same content as the
- *  director's own questions, answered straight, reads as candor instead. It
- *  also moved off the home page, where it was the first impression. */
+ *  This block began as "Qué no incluye" and then as three deficits reframed as
+ *  questions. Gabriel's call, August 2026: the no-encargado-portal and
+ *  no-colegios-yet answers come off the page and get handled in the
+ *  conversation, where they can be answered with context. Recorded in BRIEF §7
+ *  rather than taken quietly.
+ *
+ *  Data residency stays, here and in the home page's Datos section. It is the
+ *  one a colegio should ask first, it is already in the privacy policy, and
+ *  volunteering it is worth more than it costs.
+ *
+ *  These are marked up as FAQPage (lib/schema.ts). The questions in the graph
+ *  and the questions on the page must stay identical: marking up copy the
+ *  reader cannot see is a structured-data violation, not a shortcut. */
 export const faq = [
   {
-    q: "¿Hay un portal para los encargados?",
-    a: "No. Los encargados figuran como contacto en el expediente del estudiante, y son los docentes quienes los consultan. No tienen usuario propio.",
+    q: "¿Se puede dejar un colegio configurado desde cero en menos de una hora?",
+    a: "La estructura sí: curso lectivo, periodos, niveles, secciones, materias y aulas se configuran en esa primera sesión, y la matrícula entra importada desde su archivo de Excel. Lo que toma tiempo no es el sistema, es ponerse de acuerdo en cómo está organizado el colegio.",
   },
   {
-    q: "¿Qué colegios lo usan hoy?",
-    a: "Ninguno todavía. Por eso esto es un piloto y no una venta, y por eso el primer curso lectivo se acompaña de cerca.",
+    q: "¿Cada docente entra con su propia cuenta?",
+    a: "Sí. Cada docente recibe su usuario y ve únicamente sus secciones, sus materias y sus estudiantes. La dirección crea y desactiva esas cuentas desde su consola, sin depender de nadie más.",
+  },
+  {
+    q: "¿Los estudiantes también entran?",
+    a: "Sí, con su propio usuario. Ven su promedio, su porcentaje de asistencia, su horario semanal y sus notas por materia y periodo. No pueden modificar nada.",
+  },
+  {
+    q: "¿Podemos traer lo que ya tenemos en Excel?",
+    a: "Sí. La matrícula se importa desde el archivo que el colegio ya usa, y lo mismo con docentes y secciones. No hay que volver a digitar el colegio entero para empezar.",
+  },
+  {
+    q: "¿Esto reemplaza algo del MEP?",
+    a: "No. Simple Manage Pro no reemplaza nada del MEP. Ordena la información que el colegio ya maneja por dentro: notas, asistencia, horarios, expedientes y matrícula.",
+  },
+  {
+    q: "¿Funciona desde el teléfono?",
+    a: "Sí. Docentes y estudiantes entran desde el teléfono con el mismo usuario, que es donde se pasa asistencia y donde se consultan notas. La configuración del colegio se hace más cómoda desde una computadora.",
   },
   {
     q: "¿Dónde se alojan los expedientes?",
     a: "En Estados Unidos, fuera del país. Está dicho también en la política de privacidad, y es de lo primero que un colegio debería preguntar.",
+  },
+  {
+    q: "¿Y si algo falla durante el curso lectivo?",
+    a: "Escribe por WhatsApp y le contesta la persona que construyó el sistema y puede cambiarlo. Por eso el piloto es de tres colegios y no de treinta.",
+  },
+];
+
+/** /nosotros. Dates carry real information here, which is what justifies a
+ *  timeline rather than three paragraphs. */
+export const story = [
+  {
+    year: "2024",
+    title: "Un proyecto de feria científica",
+    body: "El problema es el mismo que sigue siendo hoy: al cierre de cada periodo, alguien arma las notas a mano desde archivos sueltos.",
+  },
+  {
+    year: "2025",
+    title: "De prototipo a sistema",
+    body: "Las tres consolas, los periodos ponderados, la asistencia por sección y la matrícula. Deja de ser un proyecto y empieza a ser software.",
+  },
+  {
+    year: "2026",
+    title: "Una demo pública, con datos costarricenses",
+    body: "Curso lectivo, secciones, cédula y materias en español, abierta para que cualquier colegio la revise sin pedir permiso ni dejar datos.",
+  },
+  {
+    year: "2027",
+    title: "Tres colegios",
+    body: "El piloto arranca en febrero, con el curso lectivo. Cada colegio con su estructura y su propia base de datos.",
   },
 ];

@@ -4,6 +4,19 @@
 //
 // Keep in step with src/config.ts NAV plus "/".
 
+/** Where the harnesses look for the site.
+ *
+ *  Only one process can hold :4321. A second `npm run preview` silently moves
+ *  to :4322 and every harness then measures the STALE build, which reads as
+ *  "my change did nothing" and has cost a session before. When something else
+ *  already has the port — a dev server someone left running — start preview
+ *  elsewhere and point the harnesses at it rather than guessing:
+ *
+ *      npx astro preview --port 4325
+ *      PREVIEW_URL=http://localhost:4325 npm run audit:contrast
+ */
+export const BASE_URL = process.env.PREVIEW_URL || "http://localhost:4321";
+
 export const ROUTES = [
   { path: "/", slug: "home" },
   { path: "/portales/", slug: "portales" },

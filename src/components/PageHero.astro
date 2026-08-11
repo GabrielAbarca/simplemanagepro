@@ -1,0 +1,105 @@
+---
+/**
+ * The opening of every route that is not the home page.
+ *
+ * All four used to be a bare `.page-head`: eyebrow, h1, lede, and nothing
+ * else. On the two routes that carry the product's core arguments — the three
+ * portals, and the pilot itself — that meant the most important pages on the
+ * site opened flatter than the home page's second section.
+ *
+ * This gives them the same folded sheet the home hero establishes, at a
+ * shallower angle so a page hero reads as the same object rather than as a
+ * copy of it, plus one ornament each. The ornament slot is the point: each
+ * page gets a device drawn from its own subject, not a stock illustration, so
+ * the decoration is also a preview of what the page is about.
+ */
+interface Props {
+  eyebrow: string;
+  title: string;
+  lede?: string;
+  /** Widen the copy column when there is no ornament to sit beside it. */
+  wide?: boolean;
+  class?: string;
+}
+
+const { eyebrow, title, lede, wide = false, class: className } = Astro.props;
+const hasOrnament = Astro.slots.has("ornament");
+---
+
+<section class:list={["page-hero", "fold-hero", className]}>
+  <div class="fold" aria-hidden="true">
+    <span class="face face-up"></span>
+    <span class="face face-down"></span>
+    <span class="crease"></span>
+    <span class="rule"></span>
+  </div>
+
+  <div class:list={["wrap", "hero-grid", hasOrnament && "has-ornament"]}>
+    <div class:list={["hero-copy", wide && "is-wide"]}>
+      <p class="eyebrow">{eyebrow}</p>
+      <h1>{title}</h1>
+      {lede && <p class="lede">{lede}</p>}
+      <slot />
+    </div>
+
+    {
+      hasOrnament && (
+        <div class="hero-ornament">
+          <slot name="ornament" />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  /* Shallower than the home hero's 90/54: this box is roughly half as tall,
+     and carrying the same percentages across it turns the fold into a wedge. */
+  .page-hero {
+    --fold-left: 84%;
+    --fold-right: 58%;
+    padding-block: var(--space-6) var(--space-5);
+  }
+
+  .hero-grid {
+    display: grid;
+    gap: var(--space-5);
+    align-items: center;
+  }
+
+  .hero-copy {
+    animation: rise var(--dur-slow) var(--ease-out) both;
+    max-width: 40ch;
+  }
+  .hero-copy.is-wide {
+    max-width: 52ch;
+  }
+
+  .page-hero h1 {
+    font-size: clamp(2.1rem, 4.2vw, 3.1rem);
+  }
+
+  .hero-ornament {
+    animation: rise var(--dur-slow) 120ms var(--ease-out) both;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(1.2rem);
+    }
+  }
+
+  @media (min-width: 1000px) {
+    .hero-grid.has-ornament {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-copy,
+    .hero-ornament {
+      animation: none;
+    }
+  }
+</style>

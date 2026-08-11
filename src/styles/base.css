@@ -85,6 +85,126 @@ h3 {
   margin-bottom: var(--space-5);
 }
 
+/* ── The fold, at hero scale ────────────────────────────────────────────── */
+
+/* The brand mark is a crimson ribbon folded back on itself, with the darker
+   crimson on the underside of each fold. This is that shape at page scale: two
+   surfaces meeting along a diagonal crease, the upper one lit, the lower one
+   turned away, and the crease catching brand light where it breaks.
+   Decorative, so the markup that carries it is aria-hidden.
+
+   All of it is clip-path and gradients. No image, no WebGL, nothing that costs
+   a slow Android anything to paint, which matters because the primary channel
+   is a WhatsApp forward opened on mobile data.
+
+   It lived scoped inside Hero.astro while the home page was the only route
+   with a decorated hero. Four more routes need it now, and Astro scopes
+   component styles, so a second copy in each page's <style> would be four
+   places to keep in step. The crease's two ends are variables because the home
+   hero is tall and a page hero is not: the same percentages across a shorter
+   box read as a much steeper wedge. */
+.fold-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  --fold-left: 90%;
+  --fold-right: 54%;
+}
+
+.fold-hero > .fold {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.fold .face {
+  position: absolute;
+  inset: 0;
+}
+
+/* Upper surface: turned toward the light, so it carries the tint. The two
+   clip-paths share their percentages, which is what makes the faces meet
+   exactly instead of leaving a seam.
+
+   The crease runs low on the left and high on the right so it stays clear of
+   the copy block and passes behind the product shot instead. An earlier pass
+   ran it at 76%/44% and it cut straight through the CTA row, where it read as
+   a stray line rather than as an edge. */
+.fold .face-up {
+  background: linear-gradient(
+    152deg,
+    color-mix(in srgb, var(--color-primary) 16%, var(--color-background)) 0%,
+    color-mix(in srgb, var(--color-primary-accent) 10%, var(--color-background))
+      42%,
+    color-mix(in srgb, var(--color-primary) 5%, var(--color-background)) 82%
+  );
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% var(--fold-right),
+    0 var(--fold-left)
+  );
+}
+
+/* Lower surface: the underside, turned away. Left at the flat page colour so
+   the step across the crease is the whole effect. */
+.fold .face-down {
+  background: var(--color-background);
+  clip-path: polygon(
+    0 var(--fold-left),
+    100% var(--fold-right),
+    100% 100%,
+    0 100%
+  );
+}
+
+/* Where the sheet breaks. Crimson at the left, cooling into the product's
+   periwinkle as it runs right, fading out at both ends so it never terminates
+   on a hard edge. This is the only place the brand colour appears outside the
+   wordmark. */
+.fold .crease {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    92deg,
+    transparent 0%,
+    var(--color-brand) 24%,
+    var(--color-primary-accent) 58%,
+    var(--color-primary) 80%,
+    transparent 100%
+  );
+  opacity: 0.55;
+  clip-path: polygon(
+    0 calc(var(--fold-left) - 0.3%),
+    100% calc(var(--fold-right) - 0.3%),
+    100% calc(var(--fold-right) + 0.3%),
+    0 calc(var(--fold-left) + 0.3%)
+  );
+}
+
+/* A wider, much fainter wash just under the crease, so the light looks like it
+   falls off the edge instead of stopping at it. */
+.fold .rule {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    92deg,
+    transparent,
+    color-mix(in srgb, var(--color-primary) 38%, transparent) 60%,
+    transparent
+  );
+  opacity: 0.45;
+  filter: blur(26px);
+  clip-path: polygon(
+    0 calc(var(--fold-left) - 2%),
+    100% calc(var(--fold-right) - 2%),
+    100% calc(var(--fold-right) + 6%),
+    0 calc(var(--fold-left) + 6%)
+  );
+}
+
 /* ── The fold, continued ────────────────────────────────────────────────── */
 
 /* The hero establishes the page as a sheet folded back on itself. This carries
@@ -193,6 +313,152 @@ h3 {
   border-left: 2px solid var(--color-light);
 }
 
+/* ── Cards ──────────────────────────────────────────────────────────────── */
+
+/* Two tiers, on purpose.
+ *
+ * Every block on the site used to be the same white box with the same 1px
+ * border: the three portals, the pilot's terms, the contact channels, the FAQ.
+ * When everything is a card, nothing on the page announces that it is the
+ * point of its section — which is the single reason the previous pass read as
+ * flat, and the reason the three portals looked like navigation rather than
+ * like the product.
+ *
+ * .card is the quiet tier. .card-lead is for the thing a section is actually
+ * about: it sits above the page rather than on it, and it is allowed one
+ * accent. Do not reach for .card-lead more than once or twice per page or it
+ * stops meaning anything.
+ *
+ * --accent is the hue a lead card wears. Defaults to the product's periwinkle
+ * so a card that sets nothing still looks deliberate.
+ */
+.card,
+.card-lead {
+  --accent: var(--color-primary-fill);
+  position: relative;
+  background: var(--color-white);
+  border: 1px solid var(--color-light);
+  border-radius: var(--card-border-radius);
+  padding: var(--space-4);
+}
+
+.card-lead {
+  padding: var(--space-4);
+  box-shadow: var(--elev-2);
+  border-color: color-mix(in srgb, var(--accent) 22%, var(--color-light));
+}
+
+@media (min-width: 760px) {
+  .card-lead {
+    padding: var(--space-4) var(--space-4) var(--space-4);
+  }
+}
+
+/* The dog-ear: the ribbon's turned-back corner at card scale, in the card's
+   own accent. Reserved for cards where a fold means something — the three
+   portals, and the two sides of the pilot's exchange — rather than applied to
+   everything as a texture.
+ *
+ * Drawn as a corner triangle rather than by clipping the card, because a
+ * clip-path on the box would take the elevation with it and elevation is half
+ * of what makes a lead card lead. */
+.card-fold::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-top-right-radius: var(--card-border-radius);
+  background: linear-gradient(
+    225deg,
+    var(--accent) 0 52%,
+    color-mix(in srgb, var(--accent) 55%, transparent) 52% 54%,
+    transparent 54%
+  );
+  transition: width var(--dur-mid) var(--ease-out),
+    height var(--dur-mid) var(--ease-out);
+}
+
+a.card-lead,
+a.card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast) var(--ease-out);
+}
+
+a.card-lead:hover,
+a.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--elev-3);
+}
+
+/* The corner lifts further as the card does. One micro-interaction, tied to
+   the motif, rather than a colour change that would say nothing. */
+a.card-fold:hover::after {
+  width: 3.2rem;
+  height: 3.2rem;
+}
+
+/* ── Chips and marked lists ─────────────────────────────────────────────── */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  background: var(--color-primary-light);
+  color: var(--color-dark);
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.chip svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* .plain marks an item with a border it shares with every other list on the
+   site. .icon-list gives each item a glyph, which is what lets two lists side
+   by side say different things — "this is what you get" against "this is what
+   we need from you" — before either is read. */
+.icon-list {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.icon-list li {
+  display: grid;
+  grid-template-columns: 1.6rem 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.icon-list svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-top: 0.1rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 /* ── Buttons ────────────────────────────────────────────────────────────── */
 
 .cta-row {
@@ -272,6 +538,35 @@ h3 {
   transform: none;
 }
 
+/* Stagger, with no new JavaScript.
+ *
+ * A .reveal-stagger element also carries .reveal, so Layout.astro's existing
+ * scroll sweep already finds it and already adds .is-in — the only difference
+ * is where the transition lives. The container stops animating itself and its
+ * children animate instead, each offset by its own index.
+ *
+ * Set --i inline from the template's map index. Items with no --i all land at
+ * once, which is the correct fallback rather than a broken one.
+ *
+ * The sweep is deliberately not an IntersectionObserver; see Layout.astro. */
+.js .reveal.reveal-stagger {
+  opacity: 1;
+  transform: none;
+}
+
+.js .reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(0.9rem);
+  transition:
+    opacity var(--dur-slow) var(--ease-out) calc(var(--i, 0) * 70ms),
+    transform var(--dur-slow) var(--ease-out) calc(var(--i, 0) * 70ms);
+}
+
+.js .reveal-stagger.is-in > * {
+  opacity: 1;
+  transform: none;
+}
+
 /* ── Breakpoints ────────────────────────────────────────────────────────── */
 
 @media (max-width: 999px) {
@@ -288,9 +583,20 @@ h3 {
     transform: none;
   }
 
-  .js .reveal {
+  .js .reveal,
+  .js .reveal-stagger > * {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+
+  a.card:hover,
+  a.card-lead:hover {
+    transform: none;
+  }
+
+  a.card-fold:hover::after {
+    width: 2.6rem;
+    height: 2.6rem;
   }
 }

@@ -9,7 +9,7 @@ import { chromium } from "playwright";
 import { mkdir } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { selectedRoutes } from "./routes.mjs";
+import { selectedRoutes, BASE_URL } from "./routes.mjs";
 
 // os.tmpdir(), not a literal "/tmp". Node on Windows resolves "/tmp/review"
 // against the current drive as C:\tmp\review, while the shell that launches it
@@ -17,7 +17,7 @@ import { selectedRoutes } from "./routes.mjs";
 // its captures somewhere other than where they were being read from, and a
 // review looked like it had changed nothing.
 const OUT = process.env.REVIEW_OUT || path.join(os.tmpdir(), "review");
-const BASE = process.env.REVIEW_URL || "http://localhost:4321";
+const BASE = process.env.REVIEW_URL || BASE_URL;
 const ROUTES = selectedRoutes();
 
 const VIEWS = [

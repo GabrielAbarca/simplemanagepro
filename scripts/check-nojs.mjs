@@ -1,12 +1,12 @@
 // Every page must render complete and readable with JavaScript disabled.
 import { chromium } from "playwright";
-import { ROUTES } from "./routes.mjs";
+import { ROUTES, BASE_URL } from "./routes.mjs";
 
 const b = await chromium.launch();
 const ctx = await b.newContext({ viewport: { width: 1440, height: 900 }, javaScriptEnabled: false });
 for (const r of ROUTES) {
   const p = await ctx.newPage();
-  await p.goto("http://localhost:4321" + r.path, { waitUntil: "load" });
+  await p.goto(BASE_URL + r.path, { waitUntil: "load" });
   const res = await p.evaluate(() => {
     const hidden = [...document.querySelectorAll(".reveal")].filter((e) => {
       const cs = getComputedStyle(e);

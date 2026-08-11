@@ -1,10 +1,12 @@
 ---
+import PortalGlyph from "../PortalGlyph.astro";
 import { portals } from "../../data/site";
 ---
 
-<section class="band portals-summary">
+<section class="band portals-summary fold-band">
   <div class="wrap">
     <div class="narrow reveal">
+      <p class="eyebrow">El producto</p>
       <h2>Tres portales, un solo sistema</h2>
       <p>
         La dirección configura el colegio, los docentes llevan sus clases y los
@@ -12,15 +14,39 @@ import { portals } from "../../data/site";
       </p>
     </div>
 
-    <ul class="lineup reveal">
+    <!-- These are the product, not navigation.
+         They used to be three white boxes with the same border as every other
+         block on the site, which is why they read as links rather than as the
+         three consoles the whole page is about. Each one now carries its own
+         accent, its own console shape and its own capabilities, and the folded
+         corner ties them to the mark. -->
+    <ul class="lineup reveal reveal-stagger">
       {
-        portals.map((p) => (
-          <li>
-            <a href={`/portales#${p.id}`}>
-              <span class="lineup-label">{p.label}</span>
-              <span class="lineup-body">{p.short}</span>
+        portals.map((p, i) => (
+          <li style={`--i:${i}`}>
+            <a
+              class="card-lead card-fold"
+              href={`/portales#${p.id}`}
+              style={`--accent:${p.accent}`}
+            >
+              <PortalGlyph variant={p.glyph} class="lineup-glyph" />
+              <h3 class="lineup-label">{p.label}</h3>
+              <p class="lineup-body">{p.short}</p>
+              <ul class="lineup-caps">
+                {p.capabilities.map((c) => (
+                  <li>
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                      <path d="M3 8.4 6.3 11.7 13 5" />
+                    </svg>
+                    {c}
+                  </li>
+                ))}
+              </ul>
               <span class="lineup-more" aria-hidden="true">
                 Ver el portal
+                <svg viewBox="0 0 16 16">
+                  <path d="M2.5 8h11M9.5 3.5 14 8l-4.5 4.5" />
+                </svg>
               </span>
             </a>
           </li>
@@ -41,48 +67,91 @@ import { portals } from "../../data/site";
 
   .lineup a {
     display: grid;
-    gap: 0.5rem;
+    gap: var(--space-2);
     height: 100%;
-    padding: var(--space-4);
-    background: var(--color-white);
-    border: 1px solid var(--color-light);
-    border-radius: var(--card-border-radius);
-    text-decoration: none;
-    transition:
-      transform var(--dur-fast) var(--ease-out),
-      box-shadow var(--dur-fast) var(--ease-out);
+    align-content: start;
   }
-  .lineup a:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--elev-2);
+
+  .lineup-glyph {
+    /* Kept clear of the folded corner. */
+    max-width: 11rem;
+    margin-bottom: var(--space-2);
   }
 
   .lineup-label {
+    font-size: 1.2rem;
     font-weight: 700;
-    font-size: 1.1rem;
     color: var(--color-dark);
+    margin: 0;
   }
+
   .lineup-body {
     color: var(--color-dark-variant);
     font-size: 0.98rem;
   }
-  .lineup-more {
-    margin-top: auto;
-    padding-top: var(--space-2);
-    font-weight: 600;
+
+  .lineup-caps {
+    list-style: none;
+    margin: var(--space-1) 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+  .lineup-caps li {
+    display: grid;
+    grid-template-columns: 1rem 1fr;
+    gap: 0.6rem;
+    align-items: start;
     font-size: 0.9rem;
+    color: var(--color-dark-variant);
+    line-height: 1.45;
+  }
+  .lineup-caps svg {
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.25rem;
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .lineup-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--color-light);
+    font-weight: 600;
+    font-size: 0.92rem;
     color: var(--color-primary-text);
+  }
+  .lineup-more svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: translate var(--dur-fast) var(--ease-out);
+  }
+  .lineup a:hover .lineup-more svg {
+    translate: 0.2rem 0;
   }
 
   @media (min-width: 860px) {
     .lineup {
       grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .lineup a:hover {
-      transform: none;
+    .lineup a:hover .lineup-more svg {
+      translate: none;
     }
   }
 </style>

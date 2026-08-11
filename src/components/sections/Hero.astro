@@ -1,27 +1,20 @@
 ---
-import HeroShot from "../HeroShot.astro";
-import ThemedShot from "../ThemedShot.astro";
+import ConsoleShot from "../ConsoleShot.astro";
 import { DEMO_URL } from "../../config";
+import { portals } from "../../data/site";
 
-import adminStats from "../../assets/screenshots/admin-stats.png";
-import adminStatsDark from "../../assets/screenshots/admin-stats-dark.png";
-import gradebook from "../../assets/screenshots/gradebook-rows.png";
-import gradebookDark from "../../assets/screenshots/gradebook-rows-dark.png";
-import gradebookM from "../../assets/screenshots/gradebook-rows-mobile.png";
-import gradebookMDark from "../../assets/screenshots/gradebook-rows-mobile-dark.png";
+const admin = portals[0];
+
+// Shown with the URL bar, so it has to be the URL the CTA actually opens.
+const demoHost = DEMO_URL.replace(/^https?:\/\//, "");
 ---
 
-<section class="hero">
-  <!-- The fold.
-       The brand mark is a crimson ribbon folded back on itself, with the
-       darker crimson on the underside of each fold. This is that shape at page
-       scale: two surfaces meeting along a diagonal crease, the upper one lit,
-       the lower one turned away, and the crease catching brand light where it
-       breaks. Decorative, so aria-hidden and pointer-events:none.
-
-       All of it is clip-path and gradients. No image, no WebGL, nothing that
-       costs a slow Android anything to paint, which matters because the
-       primary channel is a WhatsApp forward opened on mobile data. -->
+<section class="hero fold-hero">
+  <!-- The fold. The brand mark is a crimson ribbon folded back on itself, and
+       this is that shape at page scale. Geometry lives in base.css; the hero
+       only sets where the crease crosses, which here is right where the copy
+       ends and the console begins, so the product reads as resting on the
+       turned-back face of the sheet. -->
   <div class="fold" aria-hidden="true">
     <span class="face face-up"></span>
     <span class="face face-down"></span>
@@ -29,51 +22,63 @@ import gradebookMDark from "../../assets/screenshots/gradebook-rows-mobile-dark.
     <span class="rule"></span>
   </div>
 
-  <div class="wrap hero-grid">
+  <div class="wrap">
+    <!-- The headline splits across the row rather than stacking above it.
+         Stacked, the claim ran four lines down the left and left the entire
+         upper right of the hero empty, and it pushed the console almost
+         entirely below the fold — on the one page whose job is to show the
+         product. Set against the lede and the CTAs it fills the band, and the
+         console clears the fold on a laptop. -->
     <div class="hero-copy">
-      <p class="eyebrow">Hecho para Costa Rica</p>
-      <h1>El sistema con el que su colegio lleva el curso lectivo.</h1>
-      <p class="lede">
-        Notas, asistencia, horarios y expedientes en un solo lugar: para la
-        dirección, para los docentes y para los estudiantes.
-      </p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
-        <a class="btn btn-quiet" href="/piloto">Conocer el piloto 2027</a>
+      <div class="copy-split">
+        <div>
+          <p class="eyebrow">Hecho para Costa Rica</p>
+          <h1>El sistema con el que su colegio lleva el curso lectivo.</h1>
+        </div>
+        <div class="copy-aside">
+          <p class="lede">
+            Notas, asistencia, horarios y expedientes en un solo lugar: para la
+            dirección, para los docentes y para los estudiantes.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
+            <a class="btn btn-quiet" href="/piloto">Conocer el piloto 2027</a>
+          </div>
+          <p class="note">
+            Es un colegio de ejemplo, con datos de ejemplo. Nada de lo que haga
+            ahí se guarda.
+          </p>
+        </div>
       </div>
-      <p class="note">
-        Es un colegio de ejemplo, con datos de ejemplo. Nada de lo que haga ahí
-        se guarda.
-      </p>
     </div>
 
-    <!-- Fragments, not frames.
-         The old hero put a whole 1440px console into a 609px column: a 0.42x
-         downscale, which put a 14px table row at 5.9px and is why none of it
-         could be read. These are crops sized so that displayed width is half
-         the source width, i.e. 1:1 with the app's own CSS pixels. The
-         decoration is held around them rather than over them, so nothing here
-         is ever blurred by the thing meant to make it look good. -->
-    <div class="stage" data-tilt>
-      <figure class="frag frag-main">
-        <HeroShot
-          light={gradebook}
-          dark={gradebookDark}
-          mobileLight={gradebookM}
-          mobileDark={gradebookMDark}
-          alt="Libro de notas de Matemáticas, Undécimo Sección 1: cada estudiante con su nota del II Periodo."
-          displayWidth={640}
-          mobileDisplayWidth={358}
-        />
-      </figure>
+    <!-- The whole console, at the size the app draws it.
+         The previous hero showed two crops because a 1440px console in a 609px
+         column is 0.42x and none of it could be read. This is the other way
+         round: the capture is shot at 1280 CSS px and displayed at 1240, so
+         the console renders at 1:1 with its own pixels and the source is 3x,
+         which means no browser anywhere has to stretch it.
 
-      <figure class="frag frag-side">
-        <ThemedShot
-          light={adminStats}
-          dark={adminStatsDark}
-          alt="Resumen de la consola de dirección: matrícula total 90, 8 docentes, 6 de 10 aulas en uso."
-          widths={[270, 540]}
-          sizes="270px"
+         Deliberately NOT tilted. A rotateY on a screenshot resamples every
+         glyph across the plane, which is precisely the softness this pass
+         exists to remove. Depth comes from the frame, the elevation and the
+         fold behind it. -->
+    <div class="stage">
+      <figure class="frame">
+        <div class="frame-bar" aria-hidden="true">
+          <span class="dot"></span><span class="dot"></span><span class="dot"
+          ></span>
+          <span class="url">{demoHost}</span>
+        </div>
+        <ConsoleShot
+          light={admin.image}
+          dark={admin.imageDark}
+          mobileLight={admin.mobileImage}
+          mobileDark={admin.mobileImageDark}
+          alt={admin.alt}
+          displayWidth={1240}
+          sizes="(min-width: 1292px) 1240px, calc(100vw - 3.2rem)"
+          mobileDisplayWidth={300}
           loading="eager"
           priority={true}
         />
@@ -83,106 +88,92 @@ import gradebookMDark from "../../assets/screenshots/gradebook-rows-mobile-dark.
 </section>
 
 <style>
+  /* THE CONSTRAINT ON THESE TWO NUMBERS.
+   *
+   * Both ends of the crease must land between the console's top and its
+   * bottom. The console is opaque and nearly the full width, so a crease
+   * placed there is hidden behind the product and shows only as two short
+   * diagonal stubs in the gutters either side, which is the sheet continuing
+   * behind the thing resting on it.
+   *
+   * Anywhere higher and it crosses copy: at 22% it ran through the lede, and
+   * an earlier pass at 44% ran it through the CTA row, where a crease reads as
+   * a stray line rather than as an edge. Anywhere lower and it lands under the
+   * console in the run-out to the next section, where it competes with that
+   * section's own fold-band edge.
+   *
+   * The band is narrow and moves with the viewport, so measure rather than
+   * eyeball if you change the hero's layout: at 1440 the console runs from 32%
+   * to 88% of the hero, at 1024 from 35% to 86%.
+   */
   .hero {
-    position: relative;
-    isolation: isolate;
-    padding-block: var(--space-6) var(--space-7);
-    overflow: hidden;
+    --fold-left: 56%;
+    --fold-right: 40%;
+    padding-block: var(--space-5) var(--space-6);
   }
 
-  /* ── The fold ───────────────────────────────────────────────────────── */
-
-  .fold {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    overflow: hidden;
+  /* Between the two breakpoints the console is still the desktop frame but the
+     headline has not split yet, so the copy is a good 200px taller and the
+     desktop percentages put the crease back through it. */
+  @media (min-width: 760px) and (max-width: 999px) {
+    .hero {
+      --fold-left: 68%;
+      --fold-right: 56%;
+    }
   }
 
-  .face {
-    position: absolute;
-    inset: 0;
+  /* Stacked, the copy is taller again and the phone frame starts far lower. */
+  @media (max-width: 759px) {
+    .hero {
+      --fold-left: 62%;
+      --fold-right: 52%;
+    }
   }
 
-  /* Upper surface: turned toward the light, so it carries the tint. The
-     percentages of the two clip-paths are shared, which is what makes the two
-     faces meet exactly instead of leaving a seam. */
-  /* The crease runs from 90% on the left to 54% on the right, which keeps it
-     clear of the copy block entirely and lets it pass behind the fragments
-     instead. An earlier pass ran it at 76%/44% and it cut straight through the
-     CTA row, where it read as a stray line rather than an edge. */
-  .face-up {
-    background: linear-gradient(
-      152deg,
-      color-mix(in srgb, var(--color-primary) 16%, var(--color-background)) 0%,
-      color-mix(in srgb, var(--color-primary-accent) 10%, var(--color-background))
-        42%,
-      color-mix(in srgb, var(--color-primary) 5%, var(--color-background)) 82%
-    );
-    clip-path: polygon(0 0, 100% 0, 100% 54%, 0 90%);
-  }
-
-  /* Lower surface: the underside, turned away. Left at the flat page colour so
-     the step across the crease is the whole effect. */
-  .face-down {
-    background: var(--color-background);
-    clip-path: polygon(0 90%, 100% 54%, 100% 100%, 0 100%);
-  }
-
-  /* Where the sheet breaks. Crimson at the left, cooling into the product's
-     periwinkle as it runs right, and fading out at both ends so it never
-     terminates on a hard edge. This is the only place the brand colour appears
-     outside the wordmark. */
-  .crease {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      92deg,
-      transparent 0%,
-      var(--color-brand) 24%,
-      var(--color-primary-accent) 58%,
-      var(--color-primary) 80%,
-      transparent 100%
-    );
-    opacity: 0.55;
-    clip-path: polygon(0 89.7%, 100% 53.7%, 100% 54.3%, 0 90.3%);
-  }
-
-  /* A wider, much fainter wash just under the crease, so the light looks like
-     it falls off the edge instead of stopping at it. */
-  .rule {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      92deg,
-      transparent,
-      color-mix(in srgb, var(--color-primary) 38%, transparent) 60%,
-      transparent
-    );
-    opacity: 0.45;
-    filter: blur(26px);
-    clip-path: polygon(0 88%, 100% 52%, 100% 60%, 0 96%);
-  }
-
-  /* ── Layout ─────────────────────────────────────────────────────────── */
-
-  .hero-grid {
-    display: grid;
-    gap: var(--space-5);
-    align-items: center;
+  /* Wider than the 1180px the rest of the page uses: 1240px of content is what
+     puts the console at 1:1 with the app, and that ratio is the whole fix. */
+  .hero .wrap {
+    max-width: 1292px;
   }
 
   .hero-copy {
     /* Entrance, not a scroll reveal: this is above the fold on every screen,
        so a scroll sweep would fire immediately anyway. */
     animation: rise var(--dur-slow) var(--ease-out) both;
+    margin-bottom: var(--space-5);
   }
+
+  .copy-split {
+    display: grid;
+    gap: var(--space-4);
+  }
+
   .hero h1 {
-    max-width: 15ch;
+    font-size: clamp(2.2rem, 4.4vw, 3.4rem);
+    max-width: 18ch;
+  }
+  .hero .lede {
+    margin-top: 0;
   }
   .hero .note {
-    max-width: 42ch;
+    max-width: 44ch;
+  }
+
+  @media (min-width: 1000px) {
+    .copy-split {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: var(--space-5);
+      align-items: end;
+    }
+    .copy-aside {
+      /* Sits on the headline's own baseline rather than floating beside its
+         middle, which is what makes the two columns read as one block. */
+      padding-bottom: 0.4rem;
+    }
+  }
+
+  .stage {
+    animation: rise var(--dur-slow) 140ms var(--ease-out) both;
   }
 
   @keyframes rise {
@@ -192,94 +183,66 @@ import gradebookMDark from "../../assets/screenshots/gradebook-rows-mobile-dark.
     }
   }
 
-  /* ── The fragments ──────────────────────────────────────────────────── */
+  /* ── The frame ──────────────────────────────────────────────────────── */
 
-  /* The two fragments stack and do not overlap.
-     They used to, and the stat card landed squarely on the ESTUDIANTE column,
-     so the gradebook showed five grades attached to nobody. Anything that
-     hides the fragment's content undoes the reason for cropping it in the
-     first place. Depth comes from the tilt and the shadows instead. */
-  .stage {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    animation: rise var(--dur-slow) 120ms var(--ease-out) both;
-  }
-
-  .frag {
+  /* A browser chrome bar, carrying the demo's real host. It frames the capture
+     as a running application rather than a picture, and it tells the reader
+     where the CTA above it goes before they click it. */
+  .frame {
     margin: 0;
-    border-radius: var(--border-radius-2);
+    border-radius: var(--card-border-radius);
     overflow: hidden;
     background: var(--color-white);
     box-shadow: var(--elev-3);
     outline: 1px solid var(--color-light);
+    width: min(1240px, 100%);
+    margin-inline: auto;
   }
-  .frag :global(picture),
-  .frag :global(img) {
+
+  .frame-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem var(--space-2);
+    background: color-mix(in srgb, var(--color-dark) 5%, var(--color-white));
+    border-bottom: 1px solid var(--color-light);
+  }
+
+  .dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--color-dark) 18%, transparent);
+  }
+
+  .url {
+    margin-left: 0.6rem;
+    padding: 0.15rem 0.7rem;
+    border-radius: 999px;
+    background: var(--color-background);
+    color: var(--color-info-dark);
+    font-size: 0.76rem;
+    letter-spacing: 0.01em;
+  }
+
+  .frame :global(picture),
+  .frame :global(img) {
     display: block;
   }
-  .frag :global(img) {
+  .frame :global(img) {
     width: 100%;
     height: auto;
   }
 
-  .frag-main {
-    max-width: 640px;
-    width: 100%;
-  }
-
-  /* Second plane, stepped down and to the left so the pair reads as depth
-     without either one covering the other. */
-  .frag-side {
-    width: 270px;
-    align-self: flex-start;
-    margin-top: var(--space-2);
-    position: relative;
-    z-index: 1;
-  }
-
-  @media (min-width: 1000px) {
-    /* Wider than the 1180px the rest of the page uses. The fragment has a
-       fixed 640px it cannot go below without becoming unreadable again, and at
-       1180px that leaves the copy column at 385px, which breaks the h1 across
-       five lines. The hero is the one section allowed to run wide. */
-    .hero .wrap {
-      max-width: 1280px;
+  /* Below the switch the frame holds a phone capture, so it has to stop
+     pretending to be a desktop window. */
+  @media (max-width: 759px) {
+    .frame {
+      width: min(300px, 82vw);
+      border-radius: var(--space-3);
     }
-    .hero-grid {
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-    }
-    .stage {
-      /* Bleeds toward the viewport edge, so the fragments read as a window
-         onto something larger than the column holding them. */
-      margin-right: calc(var(--space-4) * -1);
-    }
-    .frag-main {
-      transform: perspective(1800px) rotateY(-7deg) rotateX(2.5deg);
-      transform-origin: right center;
-      transition: transform var(--dur-slow) var(--ease-out);
-    }
-    .frag-side {
-      /* Pulled left of the main plane so the two edges do not line up, which
-         is what makes them read as two sheets rather than one column. */
-      margin-left: calc(var(--space-5) * -1);
-      transform: perspective(1800px) rotateY(-7deg) rotateX(2.5deg);
-      transform-origin: left center;
-      transition: transform var(--dur-slow) var(--ease-out);
-    }
-  }
-
-  /* Below the two-column breakpoint the fragments stack. The tilt goes: a
-     sheared table at 360px is exactly the unreadability this hero exists to
-     fix, and the side plane would cover the main one. */
-  @media (max-width: 999px) {
-    .frag-main {
-      max-width: 100%;
-    }
-    .frag-side {
-      width: 240px;
+    .frame-bar {
+      display: none;
     }
   }
 
@@ -288,47 +251,5 @@ import gradebookMDark from "../../assets/screenshots/gradebook-rows-mobile-dark.
     .stage {
       animation: none;
     }
-    .frag-main,
-    .frag-side {
-      transform: none;
-      transition: none;
-    }
   }
 </style>
-
-<script>
-  // Pointer parallax on the fragments. Fine pointers only: on a touchscreen
-  // there is no hover state to respond to, so they would simply never move.
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-  const stage = document.querySelector<HTMLElement>("[data-tilt]");
-  const fine = matchMedia("(pointer: fine)");
-
-  if (stage && fine.matches && !reduced.matches) {
-    const planes = [...stage.querySelectorAll<HTMLElement>(".frag")];
-    let frame = 0;
-
-    const move = (ev: PointerEvent) => {
-      if (frame) return; // coalesce to one write per animation frame
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        if (innerWidth < 1000) return; // the flat layout owns the transform
-        const r = stage.getBoundingClientRect();
-        // −0.5…0.5 from the stage's own centre.
-        const px = (ev.clientX - r.left) / r.width - 0.5;
-        const py = (ev.clientY - r.top) / r.height - 0.5;
-        const ry = -7 + px * 4;
-        const rx = 2.5 - py * 3;
-        for (const p of planes) {
-          p.style.transform = `perspective(1800px) rotateY(${ry}deg) rotateX(${rx}deg)`;
-        }
-      });
-    };
-
-    const reset = () => {
-      for (const p of planes) p.style.transform = "";
-    };
-
-    addEventListener("pointermove", move, { passive: true });
-    stage.addEventListener("pointerleave", reset);
-  }
-</script>

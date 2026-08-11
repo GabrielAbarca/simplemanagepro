@@ -12,9 +12,9 @@
 // (>=24px, or >=18.66px when bold).
 
 import { chromium } from "playwright";
-import { selectedRoutes } from "./routes.mjs";
+import { selectedRoutes, BASE_URL } from "./routes.mjs";
 
-const BASE = process.env.AUDIT_URL || "http://localhost:4321";
+const BASE = process.env.AUDIT_URL || BASE_URL;
 const VIEWS = [
   { name: "desktop", width: 1440, height: 900 },
   { name: "mobile", width: 390, height: 844 },
