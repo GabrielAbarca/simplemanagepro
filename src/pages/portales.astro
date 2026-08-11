@@ -52,8 +52,8 @@ import { DEMO_URL } from "../config";
               light={p.image}
               dark={p.imageDark}
               alt={p.alt}
-              widths={[720, 1080, 1440]}
-              sizes="(min-width: 1180px) 1148px, calc(100vw - 3.2rem)"
+              widths={[720, 1080, 1440, 1600, 2400]}
+              sizes="(min-width: 1632px) 1600px, calc(100vw - 3.2rem)"
             />
           </figure>
 
@@ -63,8 +63,8 @@ import { DEMO_URL } from "../config";
                 light={p.extraImage}
                 dark={p.extraImageDark}
                 alt={p.extraAlt ?? ""}
-                widths={[720, 1080, 1440]}
-                sizes="(min-width: 1180px) 1148px, calc(100vw - 3.2rem)"
+                widths={[720, 1080, 1440, 1600, 2400]}
+                sizes="(min-width: 1632px) 1600px, calc(100vw - 3.2rem)"
               />
             </figure>
           )}
@@ -119,5 +119,18 @@ import { DEMO_URL } from "../config";
 
   .shot-extra {
     margin-top: var(--space-3);
+  }
+
+  /* These are whole 1440px consoles, and the wrap is 1180px, so inside it they
+     are drawn at 0.41x. Breaking out to the viewport gets them to 0.5x at
+     1440px and to 1:1 on a 2880px display, which is the difference between a
+     reader being able to pick out a row and not.
+     It does not get them to 1:1 on a laptop, and nothing short of cropping
+     will: the hero's fragments exist precisely because a full console cannot
+     be legible at this width. This page's job is the shape of each console,
+     with the demo one click away for the detail. */
+  .portal .shot {
+    width: min(1600px, calc(100vw - var(--space-3) * 2));
+    margin-inline: calc(50% - min(800px, 50vw - var(--space-3)));
   }
 </style>

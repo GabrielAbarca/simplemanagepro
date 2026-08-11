@@ -9,7 +9,7 @@ interface Props {
 const { showDemo = true } = Astro.props;
 ---
 
-<section class="band cierre">
+<section class="band cierre fold-band">
   <div class="wrap narrow reveal">
     <h2>¿Su colegio podría ser uno de los tres?</h2>
     <p>
@@ -25,7 +25,9 @@ const { showDemo = true } = Astro.props;
 </section>
 
 <style>
-  .cierre {
-    border-top: 1px solid var(--color-light);
+  /* No border-top: the fold band's own angled edge is the divider, and a
+     horizontal rule crossing it would contradict the angle. */
+  .cierre h2 {
+    max-width: 20ch;
   }
 </style>

@@ -21,6 +21,19 @@
   max-width: 70ch;
 }
 
+/* .narrow caps the measure, and inside a .wrap that is all it does. Put on the
+   .wrap itself it also inherits margin-inline: auto, so the whole 70ch column
+   centres in the viewport — which left /piloto's h1 about 200px to the right of
+   the cards directly beneath it, alignment that reads as a bug rather than a
+   choice. Keep the page gutter on the wrap, cap the content inside it. */
+.wrap.narrow {
+  max-width: var(--page-max);
+}
+
+.wrap.narrow > * {
+  max-width: 70ch;
+}
+
 section {
   padding-block: var(--space-6);
 }
@@ -70,6 +83,67 @@ h3 {
 
 .section-title {
   margin-bottom: var(--space-5);
+}
+
+/* ── The fold, continued ────────────────────────────────────────────────── */
+
+/* The hero establishes the page as a sheet folded back on itself. This carries
+   that down the page: a folded band's top edge is the same upward-to-the-right
+   slope as the hero's crease, so alternating bands read as one continuous
+   ribbon rather than as a motif being repeated for its own sake.
+
+   Both layers are behind the content (z-index -2 and -1 against the band's own
+   stacking context), so nothing decorative is ever painted over type. The tint
+   is deliberately weak: it costs contrast, and the two muted text tiers only
+   have about 1.5 points to spend between them. */
+.fold-band {
+  position: relative;
+  isolation: isolate;
+  --fold-drop: 3.5rem;
+  padding-top: calc(var(--space-6) + var(--fold-drop));
+}
+
+.fold-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background: linear-gradient(
+    172deg,
+    color-mix(in srgb, var(--color-primary) 7%, var(--color-background)),
+    var(--color-background) 58%
+  );
+  clip-path: polygon(0 var(--fold-drop), 100% 0, 100% 100%, 0 100%);
+}
+
+/* The crease itself, where the sheet breaks. */
+.fold-band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    92deg,
+    transparent 0%,
+    var(--color-primary-accent) 42%,
+    var(--color-primary) 76%,
+    transparent 100%
+  );
+  opacity: 0.4;
+  clip-path: polygon(
+    0 var(--fold-drop),
+    100% 0,
+    100% 2px,
+    0 calc(var(--fold-drop) + 2px)
+  );
+}
+
+@media (max-width: 759px) {
+  /* A 3.5rem drop across 390px is a much steeper angle than across 1440px, and
+     it starts to read as a wedge rather than a fold. */
+  .fold-band {
+    --fold-drop: 1.6rem;
+  }
 }
 
 /* ── Bands ──────────────────────────────────────────────────────────────── */
