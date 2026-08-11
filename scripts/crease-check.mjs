@@ -51,6 +51,12 @@ for (const route of ROUTES) {
       const fold = hero.querySelector(":scope > .fold");
       if (!fold) return null;
 
+      // A hero is allowed to drop the hard edge and keep only the wash, which
+      // is what the page heroes do on narrow screens where no clear band
+      // exists. Nothing is drawn, so there is nothing to cross.
+      const crease = fold.querySelector(".crease");
+      if (!crease || getComputedStyle(crease).display === "none") return [];
+
       const hb = hero.getBoundingClientRect();
       const fb = fold.getBoundingClientRect();
       const cs = getComputedStyle(hero);

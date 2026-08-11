@@ -68,6 +68,26 @@ const hasOrnament = Astro.slots.has("ornament");
     padding-block: var(--space-6) var(--space-7);
   }
 
+  /* Below the two-column breakpoint the ornament stacks under the copy, so the
+     hero is content from top to bottom and there is no band left for a crease
+     to sit in. There is no percentage that works: at 390px the copy ends below
+     where the fold's own box ends. A diagonal across a 390px column reads as a
+     wedge rather than a fold anyway, which is the same reason .fold-band
+     shallows its drop on phones.
+     So on narrow screens the sheet keeps its wash and loses its edge: the two
+     faces are collapsed into one and the crease is not drawn at all. The fold
+     is still on the page below, in the bands. */
+  @media (max-width: 999px) {
+    .page-hero {
+      --fold-left: 100%;
+      --fold-right: 100%;
+    }
+    .page-hero :global(.crease),
+    .page-hero :global(.rule) {
+      display: none;
+    }
+  }
+
   .hero-grid {
     display: grid;
     gap: var(--space-5);
@@ -76,14 +96,23 @@ const hasOrnament = Astro.slots.has("ornament");
 
   .hero-copy {
     animation: rise var(--dur-slow) var(--ease-out) both;
-    max-width: 40ch;
-  }
-  .hero-copy.is-wide {
-    max-width: 52ch;
   }
 
+  /* Capped on the elements, not on the column.
+     A max-width in `ch` on the wrapper resolves against the WRAPPER's font
+     size, so 40ch was about 320px and every sub-page headline broke into
+     four-word stubs while two thirds of the column sat empty. Each element
+     caps itself against its own size instead. */
   .page-hero h1 {
     font-size: clamp(2.1rem, 4.2vw, 3.1rem);
+    max-width: 16ch;
+  }
+  .page-hero .lede,
+  .page-hero .note {
+    max-width: var(--measure);
+  }
+  .hero-copy.is-wide h1 {
+    max-width: 22ch;
   }
 
   .hero-ornament {

@@ -1,7 +1,20 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PageHero from "../components/PageHero.astro";
 import CierreCta from "../components/sections/CierreCta.astro";
+import { story } from "../data/site";
 import { breadcrumbLd } from "../lib/schema";
+
+// The page's own claim, made checkable. These are the words the product uses,
+// and a director recognises every one of them as their own.
+const vocabulary = [
+  "curso lectivo",
+  "periodos",
+  "secciones",
+  "matrícula",
+  "expediente",
+  "cédula",
+];
 ---
 
 <Layout
@@ -15,32 +28,53 @@ import { breadcrumbLd } from "../lib/schema";
     set:html={JSON.stringify(breadcrumbLd("Nosotros", "/nosotros"))}
   />
 
-  <section class="page-head">
-    <div class="wrap narrow">
-      <p class="eyebrow">Hecho para Costa Rica</p>
-      <h1>Software escolar que ya habla como su colegio.</h1>
-      <p class="lede">
-        La mayoría del software escolar llega traducido de otro país y le pide
-        al colegio que se acomode. Simple Manage Pro empieza por la estructura
-        que el colegio ya usa.
-      </p>
+  <PageHero
+    eyebrow="Hecho para Costa Rica"
+    title="Software escolar que ya habla como su colegio."
+    lede="La mayoría del software escolar llega traducido de otro país y le pide al colegio que se acomode. Simple Manage Pro empieza por la estructura que el colegio ya usa."
+  >
+    <!-- The claim, shown rather than asserted twice. It replaces a closing
+         aside that listed the same words in prose, so the page says this once
+         and in the place where it does the most work. -->
+    <div class="vocab" slot="ornament">
+      <p class="vocab-title">El vocabulario del sistema</p>
+      <ul>
+        {
+          vocabulary.map((v, i) => (
+            <li style={`--i:${i}`}>
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3 8.4 6.3 11.7 13 5" />
+              </svg>
+              {v}
+            </li>
+          ))
+        }
+      </ul>
     </div>
-  </section>
+  </PageHero>
 
-  <section class="band fold-band">
+  <!-- Misión and visión were two cards side by side with nothing around them,
+       which read as a requirement someone had to satisfy rather than as
+       something the page meant. One panel, two statements, and the fold's own
+       diagonal as the divider between them: they are two halves of one
+       position, so they are set as type rather than boxed separately. -->
+  <section class="band">
     <div class="wrap">
-      <div class="two-col reveal">
-        <div class="col-card">
-          <h2>Misión</h2>
-          <p>
+      <div class="creed reveal">
+        <div class="creed-half">
+          <p class="eyebrow">Misión</p>
+          <p class="statement">
             Que un colegio costarricense pueda llevar su curso lectivo completo
             en un solo sistema, sin adaptar su forma de trabajar a un software
             pensado para otro país.
           </p>
         </div>
-        <div class="col-card">
-          <h2>Visión</h2>
-          <p>
+
+        <span class="creed-fold" aria-hidden="true"></span>
+
+        <div class="creed-half">
+          <p class="eyebrow">Visión</p>
+          <p class="statement">
             Que la estructura del sistema educativo costarricense, sus periodos,
             sus niveles, sus secciones y sus expedientes, sea lo normal en el
             software que usan los colegios del país, y no una configuración
@@ -51,9 +85,37 @@ import { breadcrumbLd } from "../lib/schema";
     </div>
   </section>
 
+  <section class="band fold-band" id="historia">
+    <div class="wrap">
+      <div class="narrow reveal">
+        <p class="eyebrow">Nuestra historia</p>
+        <h2>Empezó como un proyecto de feria científica.</h2>
+        <p>
+          El problema era el mismo que sigue resolviendo hoy: al cierre de cada
+          periodo, alguien en la dirección arma las notas a mano desde archivos
+          sueltos. Tres cursos lectivos después es un sistema que un colegio
+          puede usar de verdad.
+        </p>
+      </div>
+
+      <ol class="story reveal reveal-stagger">
+        {
+          story.map((s, i) => (
+            <li style={`--i:${i}`}>
+              <span class="beat-dot" aria-hidden="true" />
+              <p class="beat-year">{s.year}</p>
+              <h3>{s.title}</h3>
+              <p class="beat-body">{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
   <section class="band">
     <div class="wrap narrow reveal">
-      <h2>Cómo trabajamos</h2>
+      <h2>Quién lo construye</h2>
       <p>
         Simple Manage Pro lo construyó <strong>Gabriel Zelaya</strong>, acá en
         Costa Rica. Cuando usted escriba por WhatsApp, le contesta quien
@@ -64,11 +126,6 @@ import { breadcrumbLd } from "../lib/schema";
         configura con su propia estructura y corre sobre su propia base de
         datos, y eso se hace bien de tres en tres.
       </p>
-      <p class="aside">
-        El vocabulario del sistema es el del colegio, no el de un manual
-        traducido: curso lectivo, periodos, niveles, secciones, matrícula,
-        expediente.
-      </p>
     </div>
   </section>
 
@@ -76,29 +133,154 @@ import { breadcrumbLd } from "../lib/schema";
 </Layout>
 
 <style>
-  .page-head {
-    padding-block: var(--space-6) var(--space-5);
-  }
+  /* ── The hero ornament ────────────────────────────────────────────────── */
 
-  .two-col {
-    display: grid;
-    gap: var(--space-3);
-  }
-  .col-card {
+  .vocab {
+    padding: var(--space-4);
     background: var(--color-white);
     border: 1px solid var(--color-light);
     border-radius: var(--card-border-radius);
-    padding: var(--space-4);
+    box-shadow: var(--elev-2);
   }
-  .col-card h2 {
-    font-size: 1.3rem;
-    letter-spacing: -0.01em;
-    margin-bottom: var(--space-2);
+
+  .vocab-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-info-dark);
+    margin-bottom: var(--space-3);
+  }
+
+  .vocab ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .vocab li {
+    display: grid;
+    grid-template-columns: 1.1rem 1fr;
+    gap: 0.7rem;
+    align-items: center;
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: var(--color-dark);
+  }
+
+  .vocab svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── Misión and visión ────────────────────────────────────────────────── */
+
+  .creed {
+    position: relative;
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--card-border-radius);
+    background: color-mix(in srgb, var(--color-primary) 5%, var(--color-white));
+    border: 1px solid var(--color-light);
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .creed .statement {
+    margin-top: var(--space-2);
+    font-size: clamp(1.15rem, 1.9vw, 1.5rem);
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--color-dark);
+    text-wrap: pretty;
+  }
+
+  /* The crease, as the divider. Sitting in the gap between the two halves it
+     has no type to cross, which is why this one can be a hairline across the
+     whole panel where a hero's has to be measured. */
+  .creed-fold {
+    height: 1px;
+    background: linear-gradient(
+      92deg,
+      transparent,
+      var(--color-brand) 18%,
+      var(--color-primary-accent) 55%,
+      var(--color-primary) 80%,
+      transparent
+    );
+    opacity: 0.6;
+    rotate: -0.9deg;
+  }
+
+  /* ── The story ────────────────────────────────────────────────────────── */
+
+  .story {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .story li {
+    position: relative;
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--color-light);
+  }
+
+  .beat-dot {
+    position: absolute;
+    left: -0.44rem;
+    top: 0.45rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--color-primary-fill);
+    box-shadow: 0 0 0 4px var(--color-background);
+  }
+
+  .beat-year {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-primary-text);
+    line-height: 1.1;
+  }
+
+  .story h3 {
+    font-size: 1.08rem;
+    margin: var(--space-1) 0 0;
+  }
+
+  .beat-body {
+    margin-top: 0.4rem;
+    font-size: 0.96rem;
   }
 
   @media (min-width: 760px) {
-    .two-col {
-      grid-template-columns: 1fr 1fr;
+    .creed {
+      padding: var(--space-5);
+    }
+
+    .story {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-3);
+    }
+    .story li {
+      padding-left: 0;
+      padding-top: var(--space-3);
+      border-left: 0;
+      border-top: 2px solid var(--color-light);
+    }
+    .beat-dot {
+      left: 0;
+      top: -0.44rem;
     }
   }
 </style>
