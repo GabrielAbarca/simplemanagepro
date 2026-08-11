@@ -29,15 +29,15 @@ or the audit and review harnesses silently stop covering it.
 | --- | --- |
 | `BRIEF.md` | **The decision record.** Positioning, audience, offer, page structure (§7 + its amendment), conversion path (§8), build decisions (§9), Costa Rican language notes (§10). |
 | `src/config.ts` | URLs, contact details, nav. Anything used by more than one route. |
-| `src/data/site.ts` | Portal content, pilot lists, the `/piloto` answers. |
+| `src/data/site.ts` | Portal content (accent, glyph, capabilities, captures), pilot lists, the `/piloto` FAQ, the `/nosotros` story beats. |
 | `src/pages/` | One file per route. |
 | `src/layouts/Layout.astro` | `<head>`, per-page OG, head slot for JSON-LD, skip link, `<main>`, reveal script. |
 | `src/components/sections/` | Home-page sections. Shared closer: `CierreCta.astro`. |
-| `src/components/` | `Header.astro` (nav, mobile menu, theme toggle), `Footer.astro`, `ThemedShot.astro`, `HeroShot.astro` (theme **and** viewport swap). |
+| `src/components/` | `Header.astro` (nav, mobile menu, theme toggle), `Footer.astro`, `PageHero.astro` (every route but `/`), `ConsoleShot.astro` (theme **and** viewport swap, and the srcset rule), `ConsoleFrame.astro` (browser chrome), `PortalGlyph.astro` (drawn console wireframe). |
 | `src/lib/schema.ts` | JSON-LD builders. |
-| `src/styles/tokens.css` | Design tokens inherited from the app, plus `@font-face` for Poppins. |
-| `src/styles/base.css` | Shared layout and component primitives, and the fold system. |
-| `src/assets/screenshots/` | Portal captures, light and `-dark`, `m-` for the 390px pass, plus derived crops. |
+| `src/styles/tokens.css` | Design tokens inherited from the app, the three portal accents, plus `@font-face` for Poppins. |
+| `src/styles/base.css` | Shared layout and component primitives, the card hierarchy, console frames, and the fold system. |
+| `src/assets/screenshots/` | Portal captures, light and `-dark`, `m-` for the 390px pass. Nothing derived: see Screenshots. |
 | `public/` | Icon set, self-hosted Poppins, `og.png`, `robots.txt`, manifest. |
 
 ## Commands
@@ -49,26 +49,32 @@ npm run build           # production build
 npm run preview         # serve the build on :4321
 
 npm run capture         # re-shoot the portal screenshots from the live demo,
-                        # desktop 1440@2x plus a 390@3x pass for hero fragments
-npm run derive          # regenerate cropped screenshots from those captures
+                        # desktop 1280@3x plus a 390@3x pass for phones
 npm run og              # regenerate public/og.png (1200×630)
 
 npm run audit:contrast  # WCAG 1.4.3 audit, every route
+npm run check:crease    # the fold never crosses type, every hero × 8 widths
 npm run review          # full-page screenshots, every route × desktop/mobile × light/dark
 npm run check:nojs      # every route renders complete with JavaScript disabled
 ```
 
-The last three need `npm run preview` already running, and all accept
+The last four need `npm run preview` already running, and all accept
 `CHROMIUM_PATH=` when the environment ships a browser whose build number does
 not match what Playwright would download. `audit:contrast` and `review` accept
 `ROUTE=piloto` to narrow to one page while iterating.
 
-**Run `check`, `build`, and `audit:contrast` before considering work done.**
-Add `review` and `check:nojs` for anything visual.
+**Run `check`, `build`, `audit:contrast` and `check:crease` before considering
+work done.** Add `review` and `check:nojs` for anything visual.
 
 Only one preview server can hold :4321. If a previous one is still running the
 new one silently moves to :4322 and every harness then measures the stale
-build — kill the old process rather than assuming the port.
+build. Either kill the old process, or leave it alone and point the harnesses
+somewhere else — all four read `PREVIEW_URL`:
+
+```bash
+npx astro preview --port 4325
+PREVIEW_URL=http://localhost:4325 npm run audit:contrast
+```
 
 ## Hard rules
 
@@ -145,13 +151,22 @@ error about the product, not a style choice.
   biography, no. He is named on `/nosotros` and nowhere else: on the home page
   the same paragraph read as solo-founder risk to a director who had not yet
   decided anything.
-- **The limits stay, as `Respuestas directas` on `/piloto`.** All three facts
-  are intact and none is softened — no encargado portal, no colegio using it
-  yet, expedientes hosted abroad. What changed is the framing and the location.
-  A list of deficits headed *"para que no lo descubra en la primera reunión"*
-  announces bad news before the reader has asked; the same content as the
-  director's own questions, answered straight, reads as candor. Do not quietly
-  drop it: BRIEF §7 keeps it as a trust device and it is still one.
+- **`/piloto` carries an FAQ, and data residency is the part that stays.**
+  This block began as `Qué no incluye` (three deficits), became `Respuestas
+  directas` (the same three as the director's own questions), and is now eight
+  questions a director actually asks before deciding anything.
+
+  Gabriel's call, August 2026: the **no encargado portal** and **no colegio
+  using it yet** answers come off the page and get handled in the conversation,
+  where they can be answered with context. That is a real deviation from
+  BRIEF §7, which pinned all three to this block as a trust device, so it is
+  recorded in §7 rather than taken quietly. Do not reinstate them without
+  asking, and do not read this as licence to drop the third.
+
+  **Expedientes hosted abroad stays**, both here and in the home page's `Datos`
+  section. It is the first thing a colegio should ask, it is already in the
+  privacy policy, and volunteering it is worth more than it costs. Nothing on
+  the page may imply an encargado portal exists.
 - **Never use an em dash (—) in copy.** It is the most recognizable marker of
   AI-written text and this page cannot afford to read as generated. Commas,
   colons and full stops do the same work. The same goes for the wider register:
@@ -192,6 +207,19 @@ error about the product, not a style choice.
 
   Fills are separate from text colours: `--color-primary` carries white at
   only 3.48:1, so filled buttons use `--color-primary-fill` (4.53:1).
+- **Two card tiers, and only two.** `.card` is the quiet default; `.card-lead`
+  is for the thing a section is actually about, and `.card-fold` adds the
+  ribbon's turned-back corner. When everything on a page is the same white box
+  with the same 1px border, nothing announces that it is the point of its
+  section — which is exactly why the three portals once read as navigation.
+  Reach for `.card-lead` once or twice per page, not everywhere.
+- **One accent per portal, and they are fills.** `--accent-direccion`,
+  `--accent-docente` and `--accent-estudiante` follow each console everywhere
+  it appears. Each carries `#fff` above 4.5:1, and a fill's contrast is a
+  property of the fill rather than of the theme, so none is overridden in dark.
+  **Never set one as `color` on the page background.** Crimson is not among
+  them: `--color-brand` is identity only, and a portal wearing it would teach
+  the reader that red means "action" here and "brand" three sections later.
 - **The fold is the page's signature.** The brand mark is a crimson ribbon
   folded back on itself with the darker crimson on the underside; the hero is
   that shape at page scale, and `.fold-band` in `base.css` carries the same
@@ -200,6 +228,14 @@ error about the product, not a style choice.
   costs a slow Android anything to paint. Both layers sit behind the content in
   the band's own stacking context: **nothing decorative is ever painted over
   type.**
+
+  The crease must also never pass *behind* type. It has been placed through
+  copy three times now, because the safe band is narrow, moves with the
+  viewport and depends on how each page's copy wraps, so checking one width
+  proves nothing about the rest. `npm run check:crease` asserts it against
+  every hero at eight widths; run it after any change to a hero's layout or
+  copy length. The home hero is the one exception: its crease is meant to pass
+  behind the console, which is opaque, so the console counts as cover.
 - **Motion is CSS, and cheap.** No WebGL, no GIF backgrounds. The primary
   channel is a WhatsApp forward opening on mobile data. Everything must
   collapse under `prefers-reduced-motion`, and the page must render complete
@@ -214,27 +250,56 @@ error about the product, not a style choice.
 Captures come from the **live demo**, not fixtures, because the page invites
 the director to click through to that exact demo.
 
-**Legibility is a scale problem, not a resolution one.** The captures are a
-1440 CSS-px console; a full frame in the 1180px wrap is drawn at 0.41x, which
-puts a 14px table row at 5.9px. No bigger source file and no `srcset` changes
-that. The hero therefore uses **crops sized so displayed width is half the
-source width**, i.e. 1:1 with the app's own CSS pixels — that ratio is the
-whole trick, and `make-derived.mjs` prints it for every crop it writes. A phone
-cannot use the desktop crops either, so `npm run capture` also shoots at
-390@3x (`m-` prefix) and `HeroShot.astro` switches on viewport as well as theme.
+### The one rule
 
-Two known blemishes cannot be fixed from this repo:
+> **Capture a console at the CSS width the page displays it at, and ship
+> `srcset` candidates at exactly 1× and 2× of that width.**
+
+Then a 1× display gets a clean integer downsample and a 2× display gets
+untouched pixels. The browser never resamples fractionally and never upscales.
+`ConsoleShot.astro` is the only way screenshots reach the page, and it derives
+the whole `srcset` from one `displayWidth` prop so the rule cannot be forgotten.
+
+Concretely: `npm run capture` shoots at **1280 CSS px @3x**, every surface caps
+its frame at **1240 CSS px**, and 3× leaves headroom so nothing upscales
+anywhere. Heights are measured and the window trimmed to the content before the
+shutter, so a frame is all product.
+
+This replaces an earlier rule about cropping to half the source width. The old
+hero was soft for three reasons and only the first was about scale: a 1440px
+console in the 1180px wrap was drawn at 0.82×; the `srcset` topped out at 2400
+against a 2880 source, so any 2× display **upscaled**; and WebP at Astro's
+default quality rings around 13px UI glyph edges. Cropping treated the first
+and left the other two. With the ratio inverted there is nothing left to crop,
+so `make-derived.mjs` and the derived files are gone.
+
+**Never 3D-transform a screenshot.** A `rotateY` on a console resamples every
+glyph across the plane, which undoes all of the above for a bit of depth. Depth
+comes from the frame, the elevation and the fold behind it. Entrance animations
+are fine because they end at identity.
+
+A phone cannot use a desktop frame at all, so `npm run capture` also shoots at
+390@3x (`m-` prefix) and `ConsoleShot` switches on viewport as well as theme.
+
+Three known blemishes cannot be fixed from this repo:
 
 - The admin overview reads **"Bienvenido, Demo Account"** — the auth user's
   display name, which lives in `auth.users` and is out of bounds without an
-  explicit ask.
+  explicit ask. Gabriel's call, August 2026: keep the overview and accept it.
 - **"Asistencia de hoy: Sin datos".** Previously recorded as a weekend
   artifact; that is wrong, a Monday capture shows it too. The demo's fixtures
   carry no attendance for the current date, so it will show on any day. Fixing
   it means seeding the demo, not re-running the capture.
+- **The gradebook's periodo control captures as an empty box at 390px.** Not a
+  timing problem and not a colour problem: `#gradebook-period-trigger` measures
+  158px wide at 1280 and **0px at 390**, so its label is never painted. That is
+  a real bug in the app on phones. Until it is fixed, the docente portal's
+  `mobileImage` points at `m-teacher` instead of `m-teacher-gradebook`.
 
-`npm run derive` crops around both. BRIEF §9 sanctions cropping per section, so
-cropping is the intended treatment rather than a workaround.
+Full frames make the app's own wording legible, and it contradicts the page:
+the consoles say *"toda la escuela"*, *"Año escolar activo"* and *"año escolar
+actual"* while every line of copy says **colegio** and **curso lectivo**.
+Belongs in `../SMP-Web-Page`.
 
 ## Verification
 
@@ -251,4 +316,21 @@ Two traps that have already cost a session each:
   read from another, so a change looked like it had done nothing.
 - **Check which server you measured.** If a preview is already on :4321 the new
   one moves to :4322 without failing, and every harness then measures the old
-  build.
+  build. `PREVIEW_URL` exists so you can leave someone else's dev server alone.
+
+**When a harness reports something physically implausible, suspect the harness
+first.** It has been wrong three times and right every other time:
+
+- `contrast-audit` measured boxes *before* injecting `color: transparent`. That
+  injection forces a style recalc, the page re-wraps under it, and every box
+  below the fold was sampled about 32px off — including a filled button at
+  1.08:1. It re-measures after injection now.
+- `contrast-audit` then failed collapsed FAQ answers. A closed `<details>` is
+  not `display: none`: Chrome hides its contents with `content-visibility` on
+  `::details-content`, so the children keep `display: block` **and a real
+  bounding box**, and the audit was sampling text nobody can see against
+  whatever is painted at those coordinates two sections further down. It calls
+  `checkVisibility()` now.
+- `naturalWidth` on a `w`-descriptor `srcset` is **density-corrected**, so a
+  2480px file selected for a 1240px slot reports 1240. Check `currentSrc`, not
+  `naturalWidth`, when verifying which candidate a browser picked.
