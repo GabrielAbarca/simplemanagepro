@@ -11,6 +11,7 @@
     "capture": "node scripts/capture-screenshots.mjs",
     "og": "node scripts/make-og.mjs",
     "audit:contrast": "node scripts/contrast-audit.mjs",
+    "check:crease": "node scripts/crease-check.mjs",
     "review": "node scripts/review-shots.mjs",
     "check:nojs": "node scripts/check-nojs.mjs"
   },

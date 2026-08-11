@@ -1,6 +1,9 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import ThemedShot from "../components/ThemedShot.astro";
+import PageHero from "../components/PageHero.astro";
+import PortalGlyph from "../components/PortalGlyph.astro";
+import ConsoleShot from "../components/ConsoleShot.astro";
+import ConsoleFrame from "../components/ConsoleFrame.astro";
 import CierreCta from "../components/sections/CierreCta.astro";
 import { portals } from "../data/site";
 import { breadcrumbLd } from "../lib/schema";
@@ -18,55 +21,115 @@ import { DEMO_URL } from "../config";
     set:html={JSON.stringify(breadcrumbLd("Portales", "/portales"))}
   />
 
-  <section class="page-head">
-    <div class="wrap narrow">
-      <p class="eyebrow">El producto</p>
-      <h1>Tres portales, un solo sistema</h1>
-      <p class="lede">
-        La dirección configura el colegio, los docentes llevan sus clases y los
-        estudiantes consultan lo suyo. Cada quien ve lo que le toca, y todos
-        sobre la misma información.
-      </p>
-      <div class="cta-row">
-        <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
-      </div>
-      <p class="note">
-        Es un colegio de ejemplo, con datos de ejemplo. Nada de lo que haga ahí
-        se guarda.
-      </p>
+  <PageHero
+    eyebrow="El producto"
+    title="Tres portales, un solo sistema"
+    lede="La dirección configura el colegio, los docentes llevan sus clases y los estudiantes consultan lo suyo. Cada quien ve lo que le toca, y todos sobre la misma información."
+  >
+    <div class="cta-row">
+      <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
     </div>
-  </section>
+    <p class="note">
+      Es un colegio de ejemplo, con datos de ejemplo. Nada de lo que haga ahí se
+      guarda.
+    </p>
+
+    <!-- The page's own subject as its ornament: three panels of the folded
+         sheet, one per console, in the three accents the sections below carry.
+         It previews the page rather than decorating it. -->
+    <div class="ornament" slot="ornament" aria-hidden="true">
+      {
+        portals.map((p, i) => (
+          <span class="panel" style={`--accent:${p.accent}; --n:${i}`}>
+            <PortalGlyph variant={p.glyph} />
+          </span>
+        ))
+      }
+    </div>
+  </PageHero>
 
   {
-    portals.map((p) => (
-      <section class="portal band" id={p.id}>
+    portals.map((p, i) => (
+      // Alternating bands, so three identically structured sections do not run
+      // as one undifferentiated column. The band's own crease sits above the
+      // section's content by construction, so it cannot cross type.
+      <section
+        class:list={["portal", "band", i % 2 === 1 && "fold-band"]}
+        id={p.id}
+        style={`--accent:${p.accent}`}
+      >
         <div class="wrap">
-          <div class="portal-copy reveal">
-            <p class="portal-label">{p.label}</p>
-            <h2>{p.title}</h2>
-            <p>{p.body}</p>
+          <div class="portal-head">
+            <div class="portal-intro reveal">
+              <p class="portal-label">{p.label}</p>
+              <h2>{p.title}</h2>
+              <p class="portal-body">{p.body}</p>
+              <ul class="portal-caps">
+                {p.capabilities.map((c) => (
+                  <li>
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                      <path d="M3 8.4 6.3 11.7 13 5" />
+                    </svg>
+                    {c}
+                  </li>
+                ))}
+              </ul>
+              <a class="portal-cta" href={DEMO_URL}>
+                Abrir esta consola en la demo
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M2.5 8h11M9.5 3.5 14 8l-4.5 4.5" />
+                </svg>
+              </a>
+            </div>
+
+            {/* Second plane, and a real claim: the same console on a phone.
+                Hidden below the breakpoint, where the frame beneath has
+                already swapped to the phone capture and this would be the
+                same picture twice. */}
+            <div class="portal-phone reveal">
+              <ConsoleFrame phone>
+                <ConsoleShot
+                  light={p.mobileImage}
+                  dark={p.mobileImageDark}
+                  alt=""
+                  displayWidth={300}
+                />
+              </ConsoleFrame>
+              <p class="phone-caption">También desde el teléfono</p>
+            </div>
           </div>
 
-          <figure class="shot reveal">
-            <ThemedShot
-              light={p.image}
-              dark={p.imageDark}
-              alt={p.alt}
-              widths={[720, 1080, 1440, 1600, 2400]}
-              sizes="(min-width: 1632px) 1600px, calc(100vw - 3.2rem)"
-            />
-          </figure>
+          <div class="portal-shot reveal">
+            <ConsoleFrame>
+              <ConsoleShot
+                light={p.image}
+                dark={p.imageDark}
+                mobileLight={p.mobileImage}
+                mobileDark={p.mobileImageDark}
+                alt={p.alt}
+                displayWidth={1240}
+                sizes="(min-width: 1292px) 1240px, calc(100vw - 3.2rem)"
+                mobileDisplayWidth={300}
+              />
+            </ConsoleFrame>
+          </div>
 
           {p.extraImage && p.extraImageDark && (
-            <figure class="shot shot-extra reveal">
-              <ThemedShot
-                light={p.extraImage}
-                dark={p.extraImageDark}
-                alt={p.extraAlt ?? ""}
-                widths={[720, 1080, 1440, 1600, 2400]}
-                sizes="(min-width: 1632px) 1600px, calc(100vw - 3.2rem)"
-              />
-            </figure>
+            <div class="portal-shot portal-shot-extra reveal">
+              <ConsoleFrame>
+                <ConsoleShot
+                  light={p.extraImage}
+                  dark={p.extraImageDark}
+                  mobileLight={p.mobileImage}
+                  mobileDark={p.mobileImageDark}
+                  alt={p.extraAlt ?? ""}
+                  displayWidth={1240}
+                  sizes="(min-width: 1292px) 1240px, calc(100vw - 3.2rem)"
+                  mobileDisplayWidth={300}
+                />
+              </ConsoleFrame>
+              <p class="shot-caption">{p.extraAlt}</p>
+            </div>
           )}
         </div>
       </section>
@@ -77,60 +140,181 @@ import { DEMO_URL } from "../config";
 </Layout>
 
 <style>
-  .page-head {
-    padding-block: var(--space-6) var(--space-5);
+  /* ── The hero ornament ────────────────────────────────────────────────── */
+
+  .ornament {
+    display: grid;
+    aspect-ratio: 5 / 4;
   }
 
-  /* Stacked, not side-by-side. These are dense console screenshots: in a
-     two-column split the image lands at ~600px and the gradebook's rows stop
-     being readable, which defeats the only job this page has. Copy on a
-     measure-limited column, screenshot at the full container width.
+  .panel {
+    grid-area: 1 / 1;
+    align-self: start;
+    width: 66%;
+    padding: 0.8rem;
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-top: 3px solid var(--accent);
+    border-radius: var(--border-radius-2);
+    box-shadow: var(--elev-2);
+    /* Stepped down and across, so three panels read as a stack of consoles
+       rather than as one card with a shadow. */
+    translate: calc(var(--n) * 24%) calc(var(--n) * 30%);
+    rotate: calc((var(--n) - 1) * -1.6deg);
+  }
 
-     Every portal is laid out identically. The previous right-aligned copy on
-     even portals broke the pattern for no reason and pulled attention to the
-     asymmetry rather than to the console being described. */
+  /* ── The portal sections ──────────────────────────────────────────────── */
+
+  /* Every portal is laid out identically. A previous pass right-aligned the
+     copy on even portals, which broke the pattern for no reason and pulled
+     attention to the asymmetry rather than to the console being described. */
   .portal {
-    padding-block: var(--space-5);
+    padding-block: var(--space-6);
+    /* The wrap runs wider here than the page default: 1240px of content is
+       what puts a 1280 CSS-px capture at 1:1 with the app. */
+  }
+  .portal .wrap {
+    max-width: 1292px;
   }
 
-  .portal-copy {
-    max-width: var(--measure);
+  .portal-head {
+    display: grid;
+    gap: var(--space-4);
     margin-bottom: var(--space-4);
+  }
+
+  .portal-intro {
+    max-width: var(--measure);
   }
 
   /* The portal's own name, not a small eyebrow. The reader has to know which
      console they are looking at before they read the claim about it, and when
-     this was set at eyebrow scale the claim won every time. */
+     this was set at eyebrow scale the claim won every time. Filled with the
+     portal's accent, which is the same hue its card wears on the home page. */
   .portal-label {
     display: inline-block;
     margin-bottom: var(--space-2);
-    padding: 0.3rem 0.7rem;
-    border-radius: var(--border-radius-1);
-    background: var(--color-primary-light);
-    color: var(--color-primary-text);
-    font-size: 0.92rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.88rem;
     font-weight: 700;
     letter-spacing: 0.01em;
   }
 
+  /* Was clamped down to 2rem, which put it below the section heads it competes
+     with elsewhere on the site. It is the claim of its section. */
   .portal h2 {
-    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
   }
 
-  .shot-extra {
+  .portal-body {
     margin-top: var(--space-3);
+    color: var(--color-dark-variant);
+    font-size: 1.05rem;
   }
 
-  /* These are whole 1440px consoles, and the wrap is 1180px, so inside it they
-     are drawn at 0.41x. Breaking out to the viewport gets them to 0.5x at
-     1440px and to 1:1 on a 2880px display, which is the difference between a
-     reader being able to pick out a row and not.
-     It does not get them to 1:1 on a laptop, and nothing short of cropping
-     will: the hero's fragments exist precisely because a full console cannot
-     be legible at this width. This page's job is the shape of each console,
-     with the demo one click away for the detail. */
-  .portal .shot {
-    width: min(1600px, calc(100vw - var(--space-3) * 2));
-    margin-inline: calc(50% - min(800px, 50vw - var(--space-3)));
+  .portal-caps {
+    list-style: none;
+    margin: var(--space-3) 0 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+  .portal-caps li {
+    display: grid;
+    grid-template-columns: 1.05rem 1fr;
+    gap: 0.65rem;
+    align-items: start;
+    color: var(--color-dark);
+    font-size: 0.98rem;
+  }
+  .portal-caps svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    margin-top: 0.3rem;
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .portal-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: var(--space-3);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .portal-cta:hover {
+    text-decoration: underline;
+  }
+  .portal-cta svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: translate var(--dur-fast) var(--ease-out);
+  }
+  .portal-cta:hover svg {
+    translate: 0.2rem 0;
+  }
+
+  .portal-phone {
+    display: none;
+  }
+  .phone-caption {
+    margin-top: var(--space-2);
+    font-size: 0.85rem;
+    color: var(--color-info-dark);
+    text-align: center;
+  }
+
+  .portal-shot-extra {
+    margin-top: var(--space-4);
+  }
+  .shot-caption {
+    margin-top: var(--space-2);
+    font-size: 0.85rem;
+    color: var(--color-info-dark);
+    text-align: center;
+    max-width: var(--measure);
+    margin-inline: auto;
+  }
+
+  /* The console arrives from the side the section reads toward. Ends at
+     identity, so the resting frame is pixel-exact — a transform still applied
+     at rest would resample every glyph in it. */
+  .js .portal-shot.reveal {
+    transform: translateY(1.4rem) translateX(1.5rem);
+  }
+  .js .portal-shot.reveal.is-in {
+    transform: none;
+  }
+
+  @media (min-width: 1000px) {
+    .portal-head {
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-5);
+      align-items: center;
+    }
+    .portal-phone {
+      display: block;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .portal-cta:hover svg {
+      translate: none;
+    }
+    .panel {
+      rotate: none;
+    }
   }
 </style>

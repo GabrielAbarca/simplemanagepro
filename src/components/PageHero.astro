@@ -53,12 +53,19 @@ const hasOrnament = Astro.slots.has("ornament");
 </section>
 
 <style>
-  /* Shallower than the home hero's 90/54: this box is roughly half as tall,
-     and carrying the same percentages across it turns the fold into a wedge. */
+  /* The crease runs BELOW the copy, not through it.
+   *
+   * A page hero has no console to hide the crease behind, so the only safe
+   * band is under the content: at 84%/58% it came out straight through the
+   * "Ver la demo" button on /portales, where a crease reads as a stray line
+   * rather than as an edge. The extra bottom padding is what buys the band.
+   *
+   * scripts/crease-check.mjs asserts this against every hero on the site, at
+   * seven widths. Run it if you change any hero's layout or copy length. */
   .page-hero {
-    --fold-left: 84%;
-    --fold-right: 58%;
-    padding-block: var(--space-6) var(--space-5);
+    --fold-left: 95%;
+    --fold-right: 68%;
+    padding-block: var(--space-6) var(--space-7);
   }
 
   .hero-grid {

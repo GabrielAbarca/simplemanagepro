@@ -501,6 +501,89 @@ a.card-fold:hover::after {
   box-shadow: inset 0 0 0 1px var(--color-light);
 }
 
+/* ── Console frames ─────────────────────────────────────────────────────── */
+
+/* A capture in a browser window, carrying the demo's real host.
+ *
+ * Two jobs. It frames a screenshot as a running application rather than as a
+ * picture of one, and it tells the reader where the CTA above it goes before
+ * they click it — the page's whole conversion path is "open the demo".
+ *
+ * The width cap is not decoration: 1240px is what puts a 1280 CSS-px capture
+ * at 1:1 with the app's own pixels. Do not widen it past the capture width or
+ * the browser starts upscaling, which is the exact defect the capture rewrite
+ * removed. See ConsoleShot.astro.
+ */
+.console-frame {
+  margin: 0 auto;
+  width: min(1240px, 100%);
+  border-radius: var(--card-border-radius);
+  overflow: hidden;
+  background: var(--color-white);
+  box-shadow: var(--elev-3);
+  outline: 1px solid var(--color-light);
+}
+
+.console-frame picture,
+.console-frame img {
+  display: block;
+}
+
+.console-frame img {
+  width: 100%;
+  height: auto;
+}
+
+.frame-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem var(--space-2);
+  background: color-mix(in srgb, var(--color-dark) 5%, var(--color-white));
+  border-bottom: 1px solid var(--color-light);
+}
+
+.frame-bar .dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-dark) 18%, transparent);
+}
+
+.frame-bar .url {
+  margin-left: 0.6rem;
+  padding: 0.15rem 0.7rem;
+  border-radius: 999px;
+  background: var(--color-background);
+  color: var(--color-info-dark);
+  font-size: 0.76rem;
+  letter-spacing: 0.01em;
+}
+
+/* Holding the 390@3x capture, so it has to stop pretending to be a desktop
+   window. Below the switch every frame becomes one, because ConsoleShot has
+   already swapped to the phone capture underneath it and stretching a 390px
+   capture across a 700px frame would undo the whole ratio argument. */
+.console-frame.is-phone {
+  width: min(300px, 82vw);
+  border-radius: var(--space-3);
+}
+
+.console-frame.is-phone .frame-bar {
+  display: none;
+}
+
+@media (max-width: 759px) {
+  .console-frame {
+    width: min(300px, 82vw);
+    border-radius: var(--space-3);
+  }
+
+  .console-frame .frame-bar {
+    display: none;
+  }
+}
+
 /* ── Screenshots ────────────────────────────────────────────────────────── */
 
 .shot {

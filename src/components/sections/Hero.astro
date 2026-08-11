@@ -1,12 +1,10 @@
 ---
 import ConsoleShot from "../ConsoleShot.astro";
+import ConsoleFrame from "../ConsoleFrame.astro";
 import { DEMO_URL } from "../../config";
 import { portals } from "../../data/site";
 
 const admin = portals[0];
-
-// Shown with the URL bar, so it has to be the URL the CTA actually opens.
-const demoHost = DEMO_URL.replace(/^https?:\/\//, "");
 ---
 
 <section class="hero fold-hero">
@@ -64,12 +62,7 @@ const demoHost = DEMO_URL.replace(/^https?:\/\//, "");
          exists to remove. Depth comes from the frame, the elevation and the
          fold behind it. -->
     <div class="stage">
-      <figure class="frame">
-        <div class="frame-bar" aria-hidden="true">
-          <span class="dot"></span><span class="dot"></span><span class="dot"
-          ></span>
-          <span class="url">{demoHost}</span>
-        </div>
+      <ConsoleFrame>
         <ConsoleShot
           light={admin.image}
           dark={admin.imageDark}
@@ -82,7 +75,7 @@ const demoHost = DEMO_URL.replace(/^https?:\/\//, "");
           loading="eager"
           priority={true}
         />
-      </figure>
+      </ConsoleFrame>
     </div>
   </div>
 </section>
@@ -180,69 +173,6 @@ const demoHost = DEMO_URL.replace(/^https?:\/\//, "");
     from {
       opacity: 0;
       transform: translateY(1.2rem);
-    }
-  }
-
-  /* ── The frame ──────────────────────────────────────────────────────── */
-
-  /* A browser chrome bar, carrying the demo's real host. It frames the capture
-     as a running application rather than a picture, and it tells the reader
-     where the CTA above it goes before they click it. */
-  .frame {
-    margin: 0;
-    border-radius: var(--card-border-radius);
-    overflow: hidden;
-    background: var(--color-white);
-    box-shadow: var(--elev-3);
-    outline: 1px solid var(--color-light);
-    width: min(1240px, 100%);
-    margin-inline: auto;
-  }
-
-  .frame-bar {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.6rem var(--space-2);
-    background: color-mix(in srgb, var(--color-dark) 5%, var(--color-white));
-    border-bottom: 1px solid var(--color-light);
-  }
-
-  .dot {
-    width: 0.55rem;
-    height: 0.55rem;
-    border-radius: 50%;
-    background: color-mix(in srgb, var(--color-dark) 18%, transparent);
-  }
-
-  .url {
-    margin-left: 0.6rem;
-    padding: 0.15rem 0.7rem;
-    border-radius: 999px;
-    background: var(--color-background);
-    color: var(--color-info-dark);
-    font-size: 0.76rem;
-    letter-spacing: 0.01em;
-  }
-
-  .frame :global(picture),
-  .frame :global(img) {
-    display: block;
-  }
-  .frame :global(img) {
-    width: 100%;
-    height: auto;
-  }
-
-  /* Below the switch the frame holds a phone capture, so it has to stop
-     pretending to be a desktop window. */
-  @media (max-width: 759px) {
-    .frame {
-      width: min(300px, 82vw);
-      border-radius: var(--space-3);
-    }
-    .frame-bar {
-      display: none;
     }
   }
 
