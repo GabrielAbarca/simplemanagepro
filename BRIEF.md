@@ -166,6 +166,42 @@ asked, not foregrounded).
 
 ## 7. Page structure
 
+> **Amendment, August 2026 — one page became five.** Agreed with Gabriel before
+> the work started; recorded here rather than by rewriting the section, so the
+> original reasoning stays readable.
+>
+> The eight sections below are still the argument and still run in this order.
+> What changed is that they no longer all live on one document:
+>
+> | Route | Carries |
+> | --- | --- |
+> | `/` | 1, 2, a condensed 3, 4, a teaser of 6 |
+> | `/portales` | 3, in full |
+> | `/piloto` | 6, plus 5 relocated |
+> | `/nosotros` | 7, rewritten — plus misión and visión, which this brief does not cover |
+> | `/contacto` | 8 |
+>
+> Four changes of substance:
+>
+> - **Section 5 moved to `/piloto` and is now `Respuestas directas`.** All three
+>   facts are intact and none is softened. The framing changed: a list of
+>   deficits headed *"para que no lo descubra en la primera reunión"* announces
+>   bad news before the reader has asked for it, and it was doing that on the
+>   first-impression surface. As the director's own three questions, answered
+>   straight, it still buys the trust §7 says it buys.
+> - **Section 7 moved to `/nosotros`.** On the home page, "no hay un centro de
+>   soporte: le contesta él" read as solo-founder risk to a director who had not
+>   yet decided anything. The founder is still named, and the scarcity argument
+>   it used to carry now sits in the pilot's own framing.
+> - **The pilot timeline is gone.** Publishing dates for *la conversación*,
+>   *arranque* and *revisión* commits to a process that will differ per colegio,
+>   and the same dates are already in the prose without the commitment.
+> - **Section 8 became a page, headed `¿Su colegio podría ser uno de los tres?`**
+>   *Hablemos* was accurate and did no work.
+>
+> §8's rule that the demo is persistent rather than a section is unchanged, and
+> the demo CTA is now in the header on every route.
+
 One page. Order follows the director's skepticism.
 
 1. **What this is, for whom** — one breath, with the demo immediately available

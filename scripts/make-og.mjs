@@ -67,7 +67,7 @@ const html = `<!doctype html>
   .copy { position: relative; padding: 0 0 0 72px; width: 660px; }
   .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 34px; }
   .brand img { width: 40px; height: 40px; border-radius: 8px; }
-  .brand span { font-size: 21px; font-weight: 600; letter-spacing: -.01em; }
+  .brand span { font-size: 20px; font-weight: 700; letter-spacing: .04em; }
   .brand b { font-weight: 700; color: #d30011; }
 
   h1 {
@@ -100,7 +100,7 @@ const html = `<!doctype html>
 <div class="copy">
   <div class="brand">
     <img src="${asset("public/apple-touch-icon.png")}" alt="">
-    <span>Simple <b>Manage Pro</b></span>
+    <span>SIMPLE <b>MANAGE PRO</b></span>
   </div>
   <h1>El sistema con el que su colegio lleva el curso lectivo.</h1>
   <p class="sub">Notas, asistencia, horarios y expedientes en un solo lugar.</p>

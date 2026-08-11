@@ -9,20 +9,36 @@ disagree about this repo, this file wins.
 
 ## Project overview
 
-One static Spanish document at `simplemanagepro.com`, built with **Astro 5**.
-No framework, no adapter, no SSR, no routing — the page has none of the things
-that would justify them. Everything dynamic on it (the demo, WhatsApp) lives on
-another origin. Deploys as its own Vercel project.
+Five static Spanish pages at `simplemanagepro.com`, built with **Astro 5**. No
+framework, no adapter, no SSR — everything dynamic (the demo, WhatsApp) lives
+on another origin. Deploys as its own Vercel project.
+
+| Route | Job |
+| --- | --- |
+| `/` | Claim, problem→solution, portal overview, data isolation, pilot teaser |
+| `/portales` | The three consoles in depth, with real screenshots |
+| `/piloto` | The offer, both commitments, pricing stance, straight answers |
+| `/nosotros` | Misión, visión, how the work is done |
+| `/contacto` | WhatsApp and email |
+
+Slugs are Spanish because the site is `lang="es-CR"` and Spanish-only. Adding a
+route means adding it to `src/config.ts` (`NAV`) **and** `scripts/routes.mjs`,
+or the audit and review harnesses silently stop covering it.
 
 | Path | What it is |
 | --- | --- |
-| `BRIEF.md` | **The decision record.** Positioning, audience, offer, page structure (§7), conversion path (§8), build decisions (§9), Costa Rican language notes (§10). Every tension in it was argued through and closed. |
-| `src/pages/index.astro` | The page. All eight sections. |
-| `src/layouts/Layout.astro` | `<head>`, icons, font preloads, skip link. |
-| `src/components/` | `Header.astro` (sticky nav + theme toggle), `ThemedShot.astro` (light/dark screenshot swap). |
-| `src/styles/tokens.css` | Design tokens **inherited from the app**, plus `@font-face` for Poppins. |
-| `src/assets/screenshots/` | Portal captures, light and `-dark`, plus derived crops. |
-| `public/` | Icon set, self-hosted Poppins, `og.png`. |
+| `BRIEF.md` | **The decision record.** Positioning, audience, offer, page structure (§7 + its amendment), conversion path (§8), build decisions (§9), Costa Rican language notes (§10). |
+| `src/config.ts` | URLs, contact details, nav. Anything used by more than one route. |
+| `src/data/site.ts` | Portal content, pilot lists, the `/piloto` answers. |
+| `src/pages/` | One file per route. |
+| `src/layouts/Layout.astro` | `<head>`, per-page OG, head slot for JSON-LD, skip link, `<main>`, reveal script. |
+| `src/components/sections/` | Home-page sections. Shared closer: `CierreCta.astro`. |
+| `src/components/` | `Header.astro` (nav, mobile menu, theme toggle), `Footer.astro`, `ThemedShot.astro`, `HeroShot.astro` (theme **and** viewport swap). |
+| `src/lib/schema.ts` | JSON-LD builders. |
+| `src/styles/tokens.css` | Design tokens inherited from the app, plus `@font-face` for Poppins. |
+| `src/styles/base.css` | Shared layout and component primitives, and the fold system. |
+| `src/assets/screenshots/` | Portal captures, light and `-dark`, `m-` for the 390px pass, plus derived crops. |
+| `public/` | Icon set, self-hosted Poppins, `og.png`, `robots.txt`, manifest. |
 
 ## Commands
 
@@ -32,19 +48,27 @@ npm run check           # astro check — must stay 0 errors / 0 warnings
 npm run build           # production build
 npm run preview         # serve the build on :4321
 
-npm run capture         # re-shoot all 8 portal screenshots from the live demo
+npm run capture         # re-shoot the portal screenshots from the live demo,
+                        # desktop 1440@2x plus a 390@3x pass for hero fragments
 npm run derive          # regenerate cropped screenshots from those captures
 npm run og              # regenerate public/og.png (1200×630)
 
-npm run audit:contrast  # WCAG 1.4.3 audit against the rendered page
-npm run review          # full-page screenshots, desktop+mobile × light+dark
+npm run audit:contrast  # WCAG 1.4.3 audit, every route
+npm run review          # full-page screenshots, every route × desktop/mobile × light/dark
+npm run check:nojs      # every route renders complete with JavaScript disabled
 ```
 
-`audit:contrast` and `review` both need `npm run preview` already running.
-Both accept `CHROMIUM_PATH=` when the environment ships a browser whose build
-number does not match what Playwright would download.
+The last three need `npm run preview` already running, and all accept
+`CHROMIUM_PATH=` when the environment ships a browser whose build number does
+not match what Playwright would download. `audit:contrast` and `review` accept
+`ROUTE=piloto` to narrow to one page while iterating.
 
 **Run `check`, `build`, and `audit:contrast` before considering work done.**
+Add `review` and `check:nojs` for anything visual.
+
+Only one preview server can hold :4321. If a previous one is still running the
+new one silently moves to :4322 and every harness then measures the stale
+build — kill the old process rather than assuming the port.
 
 ## Hard rules
 
@@ -118,8 +142,27 @@ error about the product, not a style choice.
   school instance.
 - **No tech stack, no GitHub link, no Codingraph** on the page.
 - **Do not foreground the founder's student status.** Named founder, yes;
-  biography, no.
-- **`Qué no incluye` stays.** It is a trust device, not filler.
+  biography, no. He is named on `/nosotros` and nowhere else: on the home page
+  the same paragraph read as solo-founder risk to a director who had not yet
+  decided anything.
+- **The limits stay, as `Respuestas directas` on `/piloto`.** All three facts
+  are intact and none is softened — no encargado portal, no colegio using it
+  yet, expedientes hosted abroad. What changed is the framing and the location.
+  A list of deficits headed *"para que no lo descubra en la primera reunión"*
+  announces bad news before the reader has asked; the same content as the
+  director's own questions, answered straight, reads as candor. Do not quietly
+  drop it: BRIEF §7 keeps it as a trust device and it is still one.
+- **Never use an em dash (—) in copy.** It is the most recognizable marker of
+  AI-written text and this page cannot afford to read as generated. Commas,
+  colons and full stops do the same work. The same goes for the wider register:
+  no *optimizar*, *robusto*, *integral*, *sin fisuras*, no "en el mundo actual",
+  no empty intensifiers. Em dashes in **code comments** are fine — the rule is
+  about what a visitor reads.
+- **The brand is `SIMPLE MANAGE PRO` as a logotype, `Simple Manage Pro` in
+  prose.** Caps in the header, footer and OG card, matching the app's own
+  sidebar, which is visible inside the screenshots this page displays. Title
+  case in body copy, `<title>` and OG tags, matching the app's own metadata.
+  Caps need positive tracking; lowercase does not.
 
 ## Design conventions
 
@@ -133,15 +176,30 @@ error about the product, not a style choice.
   Non-negotiable, and `npm run audit:contrast` is how you prove it rather than
   assuming.
 
-  Two tokens have **zero headroom** and will fail under any decorative tint:
-  `--color-dark-variant` (4.54:1) and `--color-info-dark` (4.50:1). If you put
-  a gradient, glow, or large soft shadow anywhere near text set in them, it
-  will fail. Hold the decoration off the text rather than dimming it until it
-  passes — at any opacity where the effect is still worth having, those tiers
-  are already under the line.
+  The two muted text tiers **diverge from the app on purpose**, and this is the
+  one token divergence the page takes. The app's `#667281` / `#627388` clear
+  4.5:1 by 0.09 and 0.07, which is enough for a console because a console is
+  flat everywhere. A marketing page is not: the hero's own wash tints the
+  background to `#f4f4f7` and drops both under the line. That is why the
+  previous pass had a gradient in exactly one place and flat bands everywhere
+  else.
+
+  They are now `--color-dark-variant: #515c6b` (6.34:1) and
+  `--color-info-dark: #4e5c70` (6.35:1), so about 1.5 points are available for
+  tint, glow and gradient behind body copy. Dark mode needed only info-dark
+  raised (`#8f9eb1`, 6.38:1). **Spend that headroom, do not bank it — but run
+  `audit:contrast` after every change to a decorative layer.**
 
   Fills are separate from text colours: `--color-primary` carries white at
   only 3.48:1, so filled buttons use `--color-primary-fill` (4.53:1).
+- **The fold is the page's signature.** The brand mark is a crimson ribbon
+  folded back on itself with the darker crimson on the underside; the hero is
+  that shape at page scale, and `.fold-band` in `base.css` carries the same
+  upward-to-the-right edge down alternating sections so the page reads as one
+  folded sheet. It is all `clip-path` and gradients — no image, nothing that
+  costs a slow Android anything to paint. Both layers sit behind the content in
+  the band's own stacking context: **nothing decorative is ever painted over
+  type.**
 - **Motion is CSS, and cheap.** No WebGL, no GIF backgrounds. The primary
   channel is a WhatsApp forward opening on mobile data. Everything must
   collapse under `prefers-reduced-motion`, and the page must render complete
@@ -154,21 +212,43 @@ error about the product, not a style choice.
 ## Screenshots
 
 Captures come from the **live demo**, not fixtures, because the page invites
-the director to click through to that exact demo. Two known blemishes cannot
-currently be fixed by recapturing:
+the director to click through to that exact demo.
+
+**Legibility is a scale problem, not a resolution one.** The captures are a
+1440 CSS-px console; a full frame in the 1180px wrap is drawn at 0.41x, which
+puts a 14px table row at 5.9px. No bigger source file and no `srcset` changes
+that. The hero therefore uses **crops sized so displayed width is half the
+source width**, i.e. 1:1 with the app's own CSS pixels — that ratio is the
+whole trick, and `make-derived.mjs` prints it for every crop it writes. A phone
+cannot use the desktop crops either, so `npm run capture` also shoots at
+390@3x (`m-` prefix) and `HeroShot.astro` switches on viewport as well as theme.
+
+Two known blemishes cannot be fixed from this repo:
 
 - The admin overview reads **"Bienvenido, Demo Account"** — the auth user's
   display name, which lives in `auth.users` and is out of bounds without an
   explicit ask.
-- **"Asistencia de hoy: Sin datos"** appears whenever the capture runs on a
-  weekend. A weekday run fills it.
+- **"Asistencia de hoy: Sin datos".** Previously recorded as a weekend
+  artifact; that is wrong, a Monday capture shows it too. The demo's fixtures
+  carry no attendance for the current date, so it will show on any day. Fixing
+  it means seeding the demo, not re-running the capture.
 
 `npm run derive` crops around both. BRIEF §9 sanctions cropping per section, so
 cropping is the intended treatment rather than a workaround.
 
 ## Verification
 
-Visual work is not done until it has been looked at. Drive Playwright against
-`npm run preview` and read the resulting PNGs — set `img.loading='eager'` and
-scroll gently before capturing, or below-the-fold sections come out blank.
-`npm run review` does this for desktop and mobile in both themes.
+Visual work is not done until it has been looked at. `npm run review` drives
+Playwright against `npm run preview` for every route, desktop and mobile, both
+themes — then **read the PNGs**.
+
+Two traps that have already cost a session each:
+
+- **Check the output path.** The harness writes to `os.tmpdir()`. It used to
+  default to a literal `/tmp/review`, which Node on Windows resolves against
+  the current drive as `C:\tmp\review` while the launching shell translates the
+  same string to the real temp directory. The captures went one place and were
+  read from another, so a change looked like it had done nothing.
+- **Check which server you measured.** If a preview is already on :4321 the new
+  one moves to :4322 without failing, and every harness then measures the old
+  build.
