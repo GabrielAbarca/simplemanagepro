@@ -1,0 +1,66 @@
+---
+/**
+ * A console in hardware rather than in a browser window.
+ *
+ * ConsoleFrame is the other half of this pair and stays the default: it says
+ * "this is a web app, at this host", which is what a surface with one console
+ * on it should say. This one exists for the home hero's lineup, where the
+ * point is that the same system is used in three different places, and three
+ * identical browser windows cannot carry that.
+ *
+ * The screen is the capture's own CSS width and the bezel is padding outside
+ * it, so putting a shot in hardware never shrinks the product. Geometry lives
+ * in base.css under "Hardware bezels"; this only picks the variant and the
+ * accent.
+ *
+ * `accent` is a portal accent from site.ts, used as a rim and an outer glow.
+ * They are fills, never text, so a rim is a legitimate use and a theme
+ * override is unnecessary: a fill's contrast is a property of the fill.
+ */
+interface Props {
+  kind: "monitor" | "tablet" | "phone";
+  /** CSS px of the SCREEN, which must equal the width the capture was shot at.
+   *  The device sizes itself from this plus its own bezel, so there is no
+   *  width to keep in sync and no way for the frame to eat into the capture.
+   *  Accepts a CSS length so a caller can hand it a min() for narrow screens. */
+  screenWidth: number | string;
+  accent?: string;
+  class?: string;
+}
+
+const { kind, screenWidth, accent, class: className } = Astro.props;
+
+const phone = kind === "phone";
+
+// Bezel and radius per device. A monitor's frame is thin and square-ish, a
+// tablet's is thicker and rounder, and a phone's is set in base.css because it
+// also carries the island and the side buttons.
+const shape = {
+  monitor: "--bz: 15px; --r: 22px;",
+  tablet: "--bz: 17px; --r: 30px;",
+  phone: "",
+}[kind];
+
+const width = typeof screenWidth === "number" ? `${screenWidth}px` : screenWidth;
+
+const style = [`--screen-w: ${width};`, shape, accent ? `--accent: ${accent};` : ""]
+  .filter(Boolean)
+  .join(" ");
+---
+
+<figure class:list={["device", phone && "device-phone", className]} style={style}>
+  {
+    phone ? (
+      <>
+        <span class="island" aria-hidden="true" />
+        <span class="side" aria-hidden="true" />
+        <span class="vol" aria-hidden="true" />
+      </>
+    ) : (
+      <span class="cam" aria-hidden="true" />
+    )
+  }
+  <div class="glass">
+    <slot />
+  </div>
+</figure>

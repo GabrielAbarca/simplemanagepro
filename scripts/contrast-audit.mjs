@@ -61,6 +61,30 @@ for (const { route, v, theme } of MATRIX) {
   });
   await page.waitForTimeout(500);
 
+  // Freeze anything sized to the viewport BEFORE growing it.
+  //
+  // The grow below sets the viewport to the document height so that one layout
+  // serves both the measurement and the screenshot. That silently breaks any
+  // element sized in viewport units, and the home hero is now
+  // `calc(100svh - var(--header-h))`: at a 5221px "viewport" it became a
+  // 5157px hero, so the audit measured a page no visitor will ever see. The
+  // hero wash lands somewhere else entirely at that height, which is how the
+  // eyebrow came back at 4.48:1 against a background it never actually sits
+  // on, while roughly 70 elements per pass fell out of the run.
+  //
+  // Pin the hero to the height it really had at the real viewport. Injected
+  // before pass 1 so both passes still see one layout.
+  const heroHeight = await page.evaluate(() => {
+    const hero = document.querySelector(".hero");
+    return hero ? Math.round(hero.getBoundingClientRect().height) : 0;
+  });
+  if (heroHeight) {
+    await page.addStyleTag({
+      content: `.hero { height: ${heroHeight}px !important; }`,
+    });
+    await page.waitForTimeout(200);
+  }
+
   // Grow the viewport to the whole document instead of using fullPage
   // screenshots. fullPage re-lays-out at the document height internally, so
   // boxes measured at 1440×900 no longer line up with the pixels captured —

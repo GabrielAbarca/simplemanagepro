@@ -61,6 +61,17 @@ const SCALE = 3;
 const MOBILE_VIEWPORT = { width: 390, height: 860 };
 const MOBILE_SCALE = 3;
 
+/**
+ * Tablet pass, landscape. Only the home hero uses it, for the middle device in
+ * the lineup, and it is shot at the CSS width that device displays: 1180 in,
+ * 1180 out, so the app's own layout lands at 1:1 the way the desktop pass
+ * does. Landscape rather than portrait because 1180 is above the app's desktop
+ * breakpoint, so the gradebook keeps the shape the copy describes; a portrait
+ * 820 would capture the phone layout at tablet size, which is neither.
+ */
+const TABLET_VIEWPORT = { width: 1180, height: 860 };
+const TABLET_SCALE = 2;
+
 /** Light keeps the plain filename; dark takes a suffix. */
 const THEMES = [
   { name: "light", suffix: "" },
@@ -73,7 +84,19 @@ const THEMES = [
  * window someone squashed; the ceiling stops a long one (75 gradebook rows)
  * from producing a strip nobody can place on a page.
  */
-const HEIGHT = { desktop: { min: 720, max: 1040 }, mobile: { min: 700, max: 860 } };
+const HEIGHT = {
+  desktop: { min: 720, max: 1040 },
+  mobile: { min: 700, max: 860 },
+  tablet: { min: 700, max: 860 },
+};
+
+/** Everything a pass needs, so adding one is a table entry rather than a new
+ *  boolean threaded through capture(). */
+const PASSES = {
+  desktop: { viewport: VIEWPORT, scale: SCALE, prefix: "", touch: false },
+  mobile: { viewport: MOBILE_VIEWPORT, scale: MOBILE_SCALE, prefix: "m-", touch: true },
+  tablet: { viewport: TABLET_VIEWPORT, scale: TABLET_SCALE, prefix: "t-", touch: true },
+};
 
 /**
  * The three portals, in the order the page shows them. `ready` is a selector
@@ -95,7 +118,7 @@ const PORTALS = [
     // "Mis clases", so m-teacher*.png had no call site — it was the stand-in
     // from when the app's mobile periodo control painted empty, and that is
     // fixed. Shooting it every pass produced two files nothing imports.
-    desktopOnly: true,
+    passes: ["desktop"],
   },
   {
     // The gradebook is the teacher view that actually argues the case: it is
@@ -124,6 +147,9 @@ const PORTALS = [
       const s = document.querySelector("#view-class select");
       return !s || Boolean(s.value);
     },
+    // Also the tablet pass: the gradebook is the middle device in the home
+    // hero's lineup, and it is the only surface that needs one.
+    passes: ["desktop", "mobile", "tablet"],
   },
   { file: "student", path: "/", ready: ".grade-overview, #grades-table, main" },
 ];
@@ -161,16 +187,17 @@ async function contentHeight(page) {
 
 const clamp = (n, { min, max }) => Math.min(max, Math.max(min, n));
 
-async function capture(browser, theme, mobile = false) {
-  const base = mobile ? MOBILE_VIEWPORT : VIEWPORT;
-  const bounds = mobile ? HEIGHT.mobile : HEIGHT.desktop;
+async function capture(browser, theme, pass = "desktop") {
+  const { viewport: base, scale, prefix, touch } = PASSES[pass];
+  const bounds = HEIGHT[pass];
+  const mobile = pass === "mobile";
 
   const context = await browser.newContext({
     viewport: base,
-    deviceScaleFactor: mobile ? MOBILE_SCALE : SCALE,
+    deviceScaleFactor: scale,
     locale: "es-CR",
     isMobile: mobile,
-    hasTouch: mobile,
+    hasTouch: touch,
   });
 
   // The page's inline <head> guard reads this before first paint, so seeding
@@ -188,7 +215,7 @@ async function capture(browser, theme, mobile = false) {
   await page.waitForURL(/\/admin\b/, { timeout: 30_000 });
 
   for (const portal of PORTALS) {
-    if (mobile && portal.desktopOnly) continue;
+    if (!(portal.passes ?? ["desktop", "mobile"]).includes(pass)) continue;
 
     // Reset: the previous portal trimmed the window to its own content.
     await page.setViewportSize(base);
@@ -263,8 +290,6 @@ async function capture(browser, theme, mobile = false) {
       await page.waitForTimeout(500);
     }
 
-    const prefix = mobile ? "m-" : "";
-    const scale = mobile ? MOBILE_SCALE : SCALE;
     const file = path.join(OUT, `${prefix}${portal.file}${theme.suffix}.png`);
     await page.screenshot({ path: file });
     console.log(
@@ -280,11 +305,15 @@ async function capture(browser, theme, mobile = false) {
 const browser = await chromium.launch();
 await mkdir(OUT, { recursive: true });
 
-console.log(`Capturing ${BASE} at ${VIEWPORT.width} CSS px @${SCALE}x`);
-for (const theme of THEMES) await capture(browser, theme);
-
-console.log(`Capturing ${MOBILE_VIEWPORT.width} CSS px @${MOBILE_SCALE}x for phones`);
-for (const theme of THEMES) await capture(browser, theme, true);
+// PASS=tablet reshoots one pass without disturbing captures that are already
+// reviewed and committed.
+const only = process.env.PASS ? process.env.PASS.split(",") : null;
+for (const pass of Object.keys(PASSES)) {
+  if (only && !only.includes(pass)) continue;
+  const { viewport, scale } = PASSES[pass];
+  console.log(`Capturing ${BASE} at ${viewport.width} CSS px @${scale}x (${pass})`);
+  for (const theme of THEMES) await capture(browser, theme, pass);
+}
 
 await browser.close();
 console.log("Done.");

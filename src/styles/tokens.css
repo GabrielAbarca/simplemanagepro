@@ -148,6 +148,15 @@
   --elev-3:
     0 12px 28px rgba(24, 26, 30, 0.12), 0 36px 68px rgba(24, 26, 30, 0.14);
 
+  /* The sticky header's height, so a hero locked to the viewport can subtract
+     it. It used to be implicit, which was fine while nothing depended on it.
+     Measured at 65.03px with the nav and 61.77px with the menu button, so this
+     is deliberately ROUNDED UP past both: over-estimating leaves a few px of
+     the next section peeking, which is harmless and even reads as a hint that
+     there is more, while under-estimating pushes the hero past the viewport
+     and forces the scrollbar the lock exists to remove. */
+  --header-h: 4.1rem;
+
   /* Motion. One ease and three durations — a landing page that eases six
      different ways reads as six different pages. */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);

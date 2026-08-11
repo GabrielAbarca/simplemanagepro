@@ -10,6 +10,8 @@ import gradebookShot from "../assets/screenshots/teacher-gradebook.png";
 import gradebookShotDark from "../assets/screenshots/teacher-gradebook-dark.png";
 import gradebookShotM from "../assets/screenshots/m-teacher-gradebook.png";
 import gradebookShotMDark from "../assets/screenshots/m-teacher-gradebook-dark.png";
+import gradebookShotT from "../assets/screenshots/t-teacher-gradebook.png";
+import gradebookShotTDark from "../assets/screenshots/t-teacher-gradebook-dark.png";
 import studentShot from "../assets/screenshots/student.png";
 import studentShotDark from "../assets/screenshots/student-dark.png";
 import studentShotM from "../assets/screenshots/m-student.png";
@@ -39,6 +41,12 @@ export interface Portal {
    *  a desktop frame at 0.3x. */
   mobileImage: ImageMetadata;
   mobileImageDark: ImageMetadata;
+  /** 1180@2x landscape capture. Only the docente console has one, because only
+   *  the home hero's lineup needs a tablet and only the gradebook is in it.
+   *  1180 is above the app's desktop breakpoint, so this is the tablet layout
+   *  with its collapsed icon rail rather than the phone layout enlarged. */
+  tabletImage?: ImageMetadata;
+  tabletImageDark?: ImageMetadata;
   alt: string;
   /** Second capture, shown only on /portales where there is room for it. */
   extraImage?: ImageMetadata;
@@ -85,6 +93,8 @@ export const portals: Portal[] = [
     imageDark: gradebookShotDark,
     mobileImage: gradebookShotM,
     mobileImageDark: gradebookShotMDark,
+    tabletImage: gradebookShotT,
+    tabletImageDark: gradebookShotTDark,
     alt: "Libro de notas de Matemáticas, Undécimo Sección 1, mostrando la nota de cada estudiante en el II Periodo.",
     extraImage: teacherShot,
     extraImageDark: teacherShotDark,

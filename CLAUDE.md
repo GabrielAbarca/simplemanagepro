@@ -220,6 +220,17 @@ error about the product, not a style choice.
   **Never set one as `color` on the page background.** Crimson is not among
   them: `--color-brand` is identity only, and a portal wearing it would teach
   the reader that red means "action" here and "brand" three sections later.
+- **The home hero is locked to one viewport.** It is
+  `height: calc(100svh - var(--header-h))`, not `min-height`, so a device
+  bleeds past the edge instead of growing the hero. `--header-h` is rounded up
+  past the real header (65.03px with the nav, 61.77px with the menu button):
+  over-estimating leaves a few px of the next section peeking, under-estimating
+  forces the scrollbar the lock exists to remove. Two consequences worth
+  knowing before editing it. `base.css` gives every `<section>` 6.4rem of block
+  padding and a hero that owns its height must zero it, or the inner box is
+  102px short at each end. And the devices are anchored in **rem, not per
+  cent**: the copy stack does not shrink with the window, so a percentage that
+  clears it at 900px tall puts a device through the note at 657.
 - **The fold is the page's signature.** The brand mark is a crimson ribbon
   folded back on itself with the darker crimson on the underside; the hero is
   that shape at page scale, and `.fold-band` in `base.css` carries the same
@@ -290,6 +301,33 @@ page wanted in exchange for a problem the geometry above does not have.
 A phone cannot use a desktop frame at all, so `npm run capture` also shoots at
 390@3x (`m-` prefix) and `ConsoleShot` switches on viewport as well as theme.
 
+**The density is not the same on both axes, and stating the rule as a flat
+1×/2× is what broke it a second time.** Laptops are 1× or 2×; phones are 3×,
+near universally, which is exactly why the mobile pass is shot at 3×. A 1×/2×
+ladder under a 300px phone frame topped out at 600w against a 900 device-px
+need and the browser upscaled by 1.5×, on the surface where the reader is
+closest to the glass. `ConsoleShot` parameterises the ladder now: 2× desktop,
+3× mobile. Desktop deliberately stays at 2× because 1240 × 3 would emit a
+3720px WebP no real display asks for.
+
+The phone frame is **390, the width the capture was shot at**, not 300. A
+390 CSS-px capture displayed in a 300px box shrinks the app's own layout, so
+the product's 13px UI text painted at 10px before any resampling started.
+
+There are three passes, and `PASS=tablet npm run capture` reshoots one without
+disturbing captures that are already reviewed. The tablet pass is **1180@2x
+landscape** (`t-` prefix) and only the gradebook has one, because only the home
+hero's lineup needs a tablet. 1180 is above the app's desktop breakpoint, so it
+captures the tablet layout with its collapsed icon rail rather than the phone
+layout enlarged.
+
+**`DeviceFrame.astro` puts a console in hardware, and its bezel is padding
+outside the screen.** The screen is always the exact CSS width its capture was
+shot at, so wrapping a shot in a monitor, tablet or phone can never shrink the
+product to make room for the frame. Set `screenWidth`, never a width on the
+device. `ConsoleFrame` stays the default for surfaces showing one console: it
+says "this is a web app, at this host", which is what those pages should say.
+
 One known blemish is left, and it is deliberate: the admin overview reads
 **"Bienvenido, Demo Account"**. That is the auth user's display name, it lives
 in `auth.users`, and it is out of bounds without an explicit ask. Gabriel's
@@ -342,6 +380,15 @@ first.** It has been wrong three times and right every other time:
   bounding box**, and the audit was sampling text nobody can see against
   whatever is painted at those coordinates two sections further down. It calls
   `checkVisibility()` now.
+- `contrast-audit` grows the viewport to the document height so that one layout
+  serves both the measurement and the screenshot. That silently breaks anything
+  sized in viewport units, and the home hero is now
+  `calc(100svh - var(--header-h))`: at a 5221px "viewport" it became a 5157px
+  hero, so the audit measured a page no visitor will ever see. The wash landed
+  somewhere else entirely, which reported the eyebrow at 4.48:1 against a
+  background it never sits on, while about 70 elements per pass fell out of the
+  run. **A drop in the element count is the tell** — it should sit near 1074.
+  It pins the hero's real height before growing now.
 - `naturalWidth` on a `w`-descriptor `srcset` is **density-corrected**, so a
   2480px file selected for a 1240px slot reports 1240. Check `currentSrc`, not
   `naturalWidth`, when verifying which candidate a browser picked.

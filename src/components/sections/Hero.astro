@@ -1,18 +1,27 @@
 ---
 import ConsoleShot from "../ConsoleShot.astro";
-import ConsoleFrame from "../ConsoleFrame.astro";
+import DeviceFrame from "../DeviceFrame.astro";
 import { DEMO_URL } from "../../config";
 import { portals } from "../../data/site";
 
-const admin = portals[0];
+const [admin, docente, estudiante] = portals;
+
+// Written out rather than derived from `label`. The three labels are not one
+// pattern ("Consola de la dirección", "Consola del docente", "Portal del
+// estudiante"), so a regex that strips the prefix leaves "Portal del
+// estudiante" sitting next to two bare nouns. These are presentation, and the
+// key needs three words of the same shape.
+const key = [
+  { name: "Dirección", accent: admin.accent },
+  { name: "Docentes", accent: docente.accent },
+  { name: "Estudiantes", accent: estudiante.accent },
+];
 ---
 
-<section class="hero fold-hero">
+<section class="hero fold-hero" data-tilt>
   <!-- The fold. The brand mark is a crimson ribbon folded back on itself, and
        this is that shape at page scale. Geometry lives in base.css; the hero
-       only sets where the crease crosses, which here is right where the copy
-       ends and the console begins, so the product reads as resting on the
-       turned-back face of the sheet. -->
+       only sets where the crease crosses. -->
   <div class="fold" aria-hidden="true">
     <span class="face face-up"></span>
     <span class="face face-down"></span>
@@ -20,174 +29,206 @@ const admin = portals[0];
     <span class="rule"></span>
   </div>
 
-  <div class="wrap">
-    <!-- The headline splits across the row rather than stacking above it.
-         Stacked, the claim ran four lines down the left and left the entire
-         upper right of the hero empty, and it pushed the console almost
-         entirely below the fold — on the one page whose job is to show the
-         product. Set against the lede and the CTAs it fills the band, and the
-         console clears the fold on a laptop. -->
+  <div class="hero-inner">
     <div class="hero-copy">
-      <div class="copy-split">
-        <div>
-          <p class="eyebrow">Hecho para Costa Rica</p>
-          <h1>El sistema con el que su colegio lleva el curso lectivo.</h1>
-        </div>
-        <div class="copy-aside">
-          <p class="lede">
-            Notas, asistencia, horarios y expedientes en un solo lugar: para la
-            dirección, para los docentes y para los estudiantes.
-          </p>
-          <div class="cta-row">
-            <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
-            <a class="btn btn-quiet" href="/piloto">Conocer el piloto 2027</a>
-          </div>
-          <p class="note">
-            Es un colegio de ejemplo, con datos de ejemplo. Nada de lo que haga
-            ahí se guarda.
-          </p>
-        </div>
+      <p class="eyebrow">Hecho para Costa Rica</p>
+      <h1>Tres consolas. Un solo sistema.</h1>
+      <p class="lede">
+        La dirección configura, los docentes califican y los estudiantes
+        consultan. Todo sobre los mismos datos.
+      </p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
+        <a class="btn btn-quiet" href="/piloto">Conocer el piloto 2027</a>
       </div>
+      <p class="note">
+        Es un colegio de ejemplo, con datos de ejemplo. Nada de lo que haga ahí
+        se guarda.
+      </p>
     </div>
 
-    <!-- Two planes in one perspective space.
-         The stage owns the perspective rather than each frame carrying its
-         own, which is the difference between a composition with depth and two
-         separately skewed rectangles. The phone sits on a positive Z, so it is
-         genuinely in front of the console rather than merely overlapping it.
+    <!-- Below the breakpoint only one console is legible, so the other two
+         keep their claim in words.
 
-         Both are whole frames. The capture is shot at 1280 CSS px and the
-         console is displayed at 1240, so it renders at 1:1 with the app's own
-         pixels, and the source is 3x, so no browser has to stretch it. See the
-         .stage rules below for why the tilt does not undo that. -->
-    <!-- The planes are wrappers this component owns, not classes handed to
-         ConsoleFrame. Astro does not put a parent's scope attribute on a child
-         component's root element, so `class="plane"` on <ConsoleFrame> renders
-         the class but never matches the rule that styles it. -->
-    <div class="stage" data-tilt>
-      <div class="plane plane-console">
-        <ConsoleFrame>
+         It sits BEFORE the lineup in the source, which matters: after it, the
+         collapsed layout put the key underneath a device that is 884px tall
+         and bleeding past the viewport, so the one element carrying the
+         three-console idea on a phone landed at y1478 and was clipped out of
+         the page entirely. -->
+    <ul class="portal-key">
+      {
+        key.map((k) => <li style={`--accent: ${k.accent}`}>{k.name}</li>)
+      }
+    </ul>
+
+    <!-- THE LINEUP.
+         Three consoles, three devices, one perspective, and the page's thesis
+         moved into the first viewport instead of 900px down it.
+
+         It fits because each device behind is partly occluded by the one in
+         front. Nothing is scaled to make room, which is the only way three
+         whole consoles stay legible at once.
+
+         WHY EVERY DEVICE SITS AT OR BEHIND z=0. Perspective scales a point by
+         p / (p - z), so a positive translateZ pulls a plane toward the viewer
+         and MAGNIFIES it, and magnification is the one transform that visibly
+         softens a screenshot. Depth is built by pushing the back devices away
+         instead: the phone is the reference at 0 and everything behind it is
+         minified, which is only ever a downsample. The same reasoning governs
+         the rotation, which is about the right edge with a negative rotateY so
+         no point comes forward, and the pointer parallax below is clamped to
+         keep it that way.
+
+         The cost, stated plainly rather than buried: the console draws at
+         about 0.93 of 1240, so it is no longer pixel-for-pixel with the app.
+         It is still a clean downsample from a 2x source. -->
+    <div class="rig">
+      <div class="dev dev-monitor">
+        <DeviceFrame kind="monitor" screenWidth={1240} accent={admin.accent}>
           <ConsoleShot
             light={admin.image}
             dark={admin.imageDark}
+            alt={admin.alt}
+            displayWidth={1240}
+            loading="lazy"
+          />
+        </DeviceFrame>
+      </div>
+
+      <div class="dev dev-tablet">
+        <DeviceFrame kind="tablet" screenWidth={1180} accent={docente.accent}>
+          <ConsoleShot
+            light={docente.tabletImage!}
+            dark={docente.tabletImageDark!}
+            alt={docente.alt}
+            displayWidth={1180}
+            loading="lazy"
+          />
+        </DeviceFrame>
+      </div>
+
+      <!-- The phone changes console at the breakpoint, which is the one place
+           this hero is asymmetric on purpose. Above it the phone is the
+           estudiante portal and the lineup reads as three. Below it the other
+           two devices are gone, so whatever is in the phone IS the hero image,
+           and the person holding that phone is far more likely to be the
+           director deciding than a student. So it carries the dirección
+           console there, and the rim follows it. -->
+      <div class="dev dev-phone">
+        <DeviceFrame kind="phone" screenWidth="var(--phone-w)">
+          <ConsoleShot
+            light={estudiante.mobileImage}
+            dark={estudiante.mobileImageDark}
             mobileLight={admin.mobileImage}
             mobileDark={admin.mobileImageDark}
             alt={admin.alt}
-            displayWidth={1240}
-            sizes="(min-width: 1292px) 1240px, calc(100vw - 3.2rem)"
-            mobileSizes="min(390px, 100vw)"
+            displayWidth={390}
+            mobileSizes="min(390px, calc(100vw - 2rem))"
+            breakpoint={1000}
             loading="eager"
             priority={true}
           />
-        </ConsoleFrame>
-      </div>
-
-      {/* Second plane. Hidden below the breakpoint, where ConsoleShot has
-          already swapped the frame above to this same phone capture and it
-          would be the same picture twice. Decorative there, so no alt. */}
-      <div class="plane plane-phone">
-        <ConsoleFrame phone>
-          <ConsoleShot
-            light={admin.mobileImage}
-            dark={admin.mobileImageDark}
-            alt=""
-            displayWidth={390}
-            loading="eager"
-          />
-        </ConsoleFrame>
+        </DeviceFrame>
       </div>
     </div>
+
   </div>
 </section>
 
 <style>
   /* THE CONSTRAINT ON THESE TWO NUMBERS.
    *
-   * Both ends of the crease must land between the console's top and its
-   * bottom. The console is opaque and nearly the full width, so a crease
-   * placed there is hidden behind the product and shows only as two short
-   * diagonal stubs in the gutters either side, which is the sheet continuing
-   * behind the thing resting on it.
-   *
-   * Anywhere higher and it crosses copy: at 22% it ran through the lede, and
-   * an earlier pass at 44% ran it through the CTA row, where a crease reads as
-   * a stray line rather than as an edge. Anywhere lower and it lands under the
-   * console in the run-out to the next section, where it competes with that
-   * section's own fold-band edge.
+   * The crease must clear the copy on the left and may hide behind a device on
+   * the right, so it rakes steeply upward rather than running shallow across
+   * the middle the way it did when the copy was a full-width band. At a locked
+   * viewport height the copy occupies most of the left column, which leaves
+   * the crease almost no room there: it goes near the bottom on that edge and
+   * mid-height on the other.
    *
    * The band is narrow and moves with the viewport, so measure rather than
-   * eyeball if you change the hero's layout: at 1440 the console runs from 32%
-   * to 88% of the hero, at 1024 from 35% to 86%.
+   * eyeball. `npm run check:crease` asserts it at eight widths and treats
+   * console frames as cover; it does NOT know about .device, so the copy is
+   * what has to stay clear.
    */
   .hero {
-    --fold-left: 56%;
+    position: relative;
+    /* block, with .hero-inner taking the height explicitly. As a flex parent
+       the inner box would not stretch: it settled at 629px inside an 834px
+       hero and centred itself, which pushed the copy 103px down, straight into
+       the phone and the tablet. Type over device hardware is the one thing the
+       fold rules forbid outright, and it failed the contrast audit at 4.39:1.
+       Deterministic beats clever here. */
+    display: block;
+    /* height, not min-height. min-height lets a device push the hero past one
+       screen, which is the defect this pass exists to remove; a fixed height
+       plus the clip .fold-hero already carries is what makes a device bleed
+       instead of grow. min-height is the floor for the pathological case, a
+       very short window or a large default font size, where clipping the CTAs
+       would be worse than scrolling. */
+    height: calc(100svh - var(--header-h));
+    min-height: 33rem;
+    /* base.css gives every <section> 6.4rem of block padding. A hero that owns
+       its own height cannot also carry it: it took 102.4px off the top and the
+       bottom, so .hero-inner was 629px inside an 834px hero and the copy began
+       102px lower than align-content:start put it. The inner box owns the
+       spacing here. */
+    padding-block: 0;
+    --fold-left: 97%;
     --fold-right: 40%;
-    padding-block: var(--space-5) var(--space-6);
+    /* Set by the pointer script; these are the resting values. */
+    --ry: -8deg;
+    --rx: 3deg;
+    --phone-w: 390px;
   }
 
-  /* Between the two breakpoints the console is still the desktop frame but the
-     headline has not split yet, so the copy is a good 200px taller and the
-     desktop percentages put the crease back through it. */
-  @media (min-width: 760px) and (max-width: 999px) {
-    .hero {
-      --fold-left: 68%;
-      --fold-right: 56%;
-    }
-  }
-
-  /* Stacked, the copy is taller again and the phone frame starts far lower. */
-  @media (max-width: 759px) {
-    .hero {
-      --fold-left: 62%;
-      --fold-right: 52%;
-    }
-  }
-
-  /* Wider than the 1180px the rest of the page uses: 1240px of content is what
-     puts the console at 1:1 with the app, and that ratio is the whole fix. */
-  .hero .wrap {
-    max-width: 1292px;
+  .hero-inner {
+    position: relative;
+    z-index: 4;
+    width: 100%;
+    height: 100%;
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: var(--space-4) var(--space-3);
+    display: grid;
+    /* minmax(0, 1fr), not the implicit `auto`. The phone is deliberately wider
+       than the gutter allows on a small screen, and an auto track takes its
+       max-content width as a floor: the column grew to the device's width and
+       dragged the copy out past the right edge with it. */
+    grid-template-columns: minmax(0, 1fr);
+    align-content: start;
+    justify-items: start;
   }
 
   .hero-copy {
+    display: grid;
+    gap: var(--space-2);
+    width: min(27rem, 100%);
     /* Entrance, not a scroll reveal: this is above the fold on every screen,
        so a scroll sweep would fire immediately anyway. */
     animation: rise var(--dur-slow) var(--ease-out) both;
-    margin-bottom: var(--space-5);
   }
 
-  .copy-split {
-    display: grid;
-    gap: var(--space-4);
+  /* The copy stack is a grid and the gap owns the rhythm. base.css gives
+     .eyebrow and .lede their own margins for the flow layouts everywhere else,
+     and left in place they stack on top of the gap: about 70px of the copy
+     block was margin nobody asked for, which is 70px of console on the phone. */
+  .hero-copy > * {
+    margin: 0;
   }
 
   .hero h1 {
-    font-size: clamp(2.2rem, 4.4vw, 3.4rem);
-    max-width: 18ch;
+    font-size: clamp(1.9rem, 2.9vw, 2.55rem);
+    max-width: 14ch;
   }
   .hero .lede {
-    margin-top: 0;
+    font-size: 1.05rem;
+    max-width: 32ch;
   }
   .hero .note {
-    max-width: 44ch;
+    max-width: 36ch;
   }
-
-  @media (min-width: 1000px) {
-    .copy-split {
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-      gap: var(--space-5);
-      align-items: end;
-    }
-    .copy-aside {
-      /* Sits on the headline's own baseline rather than floating beside its
-         middle, which is what makes the two columns read as one block. */
-      padding-bottom: 0.4rem;
-    }
-  }
-
-  .stage {
-    position: relative;
-    animation: rise var(--dur-slow) 140ms var(--ease-out) both;
+  .hero .cta-row {
+    margin-top: var(--space-1);
   }
 
   @keyframes rise {
@@ -197,117 +238,291 @@ const admin = portals[0];
     }
   }
 
-  /* ── The two planes ─────────────────────────────────────────────────── */
+  /* ── The lineup ───────────────────────────────────────────────────────── */
 
-  /* WHY A TILTED SCREENSHOT STAYS SHARP HERE.
-   *
-   * A perspective transform resamples a screenshot, and an earlier pass of
-   * this hero dropped the tilt for exactly that reason. That was the wrong
-   * conclusion: what damages a screenshot is MAGNIFICATION, not rotation.
-   * Perspective scales a point by p / (p - z). Rotating about the RIGHT edge
-   * with a negative rotateY sends every other point to a negative z, so the
-   * factor is at most 1.0 at that edge and below 1.0 everywhere else. The
-   * plane can only ever be minified, which is what a downsample is, and the
-   * source carries 3x for a frame displayed at 1x.
-   *
-   * The rule that follows: keep the origin on the edge the rotation brings
-   * forward, and keep rotateY negative. A centred origin, or a positive
-   * rotateY, pulls the near half toward the viewer and starts upscaling it.
-   * The pointer parallax below is clamped for the same reason.
-   */
-  @media (min-width: 760px) {
-    .stage {
-      perspective: 1800px;
-      /* Set by the pointer script; these are the resting values. */
-      --ry: -7deg;
-      --rx: 2.5deg;
+  /* Breaks out of the 1180px column to span the viewport, so the placements
+     below are percentages of the window rather than of the text measure. */
+  .rig {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    translate: -50% 0;
+    width: 100vw;
+    height: 100%;
+    z-index: -1;
+    perspective: 2000px;
+    perspective-origin: 68% 38%;
+    pointer-events: none;
+  }
+
+  .dev {
+    position: absolute;
+    transform-origin: right center;
+    transition: transform var(--dur-slow) var(--ease-out);
+    animation: rise var(--dur-slow) var(--ease-out) both;
+  }
+
+  .dev-monitor {
+    left: 45%;
+    top: 3%;
+    transform: translateZ(-150px) rotateY(var(--ry)) rotateX(var(--rx));
+    animation-delay: 120ms;
+  }
+
+  /* The two lower devices start below the copy block, not merely behind it:
+     both run under the copy column horizontally, so clearing it is a vertical
+     job, and type over device hardware is what the contrast audit catches.
+
+     Anchored in rem rather than in per cent of the hero. The copy is a fixed
+     stack whose height does not shrink with the window, so a percentage that
+     clears it at 900px tall puts a device straight through the note at 657:
+     58% of 591 is 343, and the copy still ends at 470. A constant offset
+     clears it at every height and simply bleeds more when there is less room,
+     which is the correct behaviour. */
+  .dev-tablet {
+    left: 27%;
+    /* Carries margin for the transform. getBoundingClientRect reports the
+       TRANSFORMED box, and perspective-origin is a percentage of the rig, so
+       how far the tilt lifts a device varies with the hero's height: the same
+       CSS top measured 7px high at 900 and 23px high at 789. The offset is set
+       past the copy by more than that swing. */
+    top: 29rem;
+    z-index: 2;
+    transform: translateZ(-70px) rotateY(var(--ry)) rotateX(var(--rx));
+    animation-delay: 220ms;
+  }
+
+  .dev-phone {
+    left: 6%;
+    top: 31.5rem;
+    z-index: 3;
+    transform: rotateY(var(--ry)) rotateX(var(--rx));
+    animation-delay: 320ms;
+  }
+
+  /* ── The key ──────────────────────────────────────────────────────────── */
+
+  .portal-key {
+    display: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    gap: var(--space-2) var(--space-3);
+    flex-wrap: wrap;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--color-info-dark);
+  }
+  .portal-key li {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+  .portal-key li::before {
+    content: "";
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* ── Collapsed ────────────────────────────────────────────────────────────
+     Below 1000 the lineup cannot hold three whole devices without shrinking
+     them, and a 1240px console at 0.3x is the unreadability this hero exists
+     to remove. The phone takes the composition, and the other two consoles
+     keep their claim in the key instead.
+
+     The two hidden captures are `loading="lazy"`, and a lazy image inside a
+     display:none subtree is never fetched, so a phone on mobile data pays
+     nothing for the devices it does not see. */
+  @media (max-width: 999px) {
+    /* Both ends drop below the copy. On the desktop composition the copy holds
+       a narrow left column, so the crease can rake steeply and pass behind the
+       lineup on the right. Collapsed, the copy is full width and there is no
+       steep line that clears it at both edges: at 97/40 the right end landed
+       at 40% of the hero, which is the middle of the lede. It runs shallow and
+       low here instead, behind the phone. */
+    .hero {
+      --fold-left: 86%;
+      --fold-right: 74%;
     }
 
-    .plane {
-      transform: rotateY(var(--ry)) rotateX(var(--rx));
-      transform-origin: right center;
-      transition: transform var(--dur-slow) var(--ease-out);
+    .dev-monitor,
+    .dev-tablet {
+      display: none;
     }
 
-    /* In front of the console, not merely on top of it.
-       Placed bottom-RIGHT because that is the only large empty region of the
-       admin overview: the stat grid stops around two thirds across and the
-       column to its right carries nothing but background. On the left it
-       covered the entire sidebar, which is a real part of the product. Right
-       is also the edge the rotation brings forward, so a plane in front of it
-       there is where the eye expects one. */
-    .plane-phone {
-      position: absolute;
-      right: 0;
-      bottom: -2.5rem;
-      z-index: 1;
-      margin-inline: 0;
-      translate: 12% 0;
-      transform: translateZ(70px) rotateY(var(--ry)) rotateX(var(--rx));
-      transform-origin: right center;
+    .rig {
+      position: relative;
+      top: auto;
+      left: auto;
+      translate: none;
+      width: 100%;
+      height: auto;
+      z-index: 0;
+      perspective: none;
+      margin-top: var(--space-4);
+    }
+
+    .dev-phone {
+      position: relative;
+      left: auto;
+      top: auto;
+      transform: none;
+      justify-self: center;
+      margin-inline: auto;
+      width: max-content;
+    }
+
+    .hero {
+      /* The phone is carrying the dirección console here, so the rim is that
+         portal's rather than the estudiante one it wears in the lineup. */
+      --phone-w: min(390px, calc(100vw - 2rem));
+    }
+    .dev-phone :global(.device) {
+      --accent: var(--accent-direccion);
+    }
+
+    .hero-inner {
+      padding-top: var(--space-3);
+      gap: var(--space-3);
+    }
+    .hero-copy {
+      width: 100%;
+    }
+    .hero h1 {
+      font-size: clamp(1.85rem, 6.6vw, 2.4rem);
+      max-width: 16ch;
+    }
+    .hero .lede {
+      max-width: 40ch;
+    }
+
+    .portal-key {
+      display: flex;
+    }
+
+    /* Side by side rather than one per row. base.css sends these full-bleed
+       below 1000, which costs about 60px, and on a 375 viewport that is the
+       difference between seeing the console and not. */
+    .hero .cta-row {
+      flex-wrap: nowrap;
+    }
+    .hero .cta-row .btn {
+      flex: 1 1 0;
+      text-align: center;
+      padding-inline: var(--space-2);
+      white-space: nowrap;
+      font-size: 0.88rem;
     }
   }
 
-  /* Below the breakpoint the console frame is already holding the phone
-     capture, so the second plane would be the same picture twice — and a
-     sheared table at 360px is the unreadability this hero exists to fix. */
-  @media (max-width: 759px) {
-    .plane-phone {
+  /* Short laptops. The lineup is anchored below a copy stack that does not
+     shrink with the window, so on a 657px-tall viewport the devices start at
+     480px into a 591px hero and show a stripe each. The copy tightens instead,
+     and the lineup moves up with it. This is the viewport that decides whether
+     the composition works, not the roomy one. */
+  @media (min-width: 1000px) and (max-height: 780px) {
+    .hero-inner {
+      padding-block: var(--space-3);
+    }
+    .hero-copy {
+      gap: var(--space-1);
+    }
+    .hero h1 {
+      font-size: 2.1rem;
+    }
+    .hero .lede {
+      font-size: 0.98rem;
+    }
+    .hero .note {
       display: none;
+    }
+    .dev-tablet {
+      top: 22rem;
+    }
+    .dev-phone {
+      top: 24.5rem;
+    }
+  }
+
+  /* Short phones. At full size the copy leaves barely a stripe of the console,
+     which is not a product shot. Everything tightens and the disclaimer drops:
+     on the smallest screen the reader gets the product instead, and the line
+     comes back on any phone taller than 720. */
+  @media (max-width: 999px) and (max-height: 720px) {
+    .hero h1 {
+      font-size: 1.72rem;
+    }
+    .hero .lede {
+      font-size: 0.96rem;
+    }
+    .hero .note {
+      display: none;
+    }
+    /* The grid gap already separates the key from the device; the rig's own
+       margin on top of it costs 25px of console on the screen with the least
+       of it to spare. */
+    .rig {
+      margin-top: 0;
+    }
+    .portal-key {
+      font-size: 0.74rem;
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .hero-copy,
-    .stage {
+    .dev {
       animation: none;
     }
-    .plane {
+    .dev {
       transition: none;
     }
   }
 </style>
 
 <script>
-  // Pointer parallax on the two planes.
+  // Pointer parallax on the lineup.
   //
-  // It writes two custom properties on the stage rather than a transform on
-  // each plane: the planes differ (one carries a translateZ, and they rotate
-  // about opposite edges), so rewriting whole transform strings from here
-  // would mean this script owning geometry that belongs in the stylesheet.
+  // It writes two custom properties on the hero rather than a transform on
+  // each device: they differ in translateZ, so rewriting whole transform
+  // strings from here would mean this script owning geometry that belongs in
+  // the stylesheet.
   //
   // Fine pointers only. On a touchscreen there is no hover state to respond
   // to, so it would simply never move.
   const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-  const stage = document.querySelector<HTMLElement>("[data-tilt]");
+  const hero = document.querySelector<HTMLElement>("[data-tilt]");
   const fine = matchMedia("(pointer: fine)");
 
-  if (stage && fine.matches && !reduced.matches) {
+  if (hero && fine.matches && !reduced.matches) {
     let frame = 0;
 
     const move = (ev: PointerEvent) => {
       if (frame) return; // coalesce to one write per animation frame
       frame = requestAnimationFrame(() => {
         frame = 0;
-        if (innerWidth < 760) return; // the flat layout owns the transform
-        const r = stage.getBoundingClientRect();
-        // −0.5…0.5 from the stage's own centre.
+        if (innerWidth < 1000) return; // the collapsed layout owns the transform
+        const r = hero.getBoundingClientRect();
+        // −0.5…0.5 from the hero's own centre.
         const px = (ev.clientX - r.left) / r.width - 0.5;
         const py = (ev.clientY - r.top) / r.height - 0.5;
         // Clamped to stay negative. A positive rotateY would swing the near
-        // half of the console toward the viewer and start upscaling it, which
-        // is the one thing that visibly softens a screenshot.
-        stage.style.setProperty("--ry", `${-7 + px * 4}deg`);
-        stage.style.setProperty("--rx", `${2.5 - py * 3}deg`);
+        // edge of a device toward the viewer and start magnifying it, which is
+        // the one thing that visibly softens a screenshot.
+        hero.style.setProperty("--ry", `${-8 + px * 4}deg`);
+        hero.style.setProperty("--rx", `${3 - py * 3}deg`);
       });
     };
 
     const reset = () => {
-      stage.style.removeProperty("--ry");
-      stage.style.removeProperty("--rx");
+      hero.style.removeProperty("--ry");
+      hero.style.removeProperty("--rx");
     };
 
     addEventListener("pointermove", move, { passive: true });
-    stage.addEventListener("pointerleave", reset);
+    hero.addEventListener("pointerleave", reset);
   }
 </script>

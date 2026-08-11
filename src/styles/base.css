@@ -595,6 +595,140 @@ a.card-fold:hover::after {
   }
 }
 
+/* ── Hardware bezels ────────────────────────────────────────────────────────
+ *
+ * A console in a device rather than in a browser window. Used by the home
+ * hero's lineup, where three consoles have to read as three places the same
+ * system is used.
+ *
+ * THE RULE THE PADDING ENFORCES. The screen is always the exact CSS width its
+ * capture was shot at, and the bezel is padding OUTSIDE that. Wrapping a shot
+ * in hardware therefore never shrinks the product to make room for the frame,
+ * which is the failure the phone frame already had once: a 390px capture in a
+ * 300px box painted the app's 13px text at 10px. Set the width on the device,
+ * never on the screen.
+ *
+ * Each device carries a rim in its portal's accent. The accents are fills, so
+ * a rim and an outer glow use them without ever setting one as `color` on the
+ * page background, which tokens.css forbids.
+ */
+.device {
+  --bz: 14px;
+  --r: 20px;
+  --screen-w: 390px;
+  --accent: var(--color-primary-fill);
+  position: relative;
+  /* The device sizes itself from the screen plus its own bezel. Setting a
+     width on the device instead would let the frame eat into the capture. */
+  width: max-content;
+  margin: 0;
+  padding: var(--bz);
+  border-radius: var(--r);
+  background: linear-gradient(
+    150deg,
+    #4b5060 0%,
+    #22252e 34%,
+    #16181f 62%,
+    #33374a 100%
+  );
+  box-shadow:
+    var(--elev-3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.26),
+    inset 0 -1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.device > .glass {
+  position: relative;
+  width: var(--screen-w);
+  max-width: 100%;
+  border-radius: calc(var(--r) - var(--bz) + 2px);
+  overflow: hidden;
+  background: var(--color-white);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.45);
+}
+
+/* No `display` here. The theme swap inside ConsoleShot owns display for every
+   capture, and a two-class container rule outranks the bare class that hides
+   the off-theme one, so both would paint at once. Geometry here, state there. */
+.device > .glass img,
+.device > .glass picture {
+  width: 100%;
+  height: auto;
+}
+
+/* The accent rim. Three layers because one is not enough to read: a hairline
+   on the edge, a soft ring just outside it, and a wide glow. Without the
+   middle ring the accent disappeared entirely against a light background and
+   the lineup became three anonymous dark slabs, which is exactly the stock
+   "works on all your devices" look the accents exist to avoid. */
+.device::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow:
+    0 0 0 1.5px color-mix(in srgb, var(--accent) 88%, transparent),
+    0 0 0 6px color-mix(in srgb, var(--accent) 15%, transparent),
+    0 0 60px -6px var(--accent);
+  pointer-events: none;
+}
+
+.device .cam {
+  position: absolute;
+  top: calc(var(--bz) / 2 - 2px);
+  left: 50%;
+  translate: -50% 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #0a0c11;
+  box-shadow: inset 0 0 0 1px rgba(120, 130, 160, 0.5);
+}
+
+/* A phone, so it needs the corner radius and the island rather than a camera
+   dot. The screen width is set by whoever places it, and defaults to the width
+   the mobile pass shoots at. */
+.device-phone {
+  --bz: 12px;
+  --r: 3.1rem;
+}
+
+.device-phone > .glass {
+  border-radius: 2.35rem;
+}
+
+.device-phone .island {
+  position: absolute;
+  top: 21px;
+  left: 50%;
+  translate: -50% 0;
+  width: 96px;
+  height: 25px;
+  border-radius: 999px;
+  background: #05070b;
+  z-index: 2;
+}
+
+.device-phone .side {
+  position: absolute;
+  right: -2px;
+  top: 148px;
+  width: 3px;
+  height: 64px;
+  border-radius: 0 2px 2px 0;
+  background: linear-gradient(180deg, #4b5060, #2a2e39);
+}
+
+.device-phone .vol {
+  position: absolute;
+  left: -2px;
+  top: 122px;
+  width: 3px;
+  height: 40px;
+  border-radius: 2px 0 0 2px;
+  background: linear-gradient(180deg, #4b5060, #2a2e39);
+}
+
 /* ── Screenshots ────────────────────────────────────────────────────────── */
 
 .shot {
