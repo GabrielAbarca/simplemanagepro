@@ -107,12 +107,14 @@ const PORTALS = [
       // both, so this captures exactly what a visitor lands on.
       { click: '[data-tab="gradebook"]', wait: "#view-class table" },
     ],
-    // Guards against shooting before the period defaults in. Note this is NOT
-    // what makes the control look empty at 390px: the app's custom select
-    // paints its label from #gradebook-period-trigger, and that button
-    // collapses to width 0 on a phone. Real app bug, tracked in SMP-Web-Page.
-    // Until it is fixed the docente portal's `mobileImage` in src/data/site.ts
-    // points at m-teacher ("Mis clases") rather than at this capture.
+    // Guards against shooting before the period defaults in.
+    //
+    // Worth knowing if the periodo control ever comes back empty: the app's
+    // custom select paints its label from #gradebook-period-trigger, not from
+    // the native <select>, which is transparent by design. That button used to
+    // collapse to width 0 below the desktop breakpoint, so the control
+    // captured as an empty box on the phone pass. Fixed in the app; if it
+    // regresses, measure the trigger's width rather than the select's value.
     settle: () => {
       const s = document.querySelector("#view-class select");
       return !s || Boolean(s.value);

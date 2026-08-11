@@ -68,19 +68,19 @@ for (const route of ROUTES) {
 
       const yAt = (x) => yAtLeft + ((yAtRight - yAtLeft) * x) / hb.width;
 
-      // The console is opaque and covers the crease where it overlaps.
-      const cover = hero.querySelector(".console-frame");
-      const cb = cover
-        ? (() => {
-            const r = cover.getBoundingClientRect();
-            return {
-              x0: r.left - hb.left,
-              x1: r.right - hb.left,
-              y0: r.top - hb.top,
-              y1: r.bottom - hb.top,
-            };
-          })()
-        : null;
+      // The console frames are opaque and cover the crease where they overlap.
+      // All of them, not just the first: the home hero carries a second plane
+      // in front of the console, and getBoundingClientRect already reports the
+      // transformed box, so a tilted frame measures where it actually lands.
+      const covers = [...hero.querySelectorAll(".console-frame")].map((el) => {
+        const r = el.getBoundingClientRect();
+        return {
+          x0: r.left - hb.left,
+          x1: r.right - hb.left,
+          y0: r.top - hb.top,
+          y1: r.bottom - hb.top,
+        };
+      });
 
       const out = [];
       for (const el of hero.querySelectorAll("h1, h2, p, a, li, span, button")) {
@@ -103,9 +103,10 @@ for (const route of ROUTES) {
         if (hi < y0 || lo > y1) continue;
 
         // Covered by the console for this element's whole width?
-        if (cb && x0 >= cb.x0 && x1 <= cb.x1 && lo >= cb.y0 && hi <= cb.y1) {
-          continue;
-        }
+        const covered = covers.some(
+          (c) => x0 >= c.x0 && x1 <= c.x1 && lo >= c.y0 && hi <= c.y1,
+        );
+        if (covered) continue;
 
         out.push({
           text: el.textContent.trim().replace(/\s+/g, " ").slice(0, 46),

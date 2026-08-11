@@ -273,33 +273,44 @@ default quality rings around 13px UI glyph edges. Cropping treated the first
 and left the other two. With the ratio inverted there is nothing left to crop,
 so `make-derived.mjs` and the derived files are gone.
 
-**Never 3D-transform a screenshot.** A `rotateY` on a console resamples every
-glyph across the plane, which undoes all of the above for a bit of depth. Depth
-comes from the frame, the elevation and the fold behind it. Entrance animations
-are fine because they end at identity.
+**A tilt is allowed, and there is exactly one safe way to do it.** What damages
+a screenshot is magnification, not rotation: perspective scales a point by
+`p / (p - z)`. Rotate about the edge the rotation brings **forward** and every
+other point goes to a negative `z`, so the factor is at most 1.0 there and
+below 1.0 everywhere else — the plane can only be minified, which is what a
+downsample is. The home hero does this with `transform-origin: right center`
+and a negative `rotateY`, and its pointer parallax is clamped to keep `rotateY`
+negative for the same reason. A centred origin, or a positive `rotateY`, pulls
+the near half toward the viewer and starts upscaling it.
+
+This is a correction: an earlier pass removed the hero's tilt outright on the
+grounds that any 3D transform resamples the glyphs. That threw away depth the
+page wanted in exchange for a problem the geometry above does not have.
 
 A phone cannot use a desktop frame at all, so `npm run capture` also shoots at
 390@3x (`m-` prefix) and `ConsoleShot` switches on viewport as well as theme.
 
-Three known blemishes cannot be fixed from this repo:
+One known blemish is left, and it is deliberate: the admin overview reads
+**"Bienvenido, Demo Account"**. That is the auth user's display name, it lives
+in `auth.users`, and it is out of bounds without an explicit ask. Gabriel's
+call, August 2026: keep the overview and accept it.
 
-- The admin overview reads **"Bienvenido, Demo Account"** — the auth user's
-  display name, which lives in `auth.users` and is out of bounds without an
-  explicit ask. Gabriel's call, August 2026: keep the overview and accept it.
-- **"Asistencia de hoy: Sin datos".** Previously recorded as a weekend
-  artifact; that is wrong, a Monday capture shows it too. The demo's fixtures
-  carry no attendance for the current date, so it will show on any day. Fixing
-  it means seeding the demo, not re-running the capture.
-- **The gradebook's periodo control captures as an empty box at 390px.** Not a
-  timing problem and not a colour problem: `#gradebook-period-trigger` measures
-  158px wide at 1280 and **0px at 390**, so its label is never painted. That is
-  a real bug in the app on phones. Until it is fixed, the docente portal's
-  `mobileImage` points at `m-teacher` instead of `m-teacher-gradebook`.
+Three others were real and are now fixed **in the demo and the app**, so
+captures taken from here on show the corrected product. Recorded because the
+page's copy depends on the first two, and because the third would otherwise
+look like a capture-timing bug:
 
-Full frames make the app's own wording legible, and it contradicts the page:
-the consoles say *"toda la escuela"*, *"Año escolar activo"* and *"año escolar
-actual"* while every line of copy says **colegio** and **curso lectivo**.
-Belongs in `../SMP-Web-Page`.
+- Attendance is seeded. The overview reads *"Asistencia del mes"* with a real
+  percentage rather than *"Sin datos"*.
+- The consoles say **colegio** and **curso lectivo**. They used to say *"toda
+  la escuela"*, *"Año escolar activo"* and *"año escolar actual"*, which
+  contradicted every line of copy on this page — full frames make the app's own
+  wording legible, so this mattered more once the crops went.
+- The gradebook's periodo control paints at 390px. `#gradebook-period-trigger`
+  used to collapse to `width: 0` below the desktop breakpoint, so the control
+  captured as an empty box on the phone pass. If it ever comes back empty,
+  measure that trigger's width — the native `<select>` under it is transparent
+  by design and will always look wrong.
 
 ## Verification
 

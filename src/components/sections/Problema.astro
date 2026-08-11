@@ -45,30 +45,41 @@ const GLYPHS: Record<Patchwork, string[]> = {
         </ul>
       </div>
 
-      <!-- The six sources narrowing into one. The wedge is the argument: it is
-           the same information, arriving from six places and leaving from one.
-           Decorative, so it carries no text and is hidden from assistive tech;
-           the two labels either side already say it. -->
-      <div class="funnel reveal" aria-hidden="true">
-        <span class="wedge"></span>
-        <svg class="tip" viewBox="0 0 24 24">
-          <path d="M4 12h15M13 5.5 19.5 12 13 18.5"></path>
-        </svg>
+      <!-- A glyph sized to itself, not a shape stretched across a column.
+           Decorative: the two labels either side already say it. -->
+      <div class="turn reveal" aria-hidden="true">
+        <span class="turn-badge">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 12h15M13 5.5 19.5 12 13 18.5"></path>
+          </svg>
+        </span>
       </div>
 
       <div class="side">
         <p class="side-label">Cómo se hace con Simple Manage Pro</p>
-        <div class="card-lead reveal one">
-          <p class="one-title">Un solo sistema</p>
-          <p class="one-body">
-            Las mismas notas, la misma asistencia y la misma matrícula, en un
-            solo lugar y actualizadas por quien las tiene de primera mano.
-          </p>
-          <ul class="streams">
-            <li class="chip">Notas</li>
-            <li class="chip">Asistencia</li>
-            <li class="chip">Matrícula</li>
-          </ul>
+
+        <!-- The same six sheets, squared into one stack. The two layers behind
+             the card are the rest of the pile: they start scattered and settle
+             flush as the section arrives, which is the collapse the section is
+             arguing for. Gated behind .js, which Layout.astro adds only when
+             the visitor has not asked for reduced motion, so a reduced-motion
+             or no-JavaScript visitor gets the settled stack rather than a pile
+             frozen mid-fall. -->
+        <div class="stack reveal">
+          <span class="sheet sheet-2" aria-hidden="true"></span>
+          <span class="sheet sheet-1" aria-hidden="true"></span>
+          <div class="card-lead one">
+            <p class="one-title">Un solo sistema</p>
+            <p class="one-body">
+              Las mismas notas, la misma asistencia y la misma matrícula, en un
+              solo lugar y actualizadas por quien las tiene de primera mano.
+            </p>
+            <ul class="streams">
+              <li class="chip">Notas</li>
+              <li class="chip">Asistencia</li>
+              <li class="chip">Matrícula</li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -167,35 +178,30 @@ const GLYPHS: Record<Patchwork, string[]> = {
     font-size: 0.82rem;
   }
 
-  /* ── The funnel ─────────────────────────────────────────────────────── */
+  /* ── The turn ───────────────────────────────────────────────────────── */
 
-  .funnel {
-    position: relative;
+  .turn {
     display: grid;
     place-items: center;
-    min-height: 3.5rem;
+    min-height: 3rem;
   }
 
-  .wedge {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--color-primary) 30%, transparent),
-      var(--color-primary-accent) 55%,
-      var(--color-primary)
-    );
-    /* Points down on a narrow screen, where the two sides stack. */
-    clip-path: polygon(6% 0, 44% 100%, 56% 100%, 94% 0);
-    opacity: 0.55;
+  .turn-badge {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    box-shadow: var(--elev-1);
   }
 
-  .tip {
-    position: relative;
-    width: 1.8rem;
-    height: 1.8rem;
+  .turn-badge svg {
+    width: 1.3rem;
+    height: 1.3rem;
     fill: none;
-    stroke: var(--color-primary);
+    stroke: var(--color-primary-text);
     stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -204,8 +210,53 @@ const GLYPHS: Record<Patchwork, string[]> = {
 
   /* ── The one system ─────────────────────────────────────────────────── */
 
+  /* The sheets sit 1.2rem above the card's own box, so the stack needs that
+     back as clearance or the top edge of the pile touches the label. */
+  .stack {
+    position: relative;
+    margin-top: 1.4rem;
+  }
+
+  /* The rest of the pile, showing only as edges behind the top card. */
+  .sheet {
+    position: absolute;
+    inset: 0;
+    border-radius: var(--card-border-radius);
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    box-shadow: var(--elev-1);
+  }
+  .sheet-1 {
+    translate: -0.6rem -0.6rem;
+    rotate: -1.2deg;
+  }
+  .sheet-2 {
+    translate: -1.2rem -1.2rem;
+    rotate: -2.6deg;
+  }
+
+  .js .sheet {
+    transition:
+      translate var(--dur-slow) var(--ease-out),
+      rotate var(--dur-slow) var(--ease-out);
+  }
+  /* Scattered until the section arrives. The top card never moves, so the
+     collapse reads as loose sheets being squared up against it. */
+  .js .stack:not(.is-in) .sheet-1 {
+    translate: -2.6rem -1.9rem;
+    rotate: -6deg;
+  }
+  .js .stack:not(.is-in) .sheet-2 {
+    translate: -4.4rem 0.9rem;
+    rotate: 5.5deg;
+  }
+  .js .stack .sheet-2 {
+    transition-delay: 90ms;
+  }
+
   .one {
     --accent: var(--color-primary-fill);
+    position: relative;
   }
   .one-title {
     font-weight: 700;
@@ -227,18 +278,14 @@ const GLYPHS: Record<Patchwork, string[]> = {
 
   @media (min-width: 760px) {
     .contrast {
-      grid-template-columns: 1fr 9.5rem 1fr;
+      grid-template-columns: 1fr auto 1fr;
+      gap: var(--space-4);
     }
     .scatter {
       grid-template-columns: 1fr 1fr;
     }
-    /* Stretched to the row, not centred in it. At a fixed height the wedge was
-       shorter than the stack it is supposed to be gathering, so it read as a
-       triangle sitting between two columns rather than as six things
-       narrowing into one. */
-    .funnel {
-      align-self: stretch;
-      min-height: 11rem;
+    .turn-badge svg {
+      rotate: none;
     }
     .wedge {
       clip-path: polygon(0 4%, 100% 40%, 100% 60%, 0 96%);
@@ -251,6 +298,9 @@ const GLYPHS: Record<Patchwork, string[]> = {
   @media (prefers-reduced-motion: reduce) {
     .scatter li {
       rotate: none;
+    }
+    .js .sheet {
+      transition: none;
     }
   }
 </style>

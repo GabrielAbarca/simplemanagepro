@@ -6,10 +6,10 @@ import adminShotM from "../assets/screenshots/m-admin.png";
 import adminShotMDark from "../assets/screenshots/m-admin-dark.png";
 import teacherShot from "../assets/screenshots/teacher.png";
 import teacherShotDark from "../assets/screenshots/teacher-dark.png";
-import teacherShotM from "../assets/screenshots/m-teacher.png";
-import teacherShotMDark from "../assets/screenshots/m-teacher-dark.png";
 import gradebookShot from "../assets/screenshots/teacher-gradebook.png";
 import gradebookShotDark from "../assets/screenshots/teacher-gradebook-dark.png";
+import gradebookShotM from "../assets/screenshots/m-teacher-gradebook.png";
+import gradebookShotMDark from "../assets/screenshots/m-teacher-gradebook-dark.png";
 import studentShot from "../assets/screenshots/student.png";
 import studentShotDark from "../assets/screenshots/student-dark.png";
 import studentShotM from "../assets/screenshots/m-student.png";
@@ -83,13 +83,8 @@ export const portals: Portal[] = [
     glyph: "docente",
     image: gradebookShot,
     imageDark: gradebookShotDark,
-    // "Mis clases" rather than the gradebook on phones, and this is a
-    // workaround with an expiry date: the app's custom select collapses to
-    // width 0 below its desktop breakpoint, so the gradebook's periodo control
-    // captures as an empty box. Tracked in SMP-Web-Page; swap this back to the
-    // m-teacher-gradebook pair once it is fixed.
-    mobileImage: teacherShotM,
-    mobileImageDark: teacherShotMDark,
+    mobileImage: gradebookShotM,
+    mobileImageDark: gradebookShotMDark,
     alt: "Libro de notas de Matemáticas, Undécimo Sección 1, mostrando la nota de cada estudiante en el II Periodo.",
     extraImage: teacherShot,
     extraImageDark: teacherShotDark,

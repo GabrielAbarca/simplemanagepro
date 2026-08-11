@@ -50,32 +50,52 @@ const admin = portals[0];
       </div>
     </div>
 
-    <!-- The whole console, at the size the app draws it.
-         The previous hero showed two crops because a 1440px console in a 609px
-         column is 0.42x and none of it could be read. This is the other way
-         round: the capture is shot at 1280 CSS px and displayed at 1240, so
-         the console renders at 1:1 with its own pixels and the source is 3x,
-         which means no browser anywhere has to stretch it.
+    <!-- Two planes in one perspective space.
+         The stage owns the perspective rather than each frame carrying its
+         own, which is the difference between a composition with depth and two
+         separately skewed rectangles. The phone sits on a positive Z, so it is
+         genuinely in front of the console rather than merely overlapping it.
 
-         Deliberately NOT tilted. A rotateY on a screenshot resamples every
-         glyph across the plane, which is precisely the softness this pass
-         exists to remove. Depth comes from the frame, the elevation and the
-         fold behind it. -->
-    <div class="stage">
-      <ConsoleFrame>
-        <ConsoleShot
-          light={admin.image}
-          dark={admin.imageDark}
-          mobileLight={admin.mobileImage}
-          mobileDark={admin.mobileImageDark}
-          alt={admin.alt}
-          displayWidth={1240}
-          sizes="(min-width: 1292px) 1240px, calc(100vw - 3.2rem)"
-          mobileDisplayWidth={300}
-          loading="eager"
-          priority={true}
-        />
-      </ConsoleFrame>
+         Both are whole frames. The capture is shot at 1280 CSS px and the
+         console is displayed at 1240, so it renders at 1:1 with the app's own
+         pixels, and the source is 3x, so no browser has to stretch it. See the
+         .stage rules below for why the tilt does not undo that. -->
+    <!-- The planes are wrappers this component owns, not classes handed to
+         ConsoleFrame. Astro does not put a parent's scope attribute on a child
+         component's root element, so `class="plane"` on <ConsoleFrame> renders
+         the class but never matches the rule that styles it. -->
+    <div class="stage" data-tilt>
+      <div class="plane plane-console">
+        <ConsoleFrame>
+          <ConsoleShot
+            light={admin.image}
+            dark={admin.imageDark}
+            mobileLight={admin.mobileImage}
+            mobileDark={admin.mobileImageDark}
+            alt={admin.alt}
+            displayWidth={1240}
+            sizes="(min-width: 1292px) 1240px, calc(100vw - 3.2rem)"
+            mobileDisplayWidth={300}
+            loading="eager"
+            priority={true}
+          />
+        </ConsoleFrame>
+      </div>
+
+      {/* Second plane. Hidden below the breakpoint, where ConsoleShot has
+          already swapped the frame above to this same phone capture and it
+          would be the same picture twice. Decorative there, so no alt. */}
+      <div class="plane plane-phone">
+        <ConsoleFrame phone>
+          <ConsoleShot
+            light={admin.mobileImage}
+            dark={admin.mobileImageDark}
+            alt=""
+            displayWidth={270}
+            loading="eager"
+          />
+        </ConsoleFrame>
+      </div>
     </div>
   </div>
 </section>
@@ -166,6 +186,7 @@ const admin = portals[0];
   }
 
   .stage {
+    position: relative;
     animation: rise var(--dur-slow) 140ms var(--ease-out) both;
   }
 
@@ -176,10 +197,117 @@ const admin = portals[0];
     }
   }
 
+  /* ── The two planes ─────────────────────────────────────────────────── */
+
+  /* WHY A TILTED SCREENSHOT STAYS SHARP HERE.
+   *
+   * A perspective transform resamples a screenshot, and an earlier pass of
+   * this hero dropped the tilt for exactly that reason. That was the wrong
+   * conclusion: what damages a screenshot is MAGNIFICATION, not rotation.
+   * Perspective scales a point by p / (p - z). Rotating about the RIGHT edge
+   * with a negative rotateY sends every other point to a negative z, so the
+   * factor is at most 1.0 at that edge and below 1.0 everywhere else. The
+   * plane can only ever be minified, which is what a downsample is, and the
+   * source carries 3x for a frame displayed at 1x.
+   *
+   * The rule that follows: keep the origin on the edge the rotation brings
+   * forward, and keep rotateY negative. A centred origin, or a positive
+   * rotateY, pulls the near half toward the viewer and starts upscaling it.
+   * The pointer parallax below is clamped for the same reason.
+   */
+  @media (min-width: 760px) {
+    .stage {
+      perspective: 1800px;
+      /* Set by the pointer script; these are the resting values. */
+      --ry: -7deg;
+      --rx: 2.5deg;
+    }
+
+    .plane {
+      transform: rotateY(var(--ry)) rotateX(var(--rx));
+      transform-origin: right center;
+      transition: transform var(--dur-slow) var(--ease-out);
+    }
+
+    /* In front of the console, not merely on top of it.
+       Placed bottom-RIGHT because that is the only large empty region of the
+       admin overview: the stat grid stops around two thirds across and the
+       column to its right carries nothing but background. On the left it
+       covered the entire sidebar, which is a real part of the product. Right
+       is also the edge the rotation brings forward, so a plane in front of it
+       there is where the eye expects one. */
+    .plane-phone {
+      position: absolute;
+      right: 0;
+      bottom: -2.5rem;
+      z-index: 1;
+      margin-inline: 0;
+      translate: 12% 0;
+      transform: translateZ(70px) rotateY(var(--ry)) rotateX(var(--rx));
+      transform-origin: right center;
+    }
+  }
+
+  /* Below the breakpoint the console frame is already holding the phone
+     capture, so the second plane would be the same picture twice — and a
+     sheared table at 360px is the unreadability this hero exists to fix. */
+  @media (max-width: 759px) {
+    .plane-phone {
+      display: none;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .hero-copy,
     .stage {
       animation: none;
     }
+    .plane {
+      transition: none;
+    }
   }
 </style>
+
+<script>
+  // Pointer parallax on the two planes.
+  //
+  // It writes two custom properties on the stage rather than a transform on
+  // each plane: the planes differ (one carries a translateZ, and they rotate
+  // about opposite edges), so rewriting whole transform strings from here
+  // would mean this script owning geometry that belongs in the stylesheet.
+  //
+  // Fine pointers only. On a touchscreen there is no hover state to respond
+  // to, so it would simply never move.
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+  const stage = document.querySelector<HTMLElement>("[data-tilt]");
+  const fine = matchMedia("(pointer: fine)");
+
+  if (stage && fine.matches && !reduced.matches) {
+    let frame = 0;
+
+    const move = (ev: PointerEvent) => {
+      if (frame) return; // coalesce to one write per animation frame
+      frame = requestAnimationFrame(() => {
+        frame = 0;
+        if (innerWidth < 760) return; // the flat layout owns the transform
+        const r = stage.getBoundingClientRect();
+        // −0.5…0.5 from the stage's own centre.
+        const px = (ev.clientX - r.left) / r.width - 0.5;
+        const py = (ev.clientY - r.top) / r.height - 0.5;
+        // Clamped to stay negative. A positive rotateY would swing the near
+        // half of the console toward the viewer and start upscaling it, which
+        // is the one thing that visibly softens a screenshot.
+        stage.style.setProperty("--ry", `${-7 + px * 4}deg`);
+        stage.style.setProperty("--rx", `${2.5 - py * 3}deg`);
+      });
+    };
+
+    const reset = () => {
+      stage.style.removeProperty("--ry");
+      stage.style.removeProperty("--rx");
+    };
+
+    addEventListener("pointermove", move, { passive: true });
+    stage.addEventListener("pointerleave", reset);
+  }
+</script>
