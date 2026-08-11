@@ -91,6 +91,11 @@ const PORTALS = [
     // day-independent.
     ready: "#myclasses-grid",
     steps: [{ click: '[data-page="myclasses"]', wait: ".class-card" }],
+    // Desktop only. The docente portal's phone frame shows the gradebook, not
+    // "Mis clases", so m-teacher*.png had no call site — it was the stand-in
+    // from when the app's mobile periodo control painted empty, and that is
+    // fixed. Shooting it every pass produced two files nothing imports.
+    desktopOnly: true,
   },
   {
     // The gradebook is the teacher view that actually argues the case: it is
@@ -183,6 +188,8 @@ async function capture(browser, theme, mobile = false) {
   await page.waitForURL(/\/admin\b/, { timeout: 30_000 });
 
   for (const portal of PORTALS) {
+    if (mobile && portal.desktopOnly) continue;
+
     // Reset: the previous portal trimmed the window to its own content.
     await page.setViewportSize(base);
 

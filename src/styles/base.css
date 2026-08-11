@@ -567,9 +567,16 @@ a.card-fold:hover::after {
 /* Holding the 390@3x capture, so it has to stop pretending to be a desktop
    window. Below the switch every frame becomes one, because ConsoleShot has
    already swapped to the phone capture underneath it and stretching a 390px
-   capture across a 700px frame would undo the whole ratio argument. */
+   capture across a 700px frame would undo the whole ratio argument.
+
+   390, not 300. The frame has to be the width the capture was shot at or the
+   app's own layout is being shrunk inside it: at 300 the product's 13px UI
+   text painted at 10px, which is half of why the phone shot read as softer
+   than the desktop one. On a 390px viewport this means the frame bleeds past
+   .wrap's padding, which is deliberate. Below 390 it tracks the viewport, and
+   the 1170w candidate still covers 3x with room to spare. */
 .console-frame.is-phone {
-  width: min(300px, 82vw);
+  width: min(390px, 100vw);
   border-radius: var(--space-3);
 }
 
@@ -579,7 +586,7 @@ a.card-fold:hover::after {
 
 @media (max-width: 759px) {
   .console-frame {
-    width: min(300px, 82vw);
+    width: min(390px, 100vw);
     border-radius: var(--space-3);
   }
 

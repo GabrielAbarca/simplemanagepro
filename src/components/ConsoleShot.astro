@@ -8,14 +8,23 @@ import type { ImageMetadata } from "astro";
  * It exists to make one rule impossible to forget, because breaking it is what
  * made the previous pass look soft:
  *
- *     ship srcset candidates at exactly 1x and 2x of the CSS width the image
- *     is displayed at, and never above the source's own width.
+ *     ship srcset candidates up to the highest pixel density the frame will
+ *     actually be displayed on, and never above the source's own width.
  *
- * Then a 1x display gets a clean integer downsample and a 2x display gets
- * untouched pixels. The old call sites passed a hand-written widths list that
- * topped out at 2400 against a 2880 source, so any 2x screen needed ~2900
- * device px and got 2400 stretched — and an upscaled screenshot is exactly
- * what "bad quality" looks like.
+ * Then every display gets a downsample and the densest one gets untouched
+ * pixels. The old call sites passed a hand-written widths list that topped out
+ * at 2400 against a 2880 source, so any 2x screen needed ~2900 device px and
+ * got 2400 stretched — and an upscaled screenshot is exactly what "bad
+ * quality" looks like.
+ *
+ * THE DENSITY IS NOT THE SAME ON BOTH AXES, and stating this rule as a flat
+ * "1x and 2x" is what broke it a second time. Laptops and monitors are 1x or
+ * 2x. Phones are 3x, near universally, which is exactly why `npm run capture`
+ * shoots the mobile pass at 390@3x. A 1x/2x ladder under a 300px phone frame
+ * topped out at 600w against a 900 device-px need, so the browser upscaled by
+ * 1.5x — on the one surface where the reader is closest to the glass. Desktop
+ * stays at 2x deliberately: 1240 * 3 would emit a 3720px WebP that no real
+ * display asks for.
  *
  * Two axes, not one:
  *
@@ -45,6 +54,11 @@ interface Props {
   alt: string;
   /** CSS px the desktop frame is displayed at. Drives the whole srcset. */
   displayWidth: number;
+  /** CSS px the phone frame is displayed at. Default 390 because that is the
+   *  viewport `npm run capture` shoots the mobile pass at, and displaying a
+   *  390 CSS-px capture in a narrower box shrinks the app's own layout: at 300
+   *  the product's 13px UI text painted at 10px before any resampling. Keep
+   *  these two numbers equal unless you also change the capture viewport. */
   mobileDisplayWidth?: number;
   /** Override when the frame is fluid below its cap, e.g.
    *  "(min-width: 1292px) 1240px, calc(100vw - 3.2rem)". `displayWidth` still
@@ -81,12 +95,19 @@ const mobileSizes = mobileSizesProp ?? `${mobileDisplayWidth}px`;
 // 92 costs roughly a third more bytes and removes the artefacts.
 const QUALITY = 92;
 
-/** 1x and 2x, clamped to what the capture actually contains. */
-const ladder = (src: ImageMetadata, w: number) =>
-  [w, w * 2].filter((n) => n <= src.width);
+/** Every density up to `max`, clamped to what the capture actually contains. */
+const ladder = (src: ImageMetadata, w: number, max: number) =>
+  Array.from({ length: max }, (_, i) => w * (i + 1)).filter(
+    (n) => n <= src.width,
+  );
 
-/** Intrinsic height at a given display width, so the <img> reserves the right
- *  box and nothing reflows when the capture lands. */
+/** Highest density each axis is displayed at. See the docblock: this asymmetry
+ *  is the point, not an oversight. */
+const DESKTOP_DENSITY = 2;
+const MOBILE_DENSITY = 3;
+
+/** Intrinsic height at a given display width, so the box reserved for the
+ *  image matches the one that lands in it. */
 const heightAt = (src: ImageMetadata, w: number) =>
   Math.round((w * src.height) / src.width);
 
@@ -95,10 +116,10 @@ const heightAt = (src: ImageMetadata, w: number) =>
 // per shot that no browser ever requests — every <source> here has a matching
 // media condition, so the <img> is a fallback in name only. Six of those is
 // about a megabyte of dead weight in the deploy.
-const shot = (src: ImageMetadata, w: number, s: string) =>
+const shot = (src: ImageMetadata, w: number, s: string, density: number) =>
   getImage({
     src,
-    widths: ladder(src, w),
+    widths: ladder(src, w, density),
     width: w,
     height: heightAt(src, w),
     sizes: s,
@@ -109,13 +130,33 @@ const shot = (src: ImageMetadata, w: number, s: string) =>
 const hasMobile = Boolean(mobileLight && mobileDark);
 
 const [d1, d2, m1, m2] = await Promise.all([
-  shot(light, displayWidth, desktopSizes),
-  shot(dark, displayWidth, desktopSizes),
-  mobileLight ? shot(mobileLight, mobileDisplayWidth, mobileSizes) : null,
-  mobileDark ? shot(mobileDark, mobileDisplayWidth, mobileSizes) : null,
+  shot(light, displayWidth, desktopSizes, DESKTOP_DENSITY),
+  shot(dark, displayWidth, desktopSizes, DESKTOP_DENSITY),
+  mobileLight
+    ? shot(mobileLight, mobileDisplayWidth, mobileSizes, MOBILE_DENSITY)
+    : null,
+  mobileDark
+    ? shot(mobileDark, mobileDisplayWidth, mobileSizes, MOBILE_DENSITY)
+    : null,
 ]);
 
 const narrow = `(max-width: ${breakpoint - 1}px)`;
+
+// Reserved box, per source rather than once on the <img>.
+//
+// A phone capture is 0.45 wide-to-tall and the desktop one is 16:9, so the
+// single <img width/height> pair — which can only describe one of them — was
+// reserving a 16:9 box below the breakpoint and then reflowing the whole hero
+// by ~490px when the real image decoded. `width`/`height` on a <source> is how
+// <picture> is meant to carry a per-source aspect ratio, and every current
+// browser honours it.
+const desktopBox = { width: displayWidth, height: heightAt(light, displayWidth) };
+const mobileBox = mobileLight
+  ? {
+      width: mobileDisplayWidth,
+      height: heightAt(mobileLight, mobileDisplayWidth),
+    }
+  : desktopBox;
 ---
 
 <picture class={className}>
@@ -128,12 +169,16 @@ const narrow = `(max-width: ${breakpoint - 1}px)`;
           sizes={mobileSizes}
           type="image/webp"
           media={`${narrow} and (prefers-color-scheme: dark)`}
+          width={mobileBox.width}
+          height={mobileBox.height}
         />
         <source
           srcset={m1!.srcSet.attribute}
           sizes={mobileSizes}
           type="image/webp"
           media={narrow}
+          width={mobileBox.width}
+          height={mobileBox.height}
         />
       </>
     )
@@ -144,13 +189,21 @@ const narrow = `(max-width: ${breakpoint - 1}px)`;
     sizes={desktopSizes}
     type="image/webp"
     media="(prefers-color-scheme: dark)"
+    width={desktopBox.width}
+    height={desktopBox.height}
   />
-  <source srcset={d1.srcSet.attribute} sizes={desktopSizes} type="image/webp" />
+  <source
+    srcset={d1.srcSet.attribute}
+    sizes={desktopSizes}
+    type="image/webp"
+    width={desktopBox.width}
+    height={desktopBox.height}
+  />
   <img
     src={d1.src}
     alt={alt}
-    width={displayWidth}
-    height={heightAt(light, displayWidth)}
+    width={desktopBox.width}
+    height={desktopBox.height}
     loading={loading}
     decoding={priority ? "sync" : "async"}
     fetchpriority={priority ? "high" : "auto"}
