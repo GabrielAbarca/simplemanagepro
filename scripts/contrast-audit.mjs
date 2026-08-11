@@ -84,8 +84,24 @@ for (const { route, v, theme } of MATRIX) {
           (x) => x.nodeType === 3 && x.textContent.trim().length > 1,
         );
         const cs = getComputedStyle(el);
+        // checkVisibility() rather than only the computed style, because a
+        // closed <details> is not covered by either. Chrome hides its contents
+        // with content-visibility on ::details-content, which leaves the
+        // children at display:block WITH a real, non-zero bounding box — so
+        // the /piloto FAQ's collapsed answers were measured, sampled against
+        // whatever is actually painted at those coordinates two sections
+        // further down, and reported as failures for text nobody can see.
+        const rendered =
+          typeof el.checkVisibility === "function"
+            ? el.checkVisibility({
+                contentVisibilityAuto: true,
+                opacityProperty: true,
+                visibilityProperty: true,
+              })
+            : true;
         if (
           hasOwnText &&
+          rendered &&
           cs.visibility !== "hidden" &&
           cs.display !== "none" &&
           parseFloat(cs.opacity) > 0.1

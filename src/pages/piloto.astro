@@ -1,8 +1,17 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PageHero from "../components/PageHero.astro";
 import CierreCta from "../components/sections/CierreCta.astro";
 import { pilotGives, pilotAsks, faq } from "../data/site";
 import { breadcrumbLd, faqLd } from "../lib/schema";
+
+// Three, because each colegio is a hand-provisioned database. The number is
+// the offer, so the ornament is the number.
+const seats = [
+  { label: "Colegio", own: false },
+  { label: "Su colegio", own: true },
+  { label: "Colegio", own: false },
+];
 ---
 
 <Layout
@@ -22,31 +31,80 @@ import { breadcrumbLd, faqLd } from "../lib/schema";
     set:html={JSON.stringify(faqLd(faq))}
   />
 
-  <section class="page-head">
-    <div class="wrap narrow">
-      <p class="eyebrow">Febrero de 2027</p>
-      <h1>El piloto 2027</h1>
-      <p class="lede">
-        Tres colegios, empezando con el curso lectivo en febrero de 2027. Cada
-        uno con su propia base de datos, configurada con la estructura de su
-        colegio.
-      </p>
+  <PageHero
+    eyebrow="Febrero de 2027"
+    title="El piloto 2027"
+    lede="Tres colegios, empezando con el curso lectivo en febrero de 2027. Cada uno con su propia base de datos, configurada con la estructura de su colegio."
+  >
+    <div class="cta-row">
+      <a class="btn btn-primary" href="/contacto">Hablar del piloto</a>
     </div>
-  </section>
+
+    <!-- The offer as an object: three places, one of them the reader's. The
+         scarcity is real (each colegio is a hand-provisioned database), so it
+         is worth showing rather than only stating. -->
+    <div class="seats" slot="ornament" aria-hidden="true">
+      {
+        seats.map((s) => (
+          <span class:list={["seat", s.own && "is-own"]}>
+            <svg viewBox="0 0 24 24">
+              <path d="M3 20.5V9.6L12 4l9 5.6v10.9" />
+              <path d="M9 20.5v-6h6v6" />
+            </svg>
+            <span class="seat-label">{s.label}</span>
+          </span>
+        ))
+      }
+      <span class="chip seats-when">
+        <svg viewBox="0 0 24 24">
+          <rect x="3.5" y="5" width="17" height="15.5" rx="3"></rect>
+          <path d="M3.5 10h17M8 3.2v3.6M16 3.2v3.6"></path>
+        </svg>
+        Arranque en febrero de 2027
+      </span>
+    </div>
+  </PageHero>
 
   <section class="band fold-band">
     <div class="wrap">
-      <div class="two-col reveal">
-        <div class="col-card">
+      <!-- Two sides of one exchange, and read as such: the receiving side
+           carries the weight, the committing side answers it. They used to be
+           two identical cards, which said the two were the same kind of thing
+           and gave the reader no reason to start with either. -->
+      <div class="exchange">
+        <div class="card-lead card-fold give reveal">
+          <p class="chip">Lo que se entrega</p>
           <h2>Qué recibe el colegio</h2>
-          <ul class="plain">
-            {pilotGives.map((g) => <li>{g}</li>)}
+          <ul class="icon-list reveal reveal-stagger">
+            {
+              pilotGives.map((g, i) => (
+                <li style={`--i:${i}`}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9.2" />
+                    <path d="M7.8 12.3 10.7 15.2 16.2 9.4" />
+                  </svg>
+                  <span>{g}</span>
+                </li>
+              ))
+            }
           </ul>
         </div>
-        <div class="col-card">
+
+        <div class="card-lead card-fold take reveal">
+          <p class="chip">Lo que se acuerda</p>
           <h2>Qué se necesita del colegio</h2>
-          <ul class="plain">
-            {pilotAsks.map((a) => <li>{a}</li>)}
+          <ul class="icon-list reveal reveal-stagger">
+            {
+              pilotAsks.map((a, i) => (
+                <li style={`--i:${i}`}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="4.6" />
+                    <path d="M7.8 12.3 10.7 15.2 16.2 9.4" />
+                  </svg>
+                  <span>{a}</span>
+                </li>
+              ))
+            }
           </ul>
         </div>
       </div>
@@ -63,32 +121,36 @@ import { breadcrumbLd, faqLd } from "../lib/schema";
     </div>
   </section>
 
-  <!-- BRIEF §7 keeps this block as a trust device and none of the three facts
-       is softened here. What changed is the framing: a list of deficits headed
-       "para que no lo descubra en la primera reunión" announces bad news before
-       the reader has asked for it, while the same content as the director's own
-       questions, answered straight, reads as candor. It also moved off the home
-       page, where it was part of the first impression. -->
-  <section class="band fold-band" id="respuestas">
+  <!-- The questions a director actually asks before the first meeting. See
+       src/data/site.ts for what changed here and why, and BRIEF §7 for the
+       decision behind it. The markup is <details> so the list stays scannable
+       at eight questions and still works with JavaScript disabled. -->
+  <section class="band" id="respuestas">
     <div class="wrap">
       <div class="narrow reveal">
-        <h2>Respuestas directas</h2>
+        <p class="eyebrow">Preguntas frecuentes</p>
+        <h2>Lo que preguntan antes de la primera reunión</h2>
         <p>
-          Tres preguntas que conviene resolver antes de seguir, contestadas acá
-          y no en la primera reunión.
+          Contestadas acá, para que la conversación empiece en el punto que le
+          interesa a su colegio.
         </p>
       </div>
 
-      <dl class="faq reveal">
+      <div class="faq reveal">
         {
-          faq.map((f) => (
-            <div class="faq-item">
-              <dt>{f.q}</dt>
-              <dd>{f.a}</dd>
-            </div>
+          faq.map((f, i) => (
+            <details class="faq-item" open={i === 0}>
+              <summary>
+                <span>{f.q}</span>
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M3.5 6 8 10.5 12.5 6" />
+                </svg>
+              </summary>
+              <p>{f.a}</p>
+            </details>
           ))
         }
-      </dl>
+      </div>
     </div>
   </section>
 
@@ -96,55 +158,170 @@ import { breadcrumbLd, faqLd } from "../lib/schema";
 </Layout>
 
 <style>
-  .page-head {
-    padding-block: var(--space-6) var(--space-5);
+  /* ── The hero ornament ────────────────────────────────────────────────── */
+
+  .seats {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: start;
   }
 
-  .two-col {
-    display: grid;
-    gap: var(--space-3);
-  }
-  .col-card {
-    background: var(--color-white);
-    border: 1px solid var(--color-light);
-    border-radius: var(--card-border-radius);
-    padding: var(--space-4);
-  }
-  .col-card h2 {
-    font-size: 1.3rem;
-    letter-spacing: -0.01em;
-    margin-bottom: var(--space-2);
-  }
-
-  .faq {
-    margin: var(--space-4) 0 0;
-    display: grid;
-    gap: var(--space-3);
-  }
-  .faq-item {
+  .seat {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
     padding: var(--space-3);
+    border-radius: var(--border-radius-2);
+    border: 1px dashed color-mix(in srgb, var(--color-dark) 25%, transparent);
+    color: var(--color-info-dark);
+    font-size: 1rem;
+  }
+
+  .seat svg {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* The one that is the reader's: taken, not offered. Scaled up a touch so the
+     three rows read as "one of these is yours" rather than as a form. */
+  .seat.is-own {
+    background: var(--color-white);
+    border: 1px solid
+      color-mix(in srgb, var(--color-primary) 55%, transparent);
+    box-shadow: var(--elev-2);
+    color: var(--color-dark);
+    font-weight: 700;
+    scale: 1.045;
+  }
+  .seat.is-own svg {
+    stroke: var(--color-primary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .seat.is-own {
+      scale: none;
+    }
+  }
+
+  .seats-when {
+    margin-top: var(--space-2);
+  }
+
+  /* ── The exchange ─────────────────────────────────────────────────────── */
+
+  .exchange {
+    display: grid;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .give {
+    --accent: var(--accent-direccion);
+  }
+  .take {
+    --accent: var(--accent-docente);
+  }
+
+  .exchange h2 {
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+    margin-top: var(--space-2);
+    margin-bottom: 0;
+  }
+
+  .exchange .chip {
+    background: color-mix(in srgb, var(--accent) 14%, var(--color-white));
+    color: var(--color-dark);
+  }
+
+  .exchange .icon-list {
+    color: var(--color-dark-variant);
+    font-size: 0.98rem;
+  }
+  .exchange .icon-list svg {
+    stroke: var(--accent);
+  }
+
+  /* ── The FAQ ──────────────────────────────────────────────────────────── */
+
+  /* One column, not two.
+     In a two-column grid each row is as tall as its taller item, so opening
+     any answer leaves a matching hole beside it — and CSS columns re-balance
+     on every toggle, which makes items jump between columns as the reader
+     works down the list. A single column at a capped measure has neither
+     problem, and the answers get a comfortable line length. */
+  .faq {
+    margin-top: var(--space-4);
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+    max-width: 54rem;
+  }
+
+  .faq-item {
     background: var(--color-white);
     border: 1px solid var(--color-light);
     border-radius: var(--border-radius-2);
+    /* Height follows the open state, so a two-column grid stays tidy. */
+    height: fit-content;
   }
-  .faq dt {
+
+  .faq summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    cursor: pointer;
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 1.02rem;
     color: var(--color-dark);
-    margin-bottom: 0.35rem;
+    list-style: none;
   }
-  .faq dd {
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq summary svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    fill: none;
+    stroke: var(--color-primary-text);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: rotate var(--dur-fast) var(--ease-out);
+  }
+  .faq-item[open] summary svg {
+    rotate: 180deg;
+  }
+
+  .faq p {
     margin: 0;
+    padding: 0 var(--space-3) var(--space-3);
     color: var(--color-dark-variant);
     font-size: 0.98rem;
   }
 
   @media (min-width: 760px) {
-    .two-col {
+    .exchange {
       grid-template-columns: 1fr 1fr;
+      align-items: start;
+      gap: var(--space-4);
     }
-    .faq {
-      grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq summary svg {
+      transition: none;
     }
   }
 </style>
