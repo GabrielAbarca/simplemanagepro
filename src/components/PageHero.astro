@@ -68,6 +68,22 @@ const hasOrnament = Astro.slots.has("ornament");
     padding-block: var(--space-6) var(--space-7);
   }
 
+  /* THE BAND IS BOUGHT WITH PADDING, SO THE PADDING CANNOT BE FLUID HERE.
+     --space-6 and --space-7 ramp down between 1180 and 390 to stop the phone
+     from carrying a desktop page's rhythm. That is right everywhere else and
+     wrong in exactly this box: the percentages above are of the hero's own
+     height, so shrinking it walks the crease up into the copy. It did — at
+     1024 the ramp took the bottom pad from 153.6 to 138 and the crease came
+     through "cédula" on /nosotros, which crease-check caught.
+     The crease is only drawn at 1000 and up (the block below hides it), so
+     pinning the old fixed values there costs the phone nothing and keeps the
+     desktop geometry byte-identical to what the percentages were tuned on. */
+  @media (min-width: 1000px) {
+    .page-hero {
+      padding-block: 6.4rem 9.6rem;
+    }
+  }
+
   /* Below the two-column breakpoint the ornament stacks under the copy, so the
      hero is content from top to bottom and there is no band left for a crease
      to sit in. There is no percentage that works: at 390px the copy ends below

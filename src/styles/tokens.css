@@ -164,14 +164,31 @@
   --dur-mid: 320ms;
   --dur-slow: 640ms;
 
-  /* Editorial spacing scale — wider than the console's */
+  /* Editorial spacing scale — wider than the console's.
+   *
+   * THE TOP THREE STEPS ARE FLUID, THE BOTTOM FOUR ARE NOT. The small steps
+   * are component-internal — a gap between a label and its value, the padding
+   * inside a pill — and they should not change with the window, because the
+   * things they separate do not either.
+   *
+   * The large steps are page rhythm, and they were set for a 1180px column.
+   * At their fixed values every <section> carried 102.4px of padding at each
+   * end and PageHero another 153.6 below it, which on a 390px phone is most of
+   * a screen of nothing between one band and the next: the home page ran to
+   * 10,097px, about twelve screens, and the sub-pages to between 3,000 and
+   * 6,600. That is the reader's whole experience of the site, because the
+   * primary channel for this page is a WhatsApp forward opened on a phone.
+   *
+   * Each ramps from its phone value at 390 to its full value at 1180 and is
+   * clamped flat outside that range, so the desktop composition is untouched —
+   * every one of these resolves to exactly its old value at 1180 and above. */
   --space-1: 0.5rem;
   --space-2: 1rem;
   --space-3: 1.6rem;
   --space-4: 2.4rem;
-  --space-5: 4rem;
-  --space-6: 6.4rem;
-  --space-7: 9.6rem;
+  --space-5: clamp(2.6rem, 1.91rem + 2.84vw, 4rem);
+  --space-6: clamp(3.2rem, 1.62rem + 6.48vw, 6.4rem);
+  --space-7: clamp(4.8rem, 2.43rem + 9.72vw, 9.6rem);
 
   --measure: 62ch;
   --page-max: 1180px;

@@ -49,10 +49,19 @@ import { NAV, PRIVACY_URL, TERMS_URL } from "../config";
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: var(--space-3);
+    /* Row gap is small because the anchors carry their own vertical padding
+       below; without that split the padded rows sat 45px apart. */
+    gap: var(--space-1) var(--space-3);
   }
 
+  /* A tap target, not a run of text. This is the only navigation at the foot
+     of a page that is 9,400px tall on a phone, and at its natural line box it
+     was 20px high — under half of the 44px a thumb needs. The padding is
+     vertical only, so the row still reads as a line of links rather than as a
+     stack of buttons. */
   .footer-nav a {
+    display: inline-block;
+    padding-block: 0.75rem;
     color: var(--color-dark-variant);
     text-decoration: none;
     font-weight: 500;

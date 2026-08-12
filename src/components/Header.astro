@@ -120,12 +120,22 @@ const isActive = (href: string) =>
   }
 
   .brand {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 0.6rem;
     text-decoration: none;
     color: var(--color-dark);
     flex-shrink: 0;
+  }
+  /* Same trick as the two controls, for the same reason: the lockup's line box
+     is 30px tall, and below 360 the wordmark hides and it becomes a 30px
+     square. Stretched over the brand's own width rather than a fixed square,
+     so the whole lockup is tappable and not just its middle. */
+  .brand::after {
+    content: "";
+    position: absolute;
+    inset: -7px 0;
   }
   /* The mark carries its own corner radius in the path now, so nothing here
      has to round a bitmap's square edge. */
@@ -183,7 +193,29 @@ const isActive = (href: string) =>
     margin-left: auto;
   }
 
+  /* THE HIT AREA IS BIGGER THAN THE BUTTON, AND ON PURPOSE.
+   *
+   * These two controls draw at 2.4rem (38.4px), which is under the 44px a
+   * thumb needs, and on a phone the disclosure is the only navigation there
+   * is. Growing the boxes to 44 was the obvious fix and the wrong one: the bar
+   * is sized by its tallest child, so it would push the real header past
+   * --header-h (4.1rem), and CLAUDE.md records that under-estimating that
+   * constant forces a scrollbar on the hero while over-estimating leaves the
+   * next section peeking. The pseudo-element takes no layout space, so the
+   * target is 44px and the header is the height it has always been. */
+  .theme-toggle::after,
+  .menu summary::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 44px;
+    height: 44px;
+  }
+
   .theme-toggle {
+    position: relative;
     display: grid;
     place-items: center;
     width: 2.4rem;
@@ -259,6 +291,7 @@ const isActive = (href: string) =>
     display: none;
   }
   .menu summary {
+    position: relative;
     display: grid;
     place-items: center;
     width: 2.4rem;
