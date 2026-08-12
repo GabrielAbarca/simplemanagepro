@@ -148,6 +148,15 @@
   --elev-3:
     0 12px 28px rgba(24, 26, 30, 0.12), 0 36px 68px rgba(24, 26, 30, 0.14);
 
+  /* A COLOUR, not a shadow: the caller supplies the offset and blur.
+     --elev-1..3 are ambient, and ambient alone leaves a tilted object floating
+     — the home hero's phone sits on a lavender wash where --elev-3's 12% is
+     almost invisible. A contact shadow is tight, dark and directional, so it
+     cannot be a fixed token the way the ambient ones are. It is a token at all
+     because a literal rgba would stay ink-on-white in dark mode, and
+     color-mix off --color-dark inverts there: that is the TEXT colour. */
+  --elev-contact: rgba(24, 26, 30, 0.3);
+
   /* The sticky header's height, so a hero locked to the viewport can subtract
      it. It used to be implicit, which was fine while nothing depended on it.
      Measured at 65.03px with the nav and 61.77px with the menu button, so this
@@ -221,6 +230,7 @@
     --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
     --elev-2: 0 4px 12px rgba(0, 0, 0, 0.45), 0 14px 34px rgba(0, 0, 0, 0.4);
     --elev-3: 0 12px 28px rgba(0, 0, 0, 0.5), 0 36px 68px rgba(0, 0, 0, 0.5);
+    --elev-contact: rgba(0, 0, 0, 0.55);
   }
 }
 
@@ -242,6 +252,7 @@
   --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
   --elev-2: 0 4px 12px rgba(0, 0, 0, 0.45), 0 14px 34px rgba(0, 0, 0, 0.4);
   --elev-3: 0 12px 28px rgba(0, 0, 0, 0.5), 0 36px 68px rgba(0, 0, 0, 0.5);
+  --elev-contact: rgba(0, 0, 0, 0.55);
 }
 
 *,
