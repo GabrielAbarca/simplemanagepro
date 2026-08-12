@@ -363,8 +363,35 @@ hardware on a scaled screen is what makes a mockup read as fake, and at 226px
 the old 96px island covered 42% of the width against about 25% on the real
 device.
 
-**This is not permission to shrink a console elsewhere.** Anywhere the reader
-is meant to read the screenshot, the frame is still the capture's own width.
+**The hero's glass is also cropped, and that is a second deviation.** It is the
+one place on the site where a capture is not shown whole: `Hero.astro` pins
+`.dev-phone .glass` to `aspect-ratio: 1 / 1.8651`, so 84.6% of the capture is
+visible and the bottom 15.4% is clipped by the `overflow: hidden` the glass
+already carries.
+
+The reason is arithmetic. At a fixed width the device's height is not a free
+variable — the capture is 1170 × 2580, so the glass is 2.2051 × its width and
+the bezel adds 0.0616, which makes the device 2.2667 × its width and nothing
+else. Height can only come off by taking width off with it, or by showing less
+of the capture. Gabriel's call, August 2026: take it off the height alone.
+
+Two consequences to carry if you touch it. The device's whole aspect (1.9267)
+is what `--phone-w`'s svh ceiling divides by, so **changing the crop means
+changing that divisor** or the cap stops meaning 68% of the screen. And both
+lineup floors are measured against the phone's transformed bottom edge, so they
+move too: 89rem → 83rem → **75rem** as the phone went 884 → 784 → 659, with the
+short-laptop floor now **68rem**.
+
+The honest cost: at 1.8651 the phone sits between 16:9 and 18:9, so it reads as
+a 2017-era handset rather than a current 19.5:9 one. That was accepted with
+width ruled out as the lever.
+
+**This is not permission to shrink or crop a console elsewhere.** Anywhere the
+reader is meant to read the screenshot, the frame is still the capture's own
+width and the capture is still shown whole — `/portales` puts the same
+`DeviceFrame kind="phone"` on the page at a full 390, which is exactly why the
+crop is scoped to `.dev-phone` in `Hero.astro` and must never be written
+against `.device-phone` in `base.css`.
 
 There are three passes, and `PASS=tablet npm run capture` reshoots one without
 disturbing captures that are already reviewed. The tablet pass is **1180@2x

@@ -269,20 +269,22 @@ const key = [
   /* The lineup's floor. The phone is the lowest device, and this has to clear
      its transformed bottom edge or .fold-hero's clip cuts the device off.
 
-     89rem was correct when the phone was 884px tall. It has been 784 since the
-     lineup's widths were cut (monitor 1000, tablet 720, phone 330), which left
-     149px of empty hero under the devices at every desktop size — measured at
-     1280x900, 1440x900, 1280x760 and 1600x1000, all within a pixel of each
-     other, because the slack is a constant, not a function of the window.
+     89rem was correct when the phone was 884px tall, then 83rem when cutting
+     the lineup's widths took it to 784. Cropping the glass has taken it to
+     659, which left 177px of empty hero under the devices — measured at
+     1280x900, 1440x900, 1600x1000, 1280x760 and 1366x720, all within a pixel
+     of each other, because the slack is a constant rather than a function of
+     the window.
 
-     83rem (1328) puts the phone's bottom about 50px above the hero's, which is
-     the same margin 89rem gave the taller phone. Measured with
-     getBoundingClientRect, which already reports the tilted box, so the ~21px
-     the rotation adds is inside the number rather than added to it.
-     Move either device's `top`, or any screenWidth, and re-measure this. */
+     75rem (1200) puts the phone's bottom 49px above the hero's, the same
+     margin the two taller phones had. Measured with getBoundingClientRect,
+     which already reports the tilted box, so the ~21px the rotation adds is
+     inside the number rather than added to it.
+     Move either device's `top`, any screenWidth, or the glass crop, and
+     re-measure this. */
   @media (min-width: 1000px) {
     .hero {
-      min-height: max(calc(100svh - var(--header-h)), 83rem);
+      min-height: max(calc(100svh - var(--header-h)), 75rem);
     }
   }
 
@@ -342,6 +344,34 @@ const key = [
     z-index: 3;
     transform: rotateY(var(--ry)) rotateX(var(--rx));
     animation-delay: 320ms;
+  }
+
+  /* A SHORTER WINDOW ONTO THE SAME CONSOLE.
+   *
+   * At a fixed width the device's height is not a free variable: the capture
+   * is 1170 x 2580, so the glass is 2.2051 x its width and the bezel adds
+   * 0.0616 on top, which makes the whole device 2.2667 x its width and nothing
+   * else. Taking height off without taking width off therefore means showing
+   * less of the capture — there is no third option.
+   *
+   * 0.85 x 2.2667 = 1.9267 for the device; less the 0.0616 bezel leaves 1.8651
+   * for the glass. 84.6% of the capture is visible and the bottom 15.4% is
+   * clipped by the `overflow: hidden` .device > .glass already carries, so the
+   * image keeps its own aspect and only the box is short. The capture already
+   * ends mid-card, so a cut lower edge is how this shot reads anyway: a phone
+   * screen is a window onto a page that continues below it.
+   *
+   * SCOPED TO THE HERO ON PURPOSE. /portales puts the same DeviceFrame phone
+   * on the page at a full 390, and that is the surface where the reader is
+   * meant to READ the console — it is what this hero's exception is defined
+   * against. The same rule written against .device-phone in base.css would
+   * crop it too, and silently.
+   *
+   * The cost, stated rather than buried: at 1.8651 the phone sits between 16:9
+   * and 18:9, so it reads as a 2017-era handset rather than a current 19.5:9
+   * one. Gabriel's call, August 2026, with width ruled out as the lever. */
+  .dev-phone :global(.glass) {
+    aspect-ratio: 1 / 1.8651;
   }
 
   /* ── The key ──────────────────────────────────────────────────────────── */
@@ -447,13 +477,15 @@ const key = [
        *     is a different defect that ConsoleShot's ladder already fixes.
        *   - Life-size and non-dominating are not both available at 390px wide.
        *
-       * 2.267 turns a height budget back into a width: the capture's aspect is
-       * 2580/1170 = 2.205, and the bezel adds 2 x 0.0308 of the screen on top
-       * of it (base.css scales the hardware with the screen now). The svh term
-       * is a ceiling rather than the driver: the width clamp wins on a normal
-       * phone, and the height cap only bites on a short one, where it shrinks
-       * the device instead of letting it run off the screen. */
-      --phone-w: min(clamp(200px, 58vw, 280px), calc(68svh / 2.267));
+       * 1.927 turns a height budget back into a width. It is the device's
+       * whole aspect: the glass is cropped to 1.8651 above and the bezel adds
+       * 2 x 0.0308 of the screen on top of it (base.css scales the hardware
+       * with the screen now). It was 2.267 before the crop — if the crop
+       * changes, this changes with it or the cap stops meaning 68% of the
+       * screen. The svh term is a ceiling rather than the driver: the width
+       * clamp wins on a normal phone, and the height cap only bites on a short
+       * one, where it shrinks the device instead of letting it run off. */
+      --phone-w: min(clamp(200px, 58vw, 280px), calc(68svh / 1.927));
     }
     .dev-phone :global(.device) {
       --accent: var(--accent-direccion);
@@ -500,11 +532,11 @@ const key = [
      the composition works, not the roomy one. */
   @media (min-width: 1000px) and (max-height: 780px) {
     /* The lineup sits higher here, so its floor comes down with it — and it
-       carried the same 149px of stale slack the roomy floor did, for the same
-       reason. The phone ends at 1228 on a 1280x760 window; 76rem (1216) leaves
-       it the same ~50px margin. */
+       carries the same slack the roomy floor does, for the same reason. The
+       phone ends at 1104 on a 1280x760 window now that the glass is cropped;
+       68rem (1088) leaves it the same ~50px margin. */
     .hero {
-      min-height: max(calc(100svh - var(--header-h)), 76rem);
+      min-height: max(calc(100svh - var(--header-h)), 68rem);
     }
     .hero-inner {
       padding-block: var(--space-3);
