@@ -57,8 +57,14 @@ interface Props {
   /** CSS px the phone frame is displayed at. Default 390 because that is the
    *  viewport `npm run capture` shoots the mobile pass at, and displaying a
    *  390 CSS-px capture in a narrower box shrinks the app's own layout: at 300
-   *  the product's 13px UI text painted at 10px before any resampling. Keep
-   *  these two numbers equal unless you also change the capture viewport. */
+   *  the product's 13px UI text painted at 10px before any resampling.
+   *
+   *  ONE SURFACE IS ALLOWED TO BREAK THAT, and it passes 280: the home hero's
+   *  phone, which is a product shot rather than a console anyone reads — a
+   *  life-size phone inside a phone is 860px of screen before the bezel and
+   *  eats the whole viewport. The mobile pass is shot at 3x, so 280 is still a
+   *  4.2x source and a clean downsample. Everywhere else, keep this equal to
+   *  the capture viewport. CLAUDE.md carries the full argument. */
   mobileDisplayWidth?: number;
   /** Override when the frame is fluid below its cap, e.g.
    *  "(min-width: 1292px) 1240px, calc(100vw - 3.2rem)". `displayWidth` still

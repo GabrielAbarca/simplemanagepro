@@ -122,8 +122,9 @@ const key = [
             mobileLight={admin.mobileImage}
             mobileDark={admin.mobileImageDark}
             alt={admin.alt}
-            displayWidth={390}
-            mobileSizes="min(390px, calc(100vw - 2rem))"
+            displayWidth={330}
+            mobileDisplayWidth={280}
+            mobileSizes="min(280px, 58vw)"
             breakpoint={1000}
             loading="eager"
             priority={true}
@@ -265,14 +266,23 @@ const key = [
 
   /* Breaks out of the 1180px column to span the viewport, so the placements
      below are percentages of the window rather than of the text measure. */
-  /* The lineup's floor. The phone is the lowest device: top 31.5rem plus its
-     884px is 1388, and the tilt drops the transformed box a further ~21px, so
-     89rem (1424) holds it with a little margin. Measured, not guessed: at
-     87.5rem the phone's bottom landed 9px past the hero and was still clipped.
-     Move either device's `top` and this has to move with it. */
+  /* The lineup's floor. The phone is the lowest device, and this has to clear
+     its transformed bottom edge or .fold-hero's clip cuts the device off.
+
+     89rem was correct when the phone was 884px tall. It has been 784 since the
+     lineup's widths were cut (monitor 1000, tablet 720, phone 330), which left
+     149px of empty hero under the devices at every desktop size — measured at
+     1280x900, 1440x900, 1280x760 and 1600x1000, all within a pixel of each
+     other, because the slack is a constant, not a function of the window.
+
+     83rem (1328) puts the phone's bottom about 50px above the hero's, which is
+     the same margin 89rem gave the taller phone. Measured with
+     getBoundingClientRect, which already reports the tilted box, so the ~21px
+     the rotation adds is inside the number rather than added to it.
+     Move either device's `top`, or any screenWidth, and re-measure this. */
   @media (min-width: 1000px) {
     .hero {
-      min-height: max(calc(100svh - var(--header-h)), 89rem);
+      min-height: max(calc(100svh - var(--header-h)), 83rem);
     }
   }
 
@@ -412,7 +422,38 @@ const key = [
     .hero {
       /* The phone is carrying the dirección console here, so the rim is that
          portal's rather than the estudiante one it wears in the lineup. */
-      --phone-w: min(390px, calc(100vw - 2rem));
+
+      /* A DEPICTION OF A PHONE, NOT A PHONE.
+       *
+       * This used to be min(390px, 100vw - 2rem), which is the capture's own
+       * width — the rule everywhere else on the site. On a phone that made the
+       * device 821px tall at 390 and 892px at 430, so the one element carrying
+       * the product started 558px down the page and ran 535px past the fold,
+       * and the hero came to 1354px on an 844px screen. A life-size phone
+       * rendered inside a phone can only ever eat the whole screen: 390 x 2.205
+       * is 860px before the bezel, and there is no arrangement of copy that
+       * leaves room for it.
+       *
+       * So the screen is displayed BELOW the width it was shot at here, which
+       * the screenshot rule forbids everywhere else. Three things make it the
+       * right call on this one surface, and CLAUDE.md now records them:
+       *
+       *   - The rule protects a console the reader is meant to READ. This is a
+       *     product shot taken in at a glance; the reader who wants to read it
+       *     has a "Ver la demo" button two inches above it.
+       *   - The mobile pass is shot at 3x, so a 260px display is a 4.5x source.
+       *     That is a clean downsample, not the upscaling the rule was written
+       *     after — the failure was a 1x/2x ladder under a 300px frame, which
+       *     is a different defect that ConsoleShot's ladder already fixes.
+       *   - Life-size and non-dominating are not both available at 390px wide.
+       *
+       * 2.267 turns a height budget back into a width: the capture's aspect is
+       * 2580/1170 = 2.205, and the bezel adds 2 x 0.0308 of the screen on top
+       * of it (base.css scales the hardware with the screen now). The svh term
+       * is a ceiling rather than the driver: the width clamp wins on a normal
+       * phone, and the height cap only bites on a short one, where it shrinks
+       * the device instead of letting it run off the screen. */
+      --phone-w: min(clamp(200px, 58vw, 280px), calc(68svh / 2.267));
     }
     .dev-phone :global(.device) {
       --accent: var(--accent-direccion);
@@ -458,9 +499,12 @@ const key = [
      and the lineup moves up with it. This is the viewport that decides whether
      the composition works, not the roomy one. */
   @media (min-width: 1000px) and (max-height: 780px) {
-    /* The lineup sits higher here, so its floor comes down with it. */
+    /* The lineup sits higher here, so its floor comes down with it — and it
+       carried the same 149px of stale slack the roomy floor did, for the same
+       reason. The phone ends at 1228 on a 1280x760 window; 76rem (1216) leaves
+       it the same ~50px margin. */
     .hero {
-      min-height: max(calc(100svh - var(--header-h)), 82rem);
+      min-height: max(calc(100svh - var(--header-h)), 76rem);
     }
     .hero-inner {
       padding-block: var(--space-3);

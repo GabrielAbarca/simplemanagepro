@@ -574,7 +574,13 @@ a.card-fold:hover::after {
    text painted at 10px, which is half of why the phone shot read as softer
    than the desktop one. On a 390px viewport this means the frame bleeds past
    .wrap's padding, which is deliberate. Below 390 it tracks the viewport, and
-   the 1170w candidate still covers 3x with room to spare. */
+   the 1170w candidate still covers 3x with room to spare.
+
+   This surface keeps that rule. The home hero's hardware phone does not, and
+   the distinction is what the reader is being asked to do: here a console is
+   put in front of someone who came to /portales to read it, and there it is a
+   product shot glanced at on the way past a headline. Hero.astro states the
+   case at the property; CLAUDE.md carries the general form. */
 .console-frame.is-phone {
   width: min(390px, 100vw);
   border-radius: var(--space-3);
@@ -688,22 +694,34 @@ a.card-fold:hover::after {
 /* A phone, so it needs the corner radius and the island rather than a camera
    dot. The screen width is set by whoever places it, and defaults to the width
    the mobile pass shoots at. */
+/* THE HARDWARE IS A FRACTION OF THE SCREEN, NOT A FIXED SIZE.
+ *
+ * Every number here was a px value calibrated for a 390px screen, which was
+ * fine while the phone was only ever displayed at 390. The home hero now sizes
+ * it down on a phone (see Hero.astro), and fixed hardware on a variable screen
+ * is what makes a mockup read as fake: at a 226px screen the 96px island was
+ * 42% of the width, against about 25% on the real thing, so the phone grew a
+ * black moustache. The fractions are the old values over 390 and are exact at
+ * that width, so the desktop lineup is unchanged.
+ *
+ * The 3px button widths and their -2px offsets stay literal. They are
+ * hairlines: scaled down they would land under a device pixel and vanish. */
 .device-phone {
-  --bz: 12px;
-  --r: 3.1rem;
+  --bz: calc(var(--screen-w) * 0.0308);
+  --r: calc(var(--screen-w) * 0.1272);
 }
 
 .device-phone > .glass {
-  border-radius: 2.35rem;
+  border-radius: calc(var(--screen-w) * 0.0964);
 }
 
 .device-phone .island {
   position: absolute;
-  top: 21px;
+  top: calc(var(--screen-w) * 0.0538);
   left: 50%;
   translate: -50% 0;
-  width: 96px;
-  height: 25px;
+  width: calc(var(--screen-w) * 0.2462);
+  height: calc(var(--screen-w) * 0.0641);
   border-radius: 999px;
   background: #05070b;
   z-index: 2;
@@ -712,9 +730,9 @@ a.card-fold:hover::after {
 .device-phone .side {
   position: absolute;
   right: -2px;
-  top: 148px;
+  top: calc(var(--screen-w) * 0.3795);
   width: 3px;
-  height: 64px;
+  height: calc(var(--screen-w) * 0.1641);
   border-radius: 0 2px 2px 0;
   background: linear-gradient(180deg, #4b5060, #2a2e39);
 }
@@ -722,9 +740,9 @@ a.card-fold:hover::after {
 .device-phone .vol {
   position: absolute;
   left: -2px;
-  top: 122px;
+  top: calc(var(--screen-w) * 0.3128);
   width: 3px;
-  height: 40px;
+  height: calc(var(--screen-w) * 0.1026);
   border-radius: 2px 0 0 2px;
   background: linear-gradient(180deg, #4b5060, #2a2e39);
 }

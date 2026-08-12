@@ -334,6 +334,38 @@ The phone frame is **390, the width the capture was shot at**, not 300. A
 390 CSS-px capture displayed in a 300px box shrinks the app's own layout, so
 the product's 13px UI text painted at 10px before any resampling started.
 
+### The one exception, and why it is not a licence
+
+**The home hero's hardware phone is displayed at 280 and below, not 390.** It
+is the only place on the site that breaks the rule above, and it does so
+because the rule and the surface are genuinely incompatible:
+
+- A phone capture is 390 × 2.205 = 860px of screen before the bezel. Rendered
+  life-size on a 390px viewport it *is* the viewport. Measured before the fix:
+  the device stood 821px tall at 390 and 892px at 430, began 558px down the
+  page, and ran 535px past the fold, with the hero at 1354px on an 844px
+  screen. There is no arrangement of copy that leaves room for it.
+- The rule exists to keep a console **legible to someone reading it**. On
+  /portales that is exactly what is being asked. In the hero it is a product
+  shot, seen at a glance, two inches under a "Ver la demo" button that takes
+  the reader to the real thing at full size.
+- The mobile pass is shot at **3×**, so a 280px display is a 4.2× source. That
+  is a clean downsample. The failure this rule was written after was the
+  opposite — a 1×/2× ladder *upscaling* by 1.5× — and `ConsoleShot`'s ladder
+  already fixes that independently.
+
+Two things keep the exception honest. `mobileDisplayWidth` must be passed
+explicitly, so a frame can only opt out on purpose and the `srcset` follows the
+width it is actually displayed at. And the phone's hardware — bezel, corner
+radius, island, side buttons — is now a **fraction of `--screen-w`** rather
+than px calibrated for 390 (`base.css`, "THE HARDWARE IS A FRACTION"): fixed
+hardware on a scaled screen is what makes a mockup read as fake, and at 226px
+the old 96px island covered 42% of the width against about 25% on the real
+device.
+
+**This is not permission to shrink a console elsewhere.** Anywhere the reader
+is meant to read the screenshot, the frame is still the capture's own width.
+
 There are three passes, and `PASS=tablet npm run capture` reshoots one without
 disturbing captures that are already reviewed. The tablet pass is **1180@2x
 landscape** (`t-` prefix) and only the gradebook has one, because only the home
