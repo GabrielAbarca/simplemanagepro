@@ -1,0 +1,72 @@
+---
+/**
+ * The mark, in vector.
+ *
+ * It is a crimson ribbon folded back on itself, with the darker crimson on the
+ * underside — the same shape the whole page is built on, which is why drawing
+ * it rather than shipping a bitmap matters: the logo and the fold become one
+ * geometry instead of two things that merely rhyme.
+ *
+ * It replaces `public/brand-mark.png`, which is 96x96. That was fine at the
+ * header's 30px and mush at anything larger, and it had no dark variant. This
+ * scales to any size, follows the theme through `--color-brand` /
+ * `--color-brand-deep`, costs about a kilobyte, and is one request fewer.
+ *
+ * `title` gives it an accessible name where it stands alone. Left off, it is
+ * decorative — which is the right call in the header, where the anchor around
+ * it already carries the label.
+ */
+interface Props {
+  size?: number | string;
+  /** Accessible name. Omit for decorative use. */
+  title?: string;
+  class?: string;
+}
+
+const { size = 30, title, class: className } = Astro.props;
+const px = typeof size === "number" ? `${size}px` : size;
+---
+
+<svg
+  class:list={["brand-mark", className]}
+  viewBox="0 0 64 64"
+  width={px}
+  height={px}
+  role={title ? "img" : "presentation"}
+  aria-hidden={title ? undefined : "true"}
+  aria-label={title}
+>
+  <defs>
+    <linearGradient id="bm-face" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="var(--bm-light, #e8142a)"></stop>
+      <stop offset="1" stop-color="var(--bm-face, var(--color-brand))"></stop>
+    </linearGradient>
+  </defs>
+
+  {/* The sheet: a band running down the mark, cut away at the lower right. */}
+  <path
+    class="face"
+    d="M12 4h40a8 8 0 0 1 8 8v28L38 62H12a8 8 0 0 1-8-8V12a8 8 0 0 1 8-8Z"
+    fill="url(#bm-face)"></path>
+
+  {/* The turned-back corner, in the darker crimson. This is the whole idea: a
+      corner folded up toward the viewer shows the reverse of the sheet. */}
+  <path class="under" d="M60 40 38 62V48a8 8 0 0 1 8-8h14Z"></path>
+
+  {/* The two rules on the face, which is what makes it read as a sheet with
+      something written on it rather than as an abstract chevron. */}
+  <rect x="16" y="17" width="28" height="6" rx="3" fill="#fff" opacity=".94"
+  ></rect>
+  <rect x="16" y="30" width="20" height="6" rx="3" fill="#fff" opacity=".6"
+  ></rect>
+</svg>
+
+<style>
+  .brand-mark {
+    display: block;
+    flex-shrink: 0;
+  }
+  .under {
+    fill: var(--color-brand-deep);
+  }
+</style>

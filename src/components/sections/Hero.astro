@@ -159,14 +159,23 @@ const key = [
        fold rules forbid outright, and it failed the contrast audit at 4.39:1.
        Deterministic beats clever here. */
     display: block;
-    /* height, not min-height. min-height lets a device push the hero past one
-       screen, which is the defect this pass exists to remove; a fixed height
-       plus the clip .fold-hero already carries is what makes a device bleed
-       instead of grow. min-height is the floor for the pathological case, a
-       very short window or a large default font size, where clipping the CTAs
-       would be worse than scrolling. */
-    height: calc(100svh - var(--header-h));
-    min-height: 33rem;
+    /* Two floors, and the taller one wins.
+     *
+     * The first is the viewport, so the hero always fills one screen. That is
+     * what a fixed height used to guarantee, but a fixed height also meant
+     * .fold-hero's clip cut the tablet and the phone off at the hero's bottom
+     * edge and no amount of scrolling revealed the rest: they read as broken
+     * rather than as bled.
+     *
+     * The second is the lineup's own extent, added per breakpoint below, so
+     * the hero continues past the first screen far enough to hold the devices
+     * whole. It is not set here because the collapsed layout has no lineup:
+     * the phone is in flow there and the hero already grows to fit it, so a
+     * desktop floor would only pad a phone with dead space.
+     *
+     * overflow:hidden STAYS. Nothing is clipped vertically now, and it is
+     * still what lets the phone bezel bleed off both edges at 390. */
+    min-height: calc(100svh - var(--header-h));
     /* base.css gives every <section> 6.4rem of block padding. A hero that owns
        its own height cannot also carry it: it took 102.4px off the top and the
        bottom, so .hero-inner was 629px inside an 834px hero and the copy began
@@ -181,11 +190,25 @@ const key = [
     --phone-w: 390px;
   }
 
+  /* The fold covers the FIRST SCREEN, not the whole hero.
+     Its clip-path percentages are of this element, so letting it span a hero
+     that now runs to 1400px would drag the crease hundreds of px below the
+     fold line and the signature would be missing from the one screen it
+     exists for. Where the element ends, `.face-down` is already
+     --color-background, so there is no seam against the page below it.
+     crease-check.mjs measures off this box too, so it follows automatically. */
+  .hero > .fold {
+    bottom: auto;
+    height: calc(100svh - var(--header-h));
+  }
+
   .hero-inner {
     position: relative;
     z-index: 4;
     width: 100%;
-    height: 100%;
+    /* No height. The hero's height comes from min-height now, so its computed
+       `height` is auto and a percentage here resolves to auto anyway. The grid
+       is align-content:start, so the copy sits at the top regardless. */
     max-width: var(--page-max);
     margin-inline: auto;
     padding: var(--space-4) var(--space-3);
@@ -242,6 +265,17 @@ const key = [
 
   /* Breaks out of the 1180px column to span the viewport, so the placements
      below are percentages of the window rather than of the text measure. */
+  /* The lineup's floor. The phone is the lowest device: top 31.5rem plus its
+     884px is 1388, and the tilt drops the transformed box a further ~21px, so
+     89rem (1424) holds it with a little margin. Measured, not guessed: at
+     87.5rem the phone's bottom landed 9px past the hero and was still clipped.
+     Move either device's `top` and this has to move with it. */
+  @media (min-width: 1000px) {
+    .hero {
+      min-height: max(calc(100svh - var(--header-h)), 89rem);
+    }
+  }
+
   .rig {
     position: absolute;
     top: 0;
@@ -424,6 +458,10 @@ const key = [
      and the lineup moves up with it. This is the viewport that decides whether
      the composition works, not the roomy one. */
   @media (min-width: 1000px) and (max-height: 780px) {
+    /* The lineup sits higher here, so its floor comes down with it. */
+    .hero {
+      min-height: max(calc(100svh - var(--header-h)), 82rem);
+    }
     .hero-inner {
       padding-block: var(--space-3);
     }

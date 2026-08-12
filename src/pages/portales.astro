@@ -3,7 +3,7 @@ import Layout from "../layouts/Layout.astro";
 import PageHero from "../components/PageHero.astro";
 import PortalGlyph from "../components/PortalGlyph.astro";
 import ConsoleShot from "../components/ConsoleShot.astro";
-import ConsoleFrame from "../components/ConsoleFrame.astro";
+import DeviceFrame from "../components/DeviceFrame.astro";
 import CierreCta from "../components/sections/CierreCta.astro";
 import { portals } from "../data/site";
 import { breadcrumbLd } from "../lib/schema";
@@ -82,52 +82,56 @@ import { DEMO_URL } from "../config";
               </a>
             </div>
 
-            {/* Second plane, and a real claim: the same console on a phone.
-                Hidden below the breakpoint, where the frame beneath has
-                already swapped to the phone capture and this would be the
-                same picture twice. */}
+            {/* The same console in hardware, on a phone.
+                It carries the phone capture at EVERY width now: below 760 it
+                is the only console on screen, and above 1000 it is the second
+                plane beside the monitor. That split is why the monitor no
+                longer takes a mobile pair. */}
             <div class="portal-phone reveal">
-              <ConsoleFrame phone>
+              <DeviceFrame kind="phone" screenWidth="var(--phone-w)" accent={p.accent}>
                 <ConsoleShot
                   light={p.mobileImage}
                   dark={p.mobileImageDark}
                   alt=""
-                  displayWidth={300}
+                  displayWidth={390}
+                  sizes="min(390px, calc(100vw - 3.2rem))"
+                  loading="lazy"
                 />
-              </ConsoleFrame>
+              </DeviceFrame>
               <p class="phone-caption">También desde el teléfono</p>
             </div>
           </div>
 
+          {/* Desktop capture only, and display:none below 760. A lazy image in
+              a display:none subtree is never fetched, so a phone stops pulling
+              three 1240px consoles it is never shown. That is also why the
+              mobile pair came off: one ConsoleShot serving two viewports is
+              what produced the 300px frame the components both warn about. */}
           <div class="portal-shot reveal">
-            <ConsoleFrame>
+            <DeviceFrame kind="monitor" screenWidth="var(--shot-w)" accent={p.accent}>
               <ConsoleShot
                 light={p.image}
                 dark={p.imageDark}
-                mobileLight={p.mobileImage}
-                mobileDark={p.mobileImageDark}
                 alt={p.alt}
                 displayWidth={1240}
                 sizes="(min-width: 1292px) 1240px, calc(100vw - 3.2rem)"
-                mobileDisplayWidth={300}
+                loading="lazy"
               />
-            </ConsoleFrame>
+            </DeviceFrame>
           </div>
 
           {p.extraImage && p.extraImageDark && (
             <div class="portal-shot portal-shot-extra reveal">
-              <ConsoleFrame>
+              <DeviceFrame kind="monitor" screenWidth="var(--shot-w)" accent={p.accent}>
                 <ConsoleShot
                   light={p.extraImage}
                   dark={p.extraImageDark}
-                  mobileLight={p.mobileImage}
-                  mobileDark={p.mobileImageDark}
                   alt={p.extraAlt ?? ""}
                   displayWidth={1240}
                   sizes="(min-width: 1292px) 1240px, calc(100vw - 3.2rem)"
-                  mobileDisplayWidth={300}
+                  loading="lazy"
                 />
-              </ConsoleFrame>
+              </DeviceFrame>
               <p class="shot-caption">{p.extraAlt}</p>
             </div>
           )}
@@ -266,13 +270,44 @@ import { DEMO_URL } from "../config";
     translate: 0.2rem 0;
   }
 
+  /* DeviceFrame sizes itself from its screen and does not shrink on its own,
+     so the fluidity ConsoleFrame used to carry in CSS is handed to it as a
+     length. These match the `sizes` on each ConsoleShot: change one and change
+     the other, or the browser picks a candidate for a slot that does not
+     exist. The monitor's 30px is its bezel, which sits outside the screen. */
+  .portal {
+    --shot-w: min(1240px, calc(100vw - 3.2rem - 30px));
+    --phone-w: min(390px, calc(100vw - 3.2rem - 24px));
+  }
+
+  /* The phone is the only console below 760, so the monitor goes. Its capture
+     is lazy, and a lazy image inside a display:none subtree is never fetched. */
+  @media (max-width: 759px) {
+    .portal-shot {
+      display: none;
+    }
+  }
+
   .portal-phone {
     display: none;
   }
+  /* Below 760 the phone IS the console, so it is centred and on its own. */
+  @media (max-width: 759px) {
+    .portal-phone {
+      display: block;
+    }
+    .portal-phone :global(.device) {
+      margin-inline: auto;
+    }
+  }
+  /* The darker tier, not --color-info-dark. These captions sit inside the
+     device's accent glow, which tints the ground under them to about #c2c6e0,
+     and the muted tier only reached 4.03:1 there. This is the headroom the two
+     muted tiers were darkened to create: spend it, then re-run the audit. */
   .phone-caption {
-    margin-top: var(--space-2);
+    margin-top: var(--space-3);
     font-size: 0.85rem;
-    color: var(--color-info-dark);
+    color: var(--color-dark);
     text-align: center;
   }
 
@@ -280,9 +315,9 @@ import { DEMO_URL } from "../config";
     margin-top: var(--space-4);
   }
   .shot-caption {
-    margin-top: var(--space-2);
+    margin-top: var(--space-3);
     font-size: 0.85rem;
-    color: var(--color-info-dark);
+    color: var(--color-dark);
     text-align: center;
     max-width: var(--measure);
     margin-inline: auto;

@@ -220,17 +220,37 @@ error about the product, not a style choice.
   **Never set one as `color` on the page background.** Crimson is not among
   them: `--color-brand` is identity only, and a portal wearing it would teach
   the reader that red means "action" here and "brand" three sections later.
-- **The home hero is locked to one viewport.** It is
-  `height: calc(100svh - var(--header-h))`, not `min-height`, so a device
-  bleeds past the edge instead of growing the hero. `--header-h` is rounded up
-  past the real header (65.03px with the nav, 61.77px with the menu button):
-  over-estimating leaves a few px of the next section peeking, under-estimating
-  forces the scrollbar the lock exists to remove. Two consequences worth
-  knowing before editing it. `base.css` gives every `<section>` 6.4rem of block
-  padding and a hero that owns its height must zero it, or the inner box is
-  102px short at each end. And the devices are anchored in **rem, not per
-  cent**: the copy stack does not shrink with the window, so a percentage that
-  clears it at 900px tall puts a device through the note at 657.
+- **The home hero fills one viewport but is not limited to it.** It carries two
+  floors and the taller wins: `min-height: max(calc(100svh - var(--header-h)),
+  89rem)`. The first is the screen. The second is the lineup's own extent, so
+  the hero continues past the fold far enough to hold the devices whole.
+
+  It used to be a fixed `height`, and that was wrong: `.fold-hero`'s clip cut
+  the tablet and the phone off at the hero's bottom edge and no amount of
+  scrolling revealed the rest, so they read as broken rather than as bled. The
+  `overflow: hidden` stays regardless, because it is also what lets the phone
+  bezel bleed off both edges at 390.
+
+  **The fold covers the first screen, not the hero.** Its clip-path percentages
+  are of the fold element, so letting it span the taller hero drags the crease
+  hundreds of px below the fold line. It carries its own
+  `height: calc(100svh - var(--header-h))` and `bottom: auto`.
+
+  `--header-h` is rounded up past the real header (65.03px with the nav,
+  61.77px with the menu button): over-estimating leaves a few px of the next
+  section peeking, under-estimating forces a scrollbar. Two more traps.
+  `base.css` gives every `<section>` 6.4rem of block padding and a hero that
+  owns its height must zero it, or the inner box is 102px short at each end.
+  And the devices are anchored in **rem, not per cent**: the copy stack does
+  not shrink with the window, so a percentage that clears it at 900px tall puts
+  a device through the note at 657.
+- **A glyph component's classes are global, so prefix them.** `FeatureGlyph`
+  drew its grade chips with `class="chip"`, which matched `base.css`'s pill
+  component. That rule sets `color`, so `fill: currentColor` resolved to the
+  page's dark text instead of the accent and the chips came out charcoal. Every
+  class in these SVGs is `g-` prefixed now, and the fills read a private
+  `var(--g)` rather than `currentColor` — a custom property cannot be reached
+  by a global rule that happens to set `color`.
 - **The fold is the page's signature.** The brand mark is a crimson ribbon
   folded back on itself with the darker crimson on the underside; the hero is
   that shape at page scale, and `.fold-band` in `base.css` carries the same
@@ -321,6 +341,16 @@ hero's lineup needs a tablet. 1180 is above the app's desktop breakpoint, so it
 captures the tablet layout with its collapsed icon rail rather than the phone
 layout enlarged.
 
+A portal may also override the desktop viewport, and one does. **The student
+Panel is shot at 1366**, because below about 1320 the app clips the third stat
+card ("Próxima clase") against the main column: it loses its right rounded
+corner and its text runs into the cut. Measured on the demo, clipped at 1240,
+1280 and 1300, clean at 1366 and up, and the old capture shipped the defect.
+The page still displays it at 1240 like the others, so the app's layout lands
+about 9% smaller in that one console — much cheaper than a cut card. **This is
+a workaround for an app bug**: put it back on the shared viewport once
+`SMP-Web-Page` stops clipping at 1280.
+
 **`DeviceFrame.astro` puts a console in hardware, and its bezel is padding
 outside the screen.** The screen is always the exact CSS width its capture was
 shot at, so wrapping a shot in a monitor, tablet or phone can never shrink the
@@ -387,8 +417,11 @@ first.** It has been wrong three times and right every other time:
   hero, so the audit measured a page no visitor will ever see. The wash landed
   somewhere else entirely, which reported the eyebrow at 4.48:1 against a
   background it never sits on, while about 70 elements per pass fell out of the
-  run. **A drop in the element count is the tell** — it should sit near 1074.
-  It pins the hero's real height before growing now.
+  run. **A drop in the element count is the tell** — it should sit near 1138.
+  It pins the hero's and the fold's real heights before growing now, and it
+  pins **`min-height` as well as `height`**: the hero is sized by a
+  `min-height: max(...)`, so pinning only `height` left the min-height free to
+  win and the hero ballooned anyway. That cost a second round of the same bug.
 - `naturalWidth` on a `w`-descriptor `srcset` is **density-corrected**, so a
   2480px file selected for a 1240px slot reports 1240. Check `currentSrc`, not
   `naturalWidth`, when verifying which candidate a browser picked.

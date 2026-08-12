@@ -107,8 +107,13 @@ const html = `<!doctype html>
     <img src="${asset("public/apple-touch-icon.png")}" alt="">
     <span>SIMPLE <b>MANAGE PRO</b></span>
   </div>
-  <h1>El sistema con el que su colegio lleva el curso lectivo.</h1>
-  <p class="sub">Notas, asistencia, horarios y expedientes en un solo lugar.</p>
+  <!-- Tracks the home hero's headline. A share card that promises one claim
+       and a page that opens with another is the same page contradicting
+       itself in the two seconds the forward is worth. -->
+  <h1>Tres consolas. Un solo sistema.</h1>
+  <p class="sub">
+    Notas, asistencia, horarios y expedientes, sobre los mismos datos.
+  </p>
 </div>
 
 <div class="foot">

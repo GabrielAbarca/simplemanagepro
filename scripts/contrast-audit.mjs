@@ -74,14 +74,31 @@ for (const { route, v, theme } of MATRIX) {
   //
   // Pin the hero to the height it really had at the real viewport. Injected
   // before pass 1 so both passes still see one layout.
-  const heroHeight = await page.evaluate(() => {
-    const hero = document.querySelector(".hero");
-    return hero ? Math.round(hero.getBoundingClientRect().height) : 0;
+  // The fold is pinned as well as the hero. It carries its own
+  // `height: calc(100svh - var(--header-h))` so that its clip-path percentages
+  // stay percentages of the FIRST SCREEN rather than of a hero that now runs
+  // past it — which means it balloons under the grow exactly like the hero did,
+  // and the wash slides out from under the copy it is supposed to sit behind.
+  const frozen = await page.evaluate(() => {
+    const box = (sel) => {
+      const el = document.querySelector(sel);
+      return el ? Math.round(el.getBoundingClientRect().height) : 0;
+    };
+    return { hero: box(".hero"), fold: box(".fold-hero > .fold") };
   });
-  if (heroHeight) {
-    await page.addStyleTag({
-      content: `.hero { height: ${heroHeight}px !important; }`,
-    });
+  // min-height as well as height, and that is not belt-and-braces: the hero is
+  // sized by `min-height: max(calc(100svh - ...), 89rem)`, and pinning only
+  // `height` leaves the min-height free to win. Under the grow it resolved to
+  // the document height and the hero ballooned anyway — same 70-elements-per-
+  // pass drop, second time around.
+  const pin = (sel, px) =>
+    `${sel} { height: ${px}px !important; min-height: ${px}px !important; }`;
+  const pins = [
+    frozen.hero && pin(".hero", frozen.hero),
+    frozen.fold && pin(".fold-hero > .fold", frozen.fold),
+  ].filter(Boolean);
+  if (pins.length) {
+    await page.addStyleTag({ content: pins.join("\n") });
     await page.waitForTimeout(200);
   }
 

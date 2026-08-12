@@ -151,7 +151,25 @@ const PORTALS = [
     // hero's lineup, and it is the only surface that needs one.
     passes: ["desktop", "mobile", "tablet"],
   },
-  { file: "student", path: "/", ready: ".grade-overview, #grades-table, main" },
+  {
+    file: "student",
+    path: "/",
+    ready: ".grade-overview, #grades-table, main",
+    // Shot wider than the rest of the desktop pass, and this is a workaround
+    // for an app bug rather than a preference.
+    //
+    // The student Panel puts three stat cards beside a right-hand aside, and
+    // below about 1320 the third one ("Próxima clase") is clipped by the main
+    // column: it loses its right rounded corner and its text runs into the cut.
+    // Measured on the demo, it is clipped at 1240, 1280 and 1300 and clean at
+    // 1366 and up. The old capture shipped that defect.
+    //
+    // The page still displays this at 1240 like the others, so the app's own
+    // layout lands about 9% smaller here than in the other two consoles. That
+    // is the cost, and it is much cheaper than shipping a cut card. Put this
+    // back to the shared viewport once the app stops clipping at 1280.
+    viewport: { width: 1366, height: 900 },
+  },
 ];
 
 /**
@@ -188,12 +206,12 @@ async function contentHeight(page) {
 const clamp = (n, { min, max }) => Math.min(max, Math.max(min, n));
 
 async function capture(browser, theme, pass = "desktop") {
-  const { viewport: base, scale, prefix, touch } = PASSES[pass];
+  const { viewport: passViewport, scale, prefix, touch } = PASSES[pass];
   const bounds = HEIGHT[pass];
   const mobile = pass === "mobile";
 
   const context = await browser.newContext({
-    viewport: base,
+    viewport: passViewport,
     deviceScaleFactor: scale,
     locale: "es-CR",
     isMobile: mobile,
@@ -216,6 +234,12 @@ async function capture(browser, theme, pass = "desktop") {
 
   for (const portal of PORTALS) {
     if (!(portal.passes ?? ["desktop", "mobile"]).includes(pass)) continue;
+
+    // A portal may need a wider window than the pass, to work around a layout
+    // the app gets wrong at the shared width. Desktop only: the phone and
+    // tablet passes are shot at the width their device actually is.
+    const base =
+      pass === "desktop" && portal.viewport ? portal.viewport : passViewport;
 
     // Reset: the previous portal trimmed the window to its own content.
     await page.setViewportSize(base);

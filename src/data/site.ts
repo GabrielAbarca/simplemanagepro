@@ -123,23 +123,81 @@ export const portals: Portal[] = [
   },
 ];
 
-/** Section 2's visual contrast. Each item is one of the sources that has to be
- *  reconciled by hand at period close, named as an object the director
- *  recognises rather than as an abstraction.
+/** Section 2, as three jobs rather than one pile.
  *
- *  `kind` picks the glyph. Six identical pills said "six things"; six things
- *  that are visibly a spreadsheet, a paper cuaderno and a chat thread say what
- *  KIND of mess it is, which is the part the director recognises. */
-export const patchwork: { label: string; meta: string; kind: Patchwork }[] = [
-  { label: "Notas de 7° A", meta: "notas_7A_final.xlsx", kind: "sheet" },
-  { label: "Asistencia", meta: "cuaderno, en papel", kind: "paper" },
-  { label: "Notas de 8° B", meta: "copia_de_notas_v3.xlsx", kind: "sheet" },
-  { label: "Grupo de docentes", meta: "WhatsApp", kind: "chat" },
-  { label: "Matrícula 2026", meta: "matricula_ok.xlsx", kind: "sheet" },
-  { label: "Notas de 9° A", meta: "notas9A_REVISADO.xlsx", kind: "sheet" },
-];
+ *  Each row is a thing the colegio already does every period, shown twice: the
+ *  objects it is done with today, and the one console that replaces them. It
+ *  used to be a single six-item scatter beside a single "un solo sistema"
+ *  card, which said there was a mess but never said what the product does
+ *  about any particular part of it.
+ *
+ *  `kind` picks the glyph on the "hoy" side, and it is still the argument that
+ *  block is making. Identical pills would say "three things"; things that are
+ *  visibly a spreadsheet, a paper cuaderno and a chat thread say what KIND of
+ *  mess it is, which is the part the director recognises.
+ *
+ *  `accent` is the console that does the work, so the colour is a claim about
+ *  which portal this lands in and not decoration. Two of the three are the
+ *  docente console, because two of the three are the docente's job. */
+export type SourceKind = "sheet" | "paper" | "chat";
+export type FixGlyph = "asistencia" | "notas" | "matricula";
 
-export type Patchwork = "sheet" | "paper" | "chat";
+export const contrasts: {
+  id: string;
+  job: string;
+  hoy: { label: string; meta: string; kind: SourceKind }[];
+  cost: string;
+  fix: { title: string; body: string; glyph: FixGlyph; accent: string };
+}[] = [
+  {
+    id: "asistencia",
+    job: "Asistencia",
+    hoy: [
+      { label: "Asistencia de 7° A", meta: "cuaderno, en papel", kind: "paper" },
+      { label: "Ausencias del mes", meta: "conteo a mano", kind: "paper" },
+      { label: "Avisos de ausencia", meta: "WhatsApp", kind: "chat" },
+    ],
+    cost: "Alguien tiene que pasar cada lista a un archivo antes de poder contar nada.",
+    fix: {
+      title: "Panel de asistencia",
+      body: "La lista se toma en el sistema y el reporte del mes sale en unos clics, por sección o por estudiante.",
+      glyph: "asistencia",
+      accent: "var(--accent-docente)",
+    },
+  },
+  {
+    id: "notas",
+    job: "Notas",
+    hoy: [
+      { label: "Notas de 7° A", meta: "notas_7A_final.xlsx", kind: "sheet" },
+      { label: "Notas de 8° B", meta: "copia_de_notas_v3.xlsx", kind: "sheet" },
+      { label: "Notas de 9° A", meta: "notas9A_REVISADO.xlsx", kind: "sheet" },
+    ],
+    cost: "Un archivo por docente, y al cierre nadie sabe cuál versión es la buena.",
+    fix: {
+      title: "Libro de notas",
+      body: "Categorías ponderadas por periodo. Al cerrar, las notas ya están donde tienen que estar.",
+      glyph: "notas",
+      accent: "var(--accent-docente)",
+    },
+  },
+  {
+    id: "matricula",
+    job: "Matrícula",
+    hoy: [
+      { label: "Matrícula 2026", meta: "matricula_ok.xlsx", kind: "sheet" },
+      { label: "Cambios de sección", meta: "correo", kind: "chat" },
+      { label: "Expedientes", meta: "carpetas en papel", kind: "paper" },
+    ],
+    cost: "La misma lista, tecleada otra vez en cada lugar que la necesita.",
+    fix: {
+      title: "Matrícula importada",
+      body: "El mismo archivo de Excel entra directo, con secciones y expedientes ya asociados.",
+      glyph: "matricula",
+      accent: "var(--accent-direccion)",
+    },
+  },
+];
 
 export const pilotGives = [
   "El sistema configurado con la estructura de su colegio: curso lectivo, periodos, niveles, secciones, materias, docentes y horarios.",
