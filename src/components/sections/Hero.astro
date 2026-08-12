@@ -188,7 +188,7 @@ const key = [
     /* Set by the pointer script; these are the resting values. */
     --ry: -8deg;
     --rx: 3deg;
-    --phone-w: 330px;
+    --phone-w: 350px;
   }
 
   /* The fold covers the FIRST SCREEN, not the whole hero.
@@ -435,48 +435,15 @@ const key = [
       width: 100%;
       height: auto;
       z-index: 0;
-      /* Shallower than the lineup's 2000. There the perspective has to serve
-         three devices at three depths without the back ones skewing; here it
-         serves one object seen small, and a shallower box is what makes the
-         angle legible at 240px wide. */
-      perspective: 1100px;
-      perspective-origin: 50% 45%;
+      perspective: none;
       margin-top: var(--space-4);
     }
 
-    /* THE PHONE IS AN OBJECT, NOT A DECAL.
-     *
-     * This block used to set `perspective: none` above and `transform: none`
-     * here, so the collapsed layout threw away both halves of the lineup's 3D
-     * treatment and drew the phone dead straight-on. Flat hardware on a flat
-     * wash reads as a vector sticker of a phone rather than a photograph of
-     * one, which is the whole job this element has on mobile: it is the only
-     * console on the screen.
-     *
-     * WHY THESE ANGLES ARE SAFE. CLAUDE.md's rule is that magnification, not
-     * rotation, is what damages a screenshot — perspective scales a point by
-     * p / (p - z), so rotating about the edge the rotation brings forward puts
-     * every other point at negative z and the plane can only be minified.
-     * `.dev` already carries `transform-origin: right center` and the rotateY
-     * stays negative, so that holds. Computed on the 240 x 436 device:
-     *
-     *   left edge   rotateY(-10deg)  z = -41.7  scale 0.9635  (3.7% MINIFIED)
-     *   bottom edge rotateX(  2deg)  z =  +7.6  scale 1.0070  (0.70% magnified)
-     *
-     * The only magnification is the rotateX component, and 0.70% is less than
-     * the 0.87% the desktop lineup already ships (rotateX(3deg) on a 659px
-     * phone at perspective 2000). Effective density stays 5.14x against the
-     * 1170px source, so there is nothing to resample away.
-     *
-     * Literal angles rather than var(--ry)/var(--rx): the pointer script bails
-     * at innerWidth < 1000, but a window dragged from wide to narrow leaves
-     * its inline values on .hero, and this tilt should not depend on where a
-     * mouse happened to be. */
     .dev-phone {
       position: relative;
       left: auto;
       top: auto;
-      transform: rotateY(-10deg) rotateX(2deg);
+      transform: none;
       justify-self: center;
       margin-inline: auto;
       width: max-content;
@@ -518,25 +485,10 @@ const key = [
        * screen. The svh term is a ceiling rather than the driver: the width
        * clamp wins on a normal phone, and the height cap only bites on a short
        * one, where it shrinks the device instead of letting it run off. */
-      --phone-w: min(clamp(200px, 58vw, 280px), calc(68svh / 1.927));
+      --phone-w: min(clamp(300px, 58vw, 280px), calc(68svh / 1.927));
     }
-    /* Grounding. The ambient shadow alone leaves the phone floating: --elev-3
-       is 12% here and the hero's wash is a pale lavender, so there is almost
-       nothing separating the device from the page behind it. A contact layer
-       is tight, dark and offset downward, which is what reads as "sitting on
-       something" rather than "pasted onto something".
-
-       The two insets are the hardware's own lit top edge and shaded bottom
-       edge. They have to be repeated: box-shadow is one property, so naming it
-       here replaces base.css's whole list rather than adding to it, and
-       dropping them would flatten the bezel we just tilted. */
     .dev-phone :global(.device) {
       --accent: var(--accent-direccion);
-      box-shadow:
-        0 18px 26px -12px var(--elev-contact),
-        var(--elev-3),
-        inset 0 1px 1px rgba(255, 255, 255, 0.26),
-        inset 0 -1px 1px rgba(0, 0, 0, 0.5);
     }
 
     .hero-inner {
