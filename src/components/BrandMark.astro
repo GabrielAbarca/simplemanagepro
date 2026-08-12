@@ -1,16 +1,40 @@
 ---
 /**
- * The mark, in vector.
+ * The mark, in vector — traced from the brand original.
  *
- * It is a crimson ribbon folded back on itself, with the darker crimson on the
- * underside — the same shape the whole page is built on, which is why drawing
- * it rather than shipping a bitmap matters: the logo and the fold become one
- * geometry instead of two things that merely rhyme.
+ * THE SHAPE IS NOT A DESIGN DECISION. It is the folded-ribbon S the product
+ * already ships: `public/android-chrome-512x512.png`, byte-identical to what
+ * demo.simplemanagepro.com serves as its app icon and to the mark inside
+ * `public/og.png`. An earlier pass drew a different thing here — a rounded
+ * sheet with a turned-back corner and two white rules across it, a "document"
+ * metaphor — so the header wore one logo while the favicon, the share card and
+ * the product itself wore another. Anything drawn here has to be measured
+ * against that PNG, not invented to rhyme with the page.
  *
- * It replaces `public/brand-mark.png`, which is 96x96. That was fine at the
- * header's 30px and mush at anything larger, and it had no dark variant. This
- * scales to any size, follows the theme through `--color-brand` /
- * `--color-brand-deep`, costs about a kilobyte, and is one request fewer.
+ * The geometry, read off the original at 512:
+ *
+ *   - Two bars, 180°-rotationally symmetric about (258.5, 250.5), joined by a
+ *     diagonal. Every long edge runs at exactly 2:1 (26.57°).
+ *   - Each bar ends in a rounded taper: the edges converge to a point that is
+ *     cut by an arc, r=30.7. That taper is what makes it read as a ribbon
+ *     under tension rather than as a chevron.
+ *   - Each bar folds back on a VERTICAL crease — x=324 above, x=194 below —
+ *     and the reverse of the sheet shows behind it in the deeper crimson,
+ *     capped by its own arc at r=20.2.
+ *   - The notch where a bar's underside meets the diagonal is a real corner,
+ *     not a curve. It is what stops the S from reading as a lazy italic.
+ *
+ * IT DOES NOT FOLLOW THE THEME, and that is deliberate. The previous version
+ * drove its fills from `--color-brand`, which resolves to #ff7782 in dark
+ * mode, so the mark turned pink on a dark background — a colour the brand does
+ * not have. The product never does this: the demo serves the same PNG under
+ * both themes. The wordmark beside it still themes, because that is text and
+ * has to clear contrast; the mark is a fill and does not.
+ *
+ * The gradients are the original's own, sampled top and bottom: the face runs
+ * #f6133b → #cb0022 down the mark and the underside #9a0829 → #730220, both in
+ * user space so all three shapes share one continuous ramp rather than each
+ * restarting inside its own box.
  *
  * `title` gives it an accessible name where it stands alone. Left off, it is
  * decorative — which is the right call in the header, where the anchor around
@@ -25,11 +49,19 @@ interface Props {
 
 const { size = 30, title, class: className } = Astro.props;
 const px = typeof size === "number" ? `${size}px` : size;
+
+// The page renders this six times (header, plus five slabs on /piloto), and
+// duplicate ids are invalid markup even where every instance paints the same.
+// Astro has no per-page id counter and frontmatter is re-evaluated per render,
+// so there is nowhere to keep one — a random suffix is the cheap correct fix.
+const uid = crypto.randomUUID().slice(0, 8);
+const faceId = `bm-face-${uid}`;
+const underId = `bm-under-${uid}`;
 ---
 
 <svg
   class:list={["brand-mark", className]}
-  viewBox="0 0 64 64"
+  viewBox="0 0 512 512"
   width={px}
   height={px}
   role={title ? "img" : "presentation"}
@@ -37,36 +69,55 @@ const px = typeof size === "number" ? `${size}px` : size;
   aria-label={title}
 >
   <defs>
-    <linearGradient id="bm-face" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="var(--bm-light, #e8142a)"></stop>
-      <stop offset="1" stop-color="var(--bm-face, var(--color-brand))"></stop>
+    <!-- userSpaceOnUse: the two folds are small boxes near the top and bottom
+         of the mark, so an objectBoundingBox ramp would run a full light-to-
+         dark sweep inside each of them and the folds would not sit on the same
+         gradient as the face they belong to. -->
+    <linearGradient id={faceId} gradientUnits="userSpaceOnUse" x1="0" y1="32" x2="0" y2="469">
+      <stop offset="0" stop-color="#f6133b"></stop>
+      <stop offset="1" stop-color="#cb0022"></stop>
+    </linearGradient>
+    <linearGradient id={underId} gradientUnits="userSpaceOnUse" x1="0" y1="32" x2="0" y2="469">
+      <stop offset="0" stop-color="#9a0829"></stop>
+      <stop offset="1" stop-color="#730220"></stop>
     </linearGradient>
   </defs>
 
-  {/* The sheet: a band running down the mark, cut away at the lower right. */}
+  {/* The face, as one closed path: down the upper crease, left across the
+      notch, down the diagonal, round the lower taper, back up the lower
+      crease, and round the upper taper. */}
+  {/* `.face` and `.under` are load-bearing: /piloto's extruded slabs restyle
+      them to build the mark's thickness. Renaming either breaks that page. */}
   <path
     class="face"
-    d="M12 4h40a8 8 0 0 1 8 8v28L38 62H12a8 8 0 0 1-8-8V12a8 8 0 0 1 8-8Z"
-    fill="url(#bm-face)"></path>
+    d="M324 32
+       L324 231
+       L279 231
+       L419 301
+       A30.7 30.7 0 0 1 419 356
+       L193 469
+       L193 270
+       L238 270
+       L98 200
+       A30.7 30.7 0 0 1 98 145
+       Z"
+    fill={`url(#${faceId})`}></path>
 
-  {/* The turned-back corner, in the darker crimson. This is the whole idea: a
-      corner folded up toward the viewer shows the reverse of the sheet. */}
-  <path class="under" d="M60 40 38 62V48a8 8 0 0 1 8-8h14Z"></path>
-
-  {/* The two rules on the face, which is what makes it read as a sheet with
-      something written on it rather than as an abstract chevron. */}
-  <rect x="16" y="17" width="28" height="6" rx="3" fill="#fff" opacity=".94"
-  ></rect>
-  <rect x="16" y="30" width="20" height="6" rx="3" fill="#fff" opacity=".6"
-  ></rect>
+  {/* The two undersides — the sheet turned back on itself at each crease.
+      Each is the face's own edge mirrored across its vertical fold. */}
+  <path
+    class="under"
+    d="M324 32 L430 85 A20.2 20.2 0 0 1 430 121 L324 174 Z"
+    fill={`url(#${underId})`}></path>
+  <path
+    class="under"
+    d="M193 469 L87 416 A20.2 20.2 0 0 1 87 380 L193 327 Z"
+    fill={`url(#${underId})`}></path>
 </svg>
 
 <style>
   .brand-mark {
     display: block;
     flex-shrink: 0;
-  }
-  .under {
-    fill: var(--color-brand-deep);
   }
 </style>

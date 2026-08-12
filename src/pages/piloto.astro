@@ -216,14 +216,13 @@ const seats = [
     height: 100%;
   }
 
-  /* Only the front slab keeps the white rules and the full-strength face; the
-     ones behind it are the extrusion, so they are the underside colour and
-     carry no detail that could ghost through the edge. */
-  .mark-slab:not(:first-child) :global(.face) {
-    fill: var(--color-brand-deep);
-  }
-  .mark-slab:not(:first-child) :global(rect) {
-    display: none;
+  /* Only the front slab keeps the gradients; the ones behind it are the
+     extrusion, so both the face and the folds flatten to the underside crimson
+     and carry no detail that could ghost through the edge. `fill` has to win
+     over the paint server the mark sets inline, hence !important. */
+  .mark-slab:not(:first-child) :global(.face),
+  .mark-slab:not(:first-child) :global(.under) {
+    fill: var(--color-brand-deep) !important;
   }
   .mark-slab:nth-child(2) { --d: 1; }
   .mark-slab:nth-child(3) { --d: 2; }
