@@ -4,6 +4,7 @@ import "../styles/base.css";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { SITE_NAME } from "../config";
+import Analytics from "@vercel/analytics/astro";
 
 interface Props {
   /** Keyword-led and page-specific. The brand is appended, so leave it out. */
@@ -115,6 +116,7 @@ const ogImageUrl = new URL(ogImage, Astro.site);
 
     <!-- Per-page structured data and any other head extras. -->
     <slot name="head" />
+    <Analytics />
   </head>
   <body>
     <a class="skip" href="#contenido">Saltar al contenido</a>
