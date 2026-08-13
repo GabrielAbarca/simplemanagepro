@@ -1,6 +1,7 @@
 ---
 import "../styles/tokens.css";
 import "../styles/base.css";
+import Analytics from "@vercel/analytics/astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { SITE_NAME } from "../config";
@@ -123,6 +124,17 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       <slot />
     </main>
     <Footer />
+
+    <!-- Vercel Web Analytics. Cookie-free, so there is no consent banner and
+         nothing to explain under Ley 8968 (BRIEF §9).
+
+         Deliberately here and not in <head>, where Vercel's docs put it. The
+         component renders a real <vercel-analytics> custom element, and an
+         unknown element in <head> ends head parsing: everything below it,
+         including the theme script and the JSON-LD slot, would be reparented
+         into <body> and the theme script would then run after first paint,
+         which is the flash it exists to prevent. -->
+    <Analytics />
 
     <script>
       // Progressive enhancement in the literal sense: the reveal styles are
