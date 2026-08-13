@@ -2,6 +2,7 @@
 import "../styles/tokens.css";
 import "../styles/base.css";
 import Analytics from "@vercel/analytics/astro";
+import SpeedInsights from "@vercel/speed-insights/astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { SITE_NAME } from "../config";
@@ -125,16 +126,19 @@ const ogImageUrl = new URL(ogImage, Astro.site);
     </main>
     <Footer />
 
-    <!-- Vercel Web Analytics. Cookie-free, so there is no consent banner and
-         nothing to explain under Ley 8968 (BRIEF §9).
+    <!-- Vercel Web Analytics and Speed Insights. Both are cookie-free, so there
+         is no consent banner and nothing to explain under Ley 8968 (BRIEF §9).
+         Speed Insights adds real-user Core Web Vitals, which matter here because
+         the primary channel is a WhatsApp forward opening on mobile data.
 
-         Deliberately here and not in <head>, where Vercel's docs put it. The
-         component renders a real <vercel-analytics> custom element, and an
-         unknown element in <head> ends head parsing: everything below it,
-         including the theme script and the JSON-LD slot, would be reparented
-         into <body> and the theme script would then run after first paint,
-         which is the flash it exists to prevent. -->
+         Deliberately here and not in <head>, where Vercel's docs put them. Each
+         component renders a real custom element (<vercel-analytics>,
+         <vercel-speed-insights>), and an unknown element in <head> ends head
+         parsing: everything below it, including the theme script and the JSON-LD
+         slot, would be reparented into <body> and the theme script would then
+         run after first paint, which is the flash it exists to prevent. -->
     <Analytics />
+    <SpeedInsights />
 
     <script>
       // Progressive enhancement in the literal sense: the reveal styles are
