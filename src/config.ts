@@ -11,7 +11,11 @@ export const TERMS_URL = `${DEMO_URL}/terms.html`;
 
 // TODO: real number. wa.me wants digits only, country code first (506 = CR).
 export const WHATSAPP = "50600000000";
-export const EMAIL = "contact@gzelaya.com";
+// Brand-domain address: the page's subject is data custody, so the contact a
+// director writes to should sit on the same domain, not a personal one. Feeds
+// the /contacto page and the Organization JSON-LD. The mailbox must be live
+// before deploy.
+export const EMAIL = "contacto@simplemanagepro.com";
 
 export const WHATSAPP_MSG =
   "Buenas, soy director/a de [colegio] y quisiera conocer más sobre el piloto 2027.";

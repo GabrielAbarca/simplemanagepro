@@ -7,6 +7,12 @@ import sitemap from "@astrojs/sitemap";
 // document, so the parts that assumed a single route had to go.
 export default defineConfig({
   site: "https://simplemanagepro.com",
+  // Directory build already serves every route with a trailing slash, and the
+  // canonical/og/sitemap URLs derived from Astro.site carry one too. Declaring
+  // it makes the policy explicit and keeps the breadcrumb item URLs (schema.ts)
+  // in agreement instead of emitting the slashless form a crawler reads as a
+  // second, redirecting URL.
+  trailingSlash: "always",
   compressHTML: true,
   integrations: [sitemap()],
   build: {
