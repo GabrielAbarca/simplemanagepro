@@ -1,0 +1,157 @@
+---
+/**
+ * The opening of every route that is not the home page.
+ *
+ * All four used to be a bare `.page-head`: eyebrow, h1, lede, and nothing
+ * else. On the two routes that carry the product's core arguments — the three
+ * portals, and the pilot itself — that meant the most important pages on the
+ * site opened flatter than the home page's second section.
+ *
+ * This gives them the same folded sheet the home hero establishes, at a
+ * shallower angle so a page hero reads as the same object rather than as a
+ * copy of it, plus one ornament each. The ornament slot is the point: each
+ * page gets a device drawn from its own subject, not a stock illustration, so
+ * the decoration is also a preview of what the page is about.
+ */
+interface Props {
+  eyebrow: string;
+  title: string;
+  lede?: string;
+  /** Widen the copy column when there is no ornament to sit beside it. */
+  wide?: boolean;
+  class?: string;
+}
+
+const { eyebrow, title, lede, wide = false, class: className } = Astro.props;
+const hasOrnament = Astro.slots.has("ornament");
+---
+
+<section class:list={["page-hero", "fold-hero", className]}>
+  <div class="fold" aria-hidden="true">
+    <span class="face face-up"></span>
+    <span class="face face-down"></span>
+    <span class="crease"></span>
+    <span class="rule"></span>
+  </div>
+
+  <div class:list={["wrap", "hero-grid", hasOrnament && "has-ornament"]}>
+    <div class:list={["hero-copy", wide && "is-wide"]}>
+      <p class="eyebrow">{eyebrow}</p>
+      <h1>{title}</h1>
+      {lede && <p class="lede">{lede}</p>}
+      <slot />
+    </div>
+
+    {
+      hasOrnament && (
+        <div class="hero-ornament">
+          <slot name="ornament" />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  /* The crease runs BELOW the copy, not through it.
+   *
+   * A page hero has no console to hide the crease behind, so the only safe
+   * band is under the content: at 84%/58% it came out straight through the
+   * "Ver la demo" button on /portales, where a crease reads as a stray line
+   * rather than as an edge. The extra bottom padding is what buys the band.
+   *
+   * scripts/crease-check.mjs asserts this against every hero on the site, at
+   * seven widths. Run it if you change any hero's layout or copy length. */
+  .page-hero {
+    --fold-left: 95%;
+    --fold-right: 68%;
+    padding-block: var(--space-6) var(--space-7);
+  }
+
+  /* THE BAND IS BOUGHT WITH PADDING, SO THE PADDING CANNOT BE FLUID HERE.
+     --space-6 and --space-7 ramp down between 1180 and 390 to stop the phone
+     from carrying a desktop page's rhythm. That is right everywhere else and
+     wrong in exactly this box: the percentages above are of the hero's own
+     height, so shrinking it walks the crease up into the copy. It did — at
+     1024 the ramp took the bottom pad from 153.6 to 138 and the crease came
+     through "cédula" on /nosotros, which crease-check caught.
+     The crease is only drawn at 1000 and up (the block below hides it), so
+     pinning the old fixed values there costs the phone nothing and keeps the
+     desktop geometry byte-identical to what the percentages were tuned on. */
+  @media (min-width: 1000px) {
+    .page-hero {
+      padding-block: 6.4rem 9.6rem;
+    }
+  }
+
+  /* Below the two-column breakpoint the ornament stacks under the copy, so the
+     hero is content from top to bottom and there is no band left for a crease
+     to sit in. There is no percentage that works: at 390px the copy ends below
+     where the fold's own box ends. A diagonal across a 390px column reads as a
+     wedge rather than a fold anyway, which is the same reason .fold-band
+     shallows its drop on phones.
+     So on narrow screens the sheet keeps its wash and loses its edge: the two
+     faces are collapsed into one and the crease is not drawn at all. The fold
+     is still on the page below, in the bands. */
+  @media (max-width: 999px) {
+    .page-hero {
+      --fold-left: 100%;
+      --fold-right: 100%;
+    }
+    .page-hero :global(.crease),
+    .page-hero :global(.rule) {
+      display: none;
+    }
+  }
+
+  .hero-grid {
+    display: grid;
+    gap: var(--space-5);
+    align-items: center;
+  }
+
+  .hero-copy {
+    animation: rise var(--dur-slow) var(--ease-out) both;
+  }
+
+  /* Capped on the elements, not on the column.
+     A max-width in `ch` on the wrapper resolves against the WRAPPER's font
+     size, so 40ch was about 320px and every sub-page headline broke into
+     four-word stubs while two thirds of the column sat empty. Each element
+     caps itself against its own size instead. */
+  .page-hero h1 {
+    font-size: clamp(2.1rem, 4.2vw, 3.1rem);
+    max-width: 16ch;
+  }
+  .page-hero .lede,
+  .page-hero .note {
+    max-width: var(--measure);
+  }
+  .hero-copy.is-wide h1 {
+    max-width: 22ch;
+  }
+
+  .hero-ornament {
+    animation: rise var(--dur-slow) 120ms var(--ease-out) both;
+  }
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(1.2rem);
+    }
+  }
+
+  @media (min-width: 1000px) {
+    .hero-grid.has-ornament {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-copy,
+    .hero-ornament {
+      animation: none;
+    }
+  }
+</style>

@@ -1,18 +1,38 @@
 ---
 import "../styles/tokens.css";
+import "../styles/base.css";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_NAME } from "../config";
 
 interface Props {
+  /** Keyword-led and page-specific. The brand is appended, so leave it out. */
   title: string;
   description: string;
+  /** Absolute-from-root path, e.g. "/og-piloto.png". Defaults to the home card. */
+  ogImage?: string;
+  ogImageAlt?: string;
+  ogType?: "website" | "article";
+  /** Set false when the title already ends in the brand. */
+  brandInTitle?: boolean;
 }
 
-const { title, description } = Astro.props;
+const {
+  title,
+  description,
+  ogImage = "/og.png",
+  ogImageAlt = "Simple Manage Pro, el sistema con el que su colegio lleva el curso lectivo.",
+  ogType = "website",
+  brandInTitle = true,
+} = Astro.props;
+
+const fullTitle = brandInTitle ? `${title} | ${SITE_NAME}` : title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 
 // The OG card is a first-class deliverable, not metadata: directors forward
 // this link in WhatsApp, which renders a preview, so the card is the first
 // impression for a second reader who never spoke to Gabriel. See BRIEF §8.
-const ogImage = new URL("/og.png", Astro.site);
+const ogImageUrl = new URL(ogImage, Astro.site);
 ---
 
 <!doctype html>
@@ -20,22 +40,69 @@ const ogImage = new URL("/og.png", Astro.site);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
+    <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={ogType} />
     <meta property="og:locale" content="es_CR" />
-    <meta property="og:site_name" content="Simple Manage Pro" />
-    <meta property="og:title" content={title} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
+    <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:image:alt" content={ogImageAlt} />
 
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
+
+    <!-- The app's own icon set, copied rather than relinked: the landing page
+         is a separate Vercel project on the apex domain, so it cannot reach
+         the demo subdomain's /public. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: light)"
+      content="#f6f6f9"
+    />
+    <meta
+      name="theme-color"
+      media="(prefers-color-scheme: dark)"
+      content="#181a1e"
+    />
+
+    <!-- Only the weights that render above the fold. 800 is the display head,
+         700 the wordmark, 600 the nav and eyebrows, 400 the lede. -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/poppins-latin-400-normal.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/poppins-latin-700-normal.woff2"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/poppins-latin-800-normal.woff2"
+      crossorigin
+    />
 
     <script is:inline>
       // Set before first paint so a returning visitor never sees a flash of
@@ -45,8 +112,89 @@ const ogImage = new URL("/og.png", Astro.site);
         if (saved) document.documentElement.dataset.theme = saved;
       } catch (e) {}
     </script>
+
+    <!-- Per-page structured data and any other head extras. -->
+    <slot name="head" />
   </head>
   <body>
-    <slot />
+    <a class="skip" href="#contenido">Saltar al contenido</a>
+    <Header />
+    <main id="contenido">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      // Progressive enhancement in the literal sense: the reveal styles are
+      // gated behind .js, so this class going on is what arms them. Without JS
+      // every page renders complete and static.
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+
+      if (!reduced.matches) {
+        document.documentElement.classList.add("js");
+
+        // Deliberately a scroll sweep rather than an IntersectionObserver.
+        //
+        // IO only reports at the moments an element CROSSES its threshold.
+        // Miss that window — a fling scroll on a phone, a jumped scroll
+        // position, a background tab throttling frames — and the element is
+        // never reported again, so a section that is opacity:0 until told
+        // otherwise stays invisible for the rest of the visit. That is exactly
+        // what happened to the "Hoy / Con Simple Manage Pro" block under a
+        // 400px-per-tick scroll, and losing a whole section of the argument is
+        // far worse than losing an animation.
+        //
+        // Re-testing position on every scroll cannot miss: it asks "is it in
+        // view NOW", not "did it cross just now". The list only shrinks, and
+        // the listener detaches once it empties.
+        let pending = [...document.querySelectorAll<HTMLElement>(".reveal")];
+        let queued = false;
+
+        const sweep = () => {
+          queued = false;
+          const limit = innerHeight * 0.92; // reveal just before fully in view
+          pending = pending.filter((el) => {
+            if (el.getBoundingClientRect().top > limit) return true;
+            el.classList.add("is-in");
+            return false;
+          });
+          if (!pending.length) removeEventListener("scroll", onScroll);
+        };
+
+        const onScroll = () => {
+          if (queued) return;
+          queued = true;
+          requestAnimationFrame(sweep);
+        };
+
+        addEventListener("scroll", onScroll, { passive: true });
+        addEventListener("resize", onScroll, { passive: true });
+        sweep();
+      }
+    </script>
+
+    <style>
+      /* Visible only on keyboard focus. Placed before the sticky header in
+         the DOM so it is the first stop, and given a z-index above it so it
+         is not painted underneath. */
+      .skip {
+        position: fixed;
+        top: var(--space-2);
+        left: var(--space-2);
+        z-index: 100;
+        padding: 0.7rem 1.1rem;
+        border-radius: var(--border-radius-2);
+        background: var(--color-white);
+        color: var(--color-dark);
+        font-weight: 600;
+        text-decoration: none;
+        box-shadow: var(--elev-2);
+        transform: translateY(calc(-100% - var(--space-3)));
+        transition: transform var(--dur-fast) var(--ease-out);
+      }
+      .skip:focus-visible {
+        transform: translateY(0);
+      }
+    </style>
   </body>
 </html>

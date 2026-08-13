@@ -1,0 +1,123 @@
+---
+/**
+ * The mark, in vector — traced from the brand original.
+ *
+ * THE SHAPE IS NOT A DESIGN DECISION. It is the folded-ribbon S the product
+ * already ships: `public/android-chrome-512x512.png`, byte-identical to what
+ * demo.simplemanagepro.com serves as its app icon and to the mark inside
+ * `public/og.png`. An earlier pass drew a different thing here — a rounded
+ * sheet with a turned-back corner and two white rules across it, a "document"
+ * metaphor — so the header wore one logo while the favicon, the share card and
+ * the product itself wore another. Anything drawn here has to be measured
+ * against that PNG, not invented to rhyme with the page.
+ *
+ * The geometry, read off the original at 512:
+ *
+ *   - Two bars, 180°-rotationally symmetric about (258.5, 250.5), joined by a
+ *     diagonal. Every long edge runs at exactly 2:1 (26.57°).
+ *   - Each bar ends in a rounded taper: the edges converge to a point that is
+ *     cut by an arc, r=30.7. That taper is what makes it read as a ribbon
+ *     under tension rather than as a chevron.
+ *   - Each bar folds back on a VERTICAL crease — x=324 above, x=194 below —
+ *     and the reverse of the sheet shows behind it in the deeper crimson,
+ *     capped by its own arc at r=20.2.
+ *   - The notch where a bar's underside meets the diagonal is a real corner,
+ *     not a curve. It is what stops the S from reading as a lazy italic.
+ *
+ * IT DOES NOT FOLLOW THE THEME, and that is deliberate. The previous version
+ * drove its fills from `--color-brand`, which resolves to #ff7782 in dark
+ * mode, so the mark turned pink on a dark background — a colour the brand does
+ * not have. The product never does this: the demo serves the same PNG under
+ * both themes. The wordmark beside it still themes, because that is text and
+ * has to clear contrast; the mark is a fill and does not.
+ *
+ * The gradients are the original's own, sampled top and bottom: the face runs
+ * #f6133b → #cb0022 down the mark and the underside #9a0829 → #730220, both in
+ * user space so all three shapes share one continuous ramp rather than each
+ * restarting inside its own box.
+ *
+ * `title` gives it an accessible name where it stands alone. Left off, it is
+ * decorative — which is the right call in the header, where the anchor around
+ * it already carries the label.
+ */
+interface Props {
+  size?: number | string;
+  /** Accessible name. Omit for decorative use. */
+  title?: string;
+  class?: string;
+}
+
+const { size = 30, title, class: className } = Astro.props;
+const px = typeof size === "number" ? `${size}px` : size;
+
+// The page renders this six times (header, plus five slabs on /piloto), and
+// duplicate ids are invalid markup even where every instance paints the same.
+// Astro has no per-page id counter and frontmatter is re-evaluated per render,
+// so there is nowhere to keep one — a random suffix is the cheap correct fix.
+const uid = crypto.randomUUID().slice(0, 8);
+const faceId = `bm-face-${uid}`;
+const underId = `bm-under-${uid}`;
+---
+
+<svg
+  class:list={["brand-mark", className]}
+  viewBox="0 0 512 512"
+  width={px}
+  height={px}
+  role={title ? "img" : "presentation"}
+  aria-hidden={title ? undefined : "true"}
+  aria-label={title}
+>
+  <defs>
+    <!-- userSpaceOnUse: the two folds are small boxes near the top and bottom
+         of the mark, so an objectBoundingBox ramp would run a full light-to-
+         dark sweep inside each of them and the folds would not sit on the same
+         gradient as the face they belong to. -->
+    <linearGradient id={faceId} gradientUnits="userSpaceOnUse" x1="0" y1="32" x2="0" y2="469">
+      <stop offset="0" stop-color="#f6133b"></stop>
+      <stop offset="1" stop-color="#cb0022"></stop>
+    </linearGradient>
+    <linearGradient id={underId} gradientUnits="userSpaceOnUse" x1="0" y1="32" x2="0" y2="469">
+      <stop offset="0" stop-color="#9a0829"></stop>
+      <stop offset="1" stop-color="#730220"></stop>
+    </linearGradient>
+  </defs>
+
+  {/* The face, as one closed path: down the upper crease, left across the
+      notch, down the diagonal, round the lower taper, back up the lower
+      crease, and round the upper taper. */}
+  {/* `.face` and `.under` are load-bearing: /piloto's extruded slabs restyle
+      them to build the mark's thickness. Renaming either breaks that page. */}
+  <path
+    class="face"
+    d="M324 32
+       L324 231
+       L279 231
+       L419 301
+       A30.7 30.7 0 0 1 419 356
+       L193 469
+       L193 270
+       L238 270
+       L98 200
+       A30.7 30.7 0 0 1 98 145
+       Z"
+    fill={`url(#${faceId})`}></path>
+
+  {/* The two undersides — the sheet turned back on itself at each crease.
+      Each is the face's own edge mirrored across its vertical fold. */}
+  <path
+    class="under"
+    d="M324 32 L430 85 A20.2 20.2 0 0 1 430 121 L324 174 Z"
+    fill={`url(#${underId})`}></path>
+  <path
+    class="under"
+    d="M193 469 L87 416 A20.2 20.2 0 0 1 87 380 L193 327 Z"
+    fill={`url(#${underId})`}></path>
+</svg>
+
+<style>
+  .brand-mark {
+    display: block;
+    flex-shrink: 0;
+  }
+</style>

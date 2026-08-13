@@ -1,0 +1,241 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageHero from "../components/PageHero.astro";
+import PortalGlyph from "../components/PortalGlyph.astro";
+import { breadcrumbLd } from "../lib/schema";
+import { DEMO_URL, EMAIL, WHATSAPP_MSG, waHref } from "../config";
+---
+
+<Layout
+  title="Hablemos del piloto 2027"
+  description="Si le interesa el piloto 2027 para su colegio, la conversación empieza por WhatsApp o por correo. Sin formularios, sin planes y sin tarjeta de crédito."
+>
+  <script
+    slot="head"
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(breadcrumbLd("Contacto", "/contacto"))}
+  />
+
+  <PageHero
+    eyebrow="Piloto 2027"
+    title="¿Está interesado en el sistema?"
+    lede="Si estás interesado en conocer más sobre nuestro sistema y participar en el piloto 2027, 
+      contáctanos para obtener más información y programar una demostración."
+  >
+    <div class="cta-row">
+      <a class="btn btn-primary" href={waHref}>Escribir por WhatsApp</a>
+      <a class="btn btn-quiet" href={`mailto:${EMAIL}`}>Escribir un correo</a>
+    </div>
+    <p class="note">
+      No hay formulario, ni plan que escoger.
+    </p>
+
+    <!-- What tapping the button actually produces. The pre-filled message is
+         the whole reason WhatsApp is the primary channel, and showing it
+         removes the one hesitation a director has about a chat link: not
+         knowing what they are about to send. -->
+    <div class="preview" slot="ornament">
+      <p class="preview-title">Nos sería de utilidad conocer información básica</p>
+      <div class="bubble">
+        <p>{WHATSAPP_MSG}</p>
+      </div>
+      <p class="preview-note">Usted lo edita antes de enviarlo.</p>
+    </div>
+  </PageHero>
+
+  <section class="band fold-band">
+    <div class="wrap">
+      <!-- Ordered the way the reader should move: look at the system first,
+           then write. "Antes de escribir" is not a third channel, it is the
+           step before either of them, so it stops being a card of the same
+           size and shape as the two that are. -->
+      <div class="card-lead before reveal">
+        <div class="before-copy">
+          <p class="eyebrow">Antes de escribir</p>
+          <h2>Vea el sistema primero.</h2>
+          <p>
+            La demo está abierta y no pide ningún dato. Es un colegio de
+            ejemplo, con datos de ejemplo, y desde ahí se llega a las tres
+            consolas.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
+          </div>
+        </div>
+        <div class="before-glyphs" aria-hidden="true">
+          <span style="--accent: var(--accent-direccion)">
+            <PortalGlyph variant="direccion" />
+          </span>
+          <span style="--accent: var(--accent-docente)">
+            <PortalGlyph variant="docente" />
+          </span>
+          <span style="--accent: var(--accent-estudiante)">
+            <PortalGlyph variant="estudiante" />
+          </span>
+        </div>
+      </div>
+
+      <ul class="channels reveal reveal-stagger">
+        <li class="card" style="--i:0">
+          <span class="ch-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="2.8" y="5" width="18.4" height="14" rx="2.8"></rect>
+              <path d="m3.4 7 8.6 6 8.6-6"></path>
+            </svg>
+          </span>
+          <h2>Correo</h2>
+          <p>Para cuando conviene dejar constancia escrita de lo conversado.</p>
+          <a class="ch-link" href={`mailto:${EMAIL}`}>{EMAIL}</a>
+        </li>
+
+        <li class="card" style="--i:1">
+          <span class="ch-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 20.2 5.3 16a8 8 0 1 1 3 2.9Z"></path>
+            </svg>
+          </span>
+          <h2>WhatsApp</h2>
+          <p>
+            Lo más rápido. El mensaje va prellenado y usted lo edita antes de
+            enviarlo.
+          </p>
+          <p class="ch-phone">+506 7184-8300</p>
+        </li>
+      </ul>
+
+      <div class="narrow reveal">
+        <p class="aside">
+          Conviene tener a mano el tamaño aproximado del colegio: cuántas
+          secciones, cuántos docentes y cuántos estudiantes matriculados. Con
+          eso la primera conversación ya es concreta.
+        </p>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  /* ── The hero ornament ────────────────────────────────────────────────── */
+
+  .preview-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-info-dark);
+    margin-bottom: var(--space-2);
+  }
+
+  .bubble {
+    position: relative;
+    padding: var(--space-3) var(--space-3) var(--space-3);
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--card-border-radius);
+    border-bottom-left-radius: var(--border-radius-1);
+    box-shadow: var(--elev-2);
+  }
+
+  .bubble p {
+    margin: 0;
+    color: var(--color-dark);
+    font-size: 1.02rem;
+    line-height: 1.5;
+  }
+
+  .preview-note {
+    margin-top: var(--space-2);
+    font-size: 0.88rem;
+    color: var(--color-info-dark);
+  }
+
+  /* ── Antes de escribir ────────────────────────────────────────────────── */
+
+  .before {
+    --accent: var(--color-primary-fill);
+    display: grid;
+    gap: var(--space-4);
+    margin-bottom: var(--space-3);
+  }
+
+  .before h2 {
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    margin-bottom: var(--space-2);
+  }
+
+  .before p {
+    color: var(--color-dark-variant);
+    max-width: var(--measure);
+  }
+
+  .before-glyphs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
+    align-items: center;
+  }
+
+  /* ── The two channels ─────────────────────────────────────────────────── */
+
+  .channels {
+    list-style: none;
+    margin: 0 0 var(--space-4);
+    padding: 0;
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .ch-icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: var(--space-2);
+    border-radius: var(--border-radius-2);
+    background: color-mix(in srgb, var(--color-primary) 13%, var(--color-white));
+  }
+  .ch-icon svg {
+    width: 1.4rem;
+    height: 1.4rem;
+    fill: none;
+    stroke: var(--color-primary-text);
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .channels h2 {
+    font-size: 1.2rem;
+    letter-spacing: -0.01em;
+    margin-bottom: var(--space-2);
+  }
+
+  .channels p {
+    color: var(--color-dark-variant);
+    font-size: 0.98rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .ch-link {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  li.card .ch-phone {
+    font-weight: 600;
+    color: var(--color-primary-text);
+  }
+  @media (min-width: 760px) {
+    .channels {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 900px) {
+    .before {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.62fr);
+      align-items: center;
+      gap: var(--space-5);
+    }
+  }
+</style>

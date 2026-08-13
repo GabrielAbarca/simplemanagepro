@@ -1,0 +1,273 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageHero from "../components/PageHero.astro";
+import CierreCta from "../components/sections/CierreCta.astro";
+import { story } from "../data/site";
+import { breadcrumbLd } from "../lib/schema";
+
+// The page's own claim, made checkable. These are the words the product uses,
+// and a director recognises every one of them as their own.
+const vocabulary = [
+  "curso lectivo",
+  "periodos",
+  "secciones",
+  "matrícula",
+  "expediente",
+  "cédula",
+];
+---
+
+<Layout
+  title="Software escolar hecho en Costa Rica"
+  description="Simple Manage Pro se construye en Costa Rica, con la estructura del sistema educativo costarricense por defecto: curso lectivo, periodos y secciones."
+>
+  <script
+    slot="head"
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(breadcrumbLd("Nosotros", "/nosotros"))}
+  />
+
+  <PageHero
+    eyebrow="Hecho para Costa Rica"
+    title="Software escolar que ya habla como su colegio."
+    lede="La mayoría del software escolar llega traducido de otro país y le pide al colegio que se acomode. Simple Manage Pro empieza por la estructura que el colegio ya usa."
+  >
+    <!-- The claim, shown rather than asserted twice. It replaces a closing
+         aside that listed the same words in prose, so the page says this once
+         and in the place where it does the most work. -->
+    <div class="vocab" slot="ornament">
+      <p class="vocab-title">El vocabulario del sistema</p>
+      <ul>
+        {
+          vocabulary.map((v, i) => (
+            <li style={`--i:${i}`}>
+              <svg viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M3 8.4 6.3 11.7 13 5" />
+              </svg>
+              {v}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </PageHero>
+
+  <!-- Misión and visión were two cards side by side with nothing around them,
+       which read as a requirement someone had to satisfy rather than as
+       something the page meant. One panel, two statements, and the fold's own
+       diagonal as the divider between them: they are two halves of one
+       position, so they are set as type rather than boxed separately. -->
+  <section class="band">
+    <div class="wrap">
+      <div class="creed reveal">
+        <div class="creed-half">
+          <p class="eyebrow">Misión</p>
+          <p class="statement">
+            Nuestra misión en Simple Manage Pro es proveer a las instituciones educativas de Costa Rica un sistema de gestión escolar
+            que refleje la estructura del sistema educativo costarricense, con curso lectivo, periodos, niveles, secciones y expedientes, 
+            para que de este modo, los colegios puedan administrar sus procesos académicos de manera eficiente y segura.
+          </p>
+        </div>
+
+        <span class="creed-fold" aria-hidden="true"></span>
+
+        <div class="creed-half">
+          <p class="eyebrow">Visión</p>
+          <p class="statement">
+            Simple Manage Pro aspira a construir un estándar en la gestión escolar en Costa Rica, 
+            ofreciendo un sistema que no solo cumpla con las necesidades administrativas de los colegios, 
+            sino que también promueva la transparencia, la seguridad de los datos y la eficiencia en la administración educativa. 
+            Buscamos ser un aliado confiable para las instituciones educativas proveyendo software moderno que solucione los desafíos de la gestión escolar,
+            acilitando su labor y contribuyendo al desarrollo académico de los estudiantes.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="band fold-band" id="historia">
+    <div class="wrap">
+      <div class="narrow reveal">
+        <p class="eyebrow">Nuestra historia</p>
+        <h2>Empezó como un proyecto de feria científica.</h2>
+        <p>
+          El problema era el mismo que sigue resolviendo hoy: al cierre de cada
+          periodo, alguien en la dirección arma las notas a mano desde archivos
+          sueltos, los resultados tardaban días o incluso semanas en llegar a los estudiantes.
+          Tres cursos lectivos después, es un sistema que un colegio
+          puede usar de verdad.
+        </p>
+      </div>
+
+      <ol class="story reveal reveal-stagger">
+        {
+          story.map((s, i) => (
+            <li style={`--i:${i}`}>
+              <span class="beat-dot" aria-hidden="true" />
+              <p class="beat-year">{s.year}</p>
+              <h3>{s.title}</h3>
+              <p class="beat-body">{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+
+  <CierreCta />
+</Layout>
+
+<style>
+  /* ── The hero ornament ────────────────────────────────────────────────── */
+
+  .vocab {
+    padding: var(--space-4);
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--card-border-radius);
+    box-shadow: var(--elev-2);
+  }
+
+  .vocab-title {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-info-dark);
+    margin-bottom: var(--space-3);
+  }
+
+  .vocab ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .vocab li {
+    display: grid;
+    grid-template-columns: 1.1rem 1fr;
+    gap: 0.7rem;
+    align-items: center;
+    font-size: 1.02rem;
+    font-weight: 600;
+    color: var(--color-dark);
+  }
+
+  .vocab svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── Misión and visión ────────────────────────────────────────────────── */
+
+  .creed {
+    position: relative;
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--card-border-radius);
+    background: color-mix(in srgb, var(--color-primary) 5%, var(--color-white));
+    border: 1px solid var(--color-light);
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .creed .statement {
+    margin-top: var(--space-2);
+    font-size: clamp(1.15rem, 1.9vw, 1.5rem);
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--color-dark);
+    text-wrap: pretty;
+  }
+
+  /* The crease, as the divider. Sitting in the gap between the two halves it
+     has no type to cross, which is why this one can be a hairline across the
+     whole panel where a hero's has to be measured. */
+  .creed-fold {
+    height: 1px;
+    background: linear-gradient(
+      92deg,
+      transparent,
+      var(--color-brand) 18%,
+      var(--color-primary-accent) 55%,
+      var(--color-primary) 80%,
+      transparent
+    );
+    opacity: 0.6;
+    rotate: -0.9deg;
+  }
+
+  /* ── The story ────────────────────────────────────────────────────────── */
+
+  .story {
+    list-style: none;
+    margin: var(--space-5) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .story li {
+    position: relative;
+    padding-left: var(--space-4);
+    border-left: 2px solid var(--color-light);
+  }
+
+  .beat-dot {
+    position: absolute;
+    left: -0.44rem;
+    top: 0.45rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 50%;
+    background: var(--color-primary-fill);
+    box-shadow: 0 0 0 4px var(--color-background);
+  }
+
+  .beat-year {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-primary-text);
+    line-height: 1.1;
+  }
+
+  .story h3 {
+    font-size: 1.08rem;
+    margin: var(--space-1) 0 0;
+  }
+
+  .beat-body {
+    margin-top: 0.4rem;
+    font-size: 0.96rem;
+  }
+
+  @media (min-width: 760px) {
+    .creed {
+      padding: var(--space-5);
+    }
+
+    .story {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-3);
+    }
+    .story li {
+      padding-left: 0;
+      padding-top: var(--space-3);
+      border-left: 0;
+      border-top: 2px solid var(--color-light);
+    }
+    .beat-dot {
+      left: 0;
+      top: -0.44rem;
+    }
+  }
+</style>

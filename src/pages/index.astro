@@ -1,431 +1,79 @@
 ---
-import { Image } from "astro:assets";
 import Layout from "../layouts/Layout.astro";
-import adminShot from "../assets/screenshots/admin.png";
-import gradebookShot from "../assets/screenshots/teacher-gradebook.png";
-import studentShot from "../assets/screenshots/student.png";
+import Hero from "../components/sections/Hero.astro";
+import Problema from "../components/sections/Problema.astro";
+import PortalesResumen from "../components/sections/PortalesResumen.astro";
+import Datos from "../components/sections/Datos.astro";
+import PilotoResumen from "../components/sections/PilotoResumen.astro";
+import CierreCta from "../components/sections/CierreCta.astro";
+import { DEMO_URL, EMAIL, SITE_NAME } from "../config";
 
-const DEMO_URL = "https://demo.simplemanagepro.com";
-const PRIVACY_URL = `${DEMO_URL}/privacy.html`;
-const TERMS_URL = `${DEMO_URL}/terms.html`;
+const site = Astro.site?.origin ?? "https://simplemanagepro.com";
 
-// TODO: real number. wa.me wants digits only, country code first (506 = CR).
-const WHATSAPP = "50600000000";
-const EMAIL = "contact@gzelaya.com";
-const WHATSAPP_MSG =
-  "Buenas, soy director/a de [colegio] y quisiera conocer más sobre el piloto 2027.";
-const waHref = `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(WHATSAPP_MSG)}`;
-
-const portals = [
-  {
-    id: "direccion",
-    eyebrow: "Consola de la dirección",
-    title: "El colegio completo, configurado desde un solo lugar",
-    body: "Curso lectivo y periodos, niveles, secciones, aulas, materias, docentes, horarios, expedientes y matrícula. La matrícula se importa desde la hoja de cálculo que ya tiene — no hay que digitarla de nuevo.",
-    image: adminShot,
-    alt: "Consola de administración mostrando el resumen del Colegio Técnico Profesional SMP: matrícula total, docentes, materias, secciones y aulas en uso.",
-  },
-  {
-    id: "docentes",
-    eyebrow: "Consola del docente",
-    title: "El libro de notas que reemplaza el archivo de Excel",
-    body: "Categorías ponderadas, notas por periodo, asistencia por sección, registro disciplinario e informe de progreso listo para imprimir. Al cerrar el periodo, las notas ya están donde tienen que estar.",
-    image: gradebookShot,
-    alt: "Libro de notas de Matemáticas, Duodécimo Sección 1, mostrando la nota de cada estudiante en el I Periodo.",
-  },
-  {
-    id: "estudiantes",
-    eyebrow: "Portal del estudiante",
-    title: "Lo que el estudiante necesita, sin tener que pedirlo",
-    body: "Promedio, porcentaje de asistencia, notas por materia y periodo, horario semanal, docentes y la cartelera de eventos del colegio. Consultable en cualquier momento, desde el teléfono.",
-    image: studentShot,
-    alt: "Portal del estudiante mostrando asistencia, promedio de notas, resumen de calificaciones por periodo y próximos eventos.",
-  },
-];
-
-const pilotGives = [
-  "El sistema configurado con la estructura de su colegio: curso lectivo, periodos, niveles, secciones, materias, docentes y horarios.",
-  "La matrícula importada desde sus hojas de cálculo, y las cuentas de docentes y estudiantes creadas.",
-  "Su propia base de datos, con respaldos verificados antes de que entre un solo expediente real.",
-  "Acompañamiento durante todo el curso lectivo, por WhatsApp, con la persona que construyó el sistema.",
-];
-
-const pilotAsks = [
-  "Una persona de contacto que lo use todas las semanas — normalmente la coordinación académica.",
-  "Una conversación al cierre de cada periodo, para corregir lo que no sirva.",
-  "Permiso para nombrar al colegio públicamente, si el primer periodo cierra bien.",
-];
-
-const limits = [
-  "No hay portal para encargados. Los encargados figuran como contacto en el expediente, pero no tienen usuario propio.",
-  "Ningún colegio lo usa todavía. Por eso esto es un piloto y no una venta.",
-  "Los expedientes se alojan fuera del país, en Estados Unidos.",
-];
+// Organization and SoftwareApplication together: the first is what the brand
+// is, the second is what the page is about. WebSite carries the name a search
+// result renders above the URL.
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${site}/#organization`,
+      name: SITE_NAME,
+      url: site,
+      logo: `${site}/android-chrome-512x512.png`,
+      email: EMAIL,
+      areaServed: { "@type": "Country", name: "Costa Rica" },
+      founder: { "@type": "Person", name: "Gabriel Zelaya" },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${site}/#website`,
+      url: site,
+      name: SITE_NAME,
+      inLanguage: "es-CR",
+      publisher: { "@id": `${site}/#organization` },
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: SITE_NAME,
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Web",
+      inLanguage: "es",
+      url: site,
+      publisher: { "@id": `${site}/#organization` },
+      description:
+        "Sistema de gestión escolar para colegios de Costa Rica: notas, asistencia, horarios, documentos externos, con consolas separadas para la dirección, los docentes y los estudiantes.",
+      featureList: [
+        "Curso lectivo y periodos",
+        "Niveles, secciones y aulas",
+        "Importación de documentos desde Excel",
+        "Libro de notas con categorías ponderadas",
+        "Asistencia por sección",
+        "Informe de progreso imprimible",
+        "Portal del estudiante",
+      ],
+      softwareHelp: DEMO_URL,
+    },
+  ],
+};
 ---
 
 <Layout
-  title="Simple Manage Pro — El sistema con el que su colegio lleva el curso lectivo"
-  description="Notas, asistencia, horarios y expedientes en un solo lugar, para la dirección, los docentes y los estudiantes. Hecho para Costa Rica. Piloto 2027 para tres colegios."
+  title="Sistema de gestión escolar en Costa Rica"
+  description="Notas, asistencia, horarios y expedientes de su colegio en un solo sistema, para la dirección, los docentes y los estudiantes. Piloto 2027 para tres colegios."
 >
-  <main>
-    <!-- 1 · Qué es, para quién, con la demo a un clic -->
-    <section class="hero">
-      <div class="wrap">
-        <p class="eyebrow">Hecho para Costa Rica</p>
-        <h1>El sistema con el que su colegio lleva el curso lectivo.</h1>
-        <p class="lede">
-          Notas, asistencia, horarios y expedientes en un solo lugar — para la
-          dirección, para los docentes y para los estudiantes.
-        </p>
-        <div class="cta-row">
-          <a class="btn btn-primary" href={DEMO_URL}>Ver la demo</a>
-          <a class="btn btn-quiet" href="#piloto">Conocer el piloto 2027</a>
-        </div>
-        <p class="note">
-          Es un colegio de ejemplo, con datos de ejemplo. Nada de lo que haga
-          ahí se guarda.
-        </p>
-      </div>
-    </section>
+  <script
+    slot="head"
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(jsonLd)}
+  />
 
-    <!-- 2 · ¿Entiende usted mi realidad? -->
-    <section class="band">
-      <div class="wrap narrow">
-        <h2>En julio y en diciembre, todo se arma a mano.</h2>
-        <p>
-          Las notas viven en el archivo de Excel de cada docente. La asistencia,
-          en papel. Los encargados preguntan por WhatsApp. Y al cierre de cada
-          periodo alguien en la dirección junta todo eso, hoja por hoja, para
-          poder entregar notas a tiempo.
-        </p>
-        <p class="aside">
-          Simple Manage Pro no reemplaza nada del MEP. Es el sistema interno del
-          colegio: lo que hoy vive en hojas de cálculo, en papel y en grupos de
-          WhatsApp.
-        </p>
-      </div>
-    </section>
-
-    <!-- 3 · Los tres portales -->
-    <section class="portals">
-      <div class="wrap">
-        <h2 class="section-title">Tres portales, un solo sistema</h2>
-        {
-          portals.map((p) => (
-            <article class="portal" id={p.id}>
-              <div class="portal-copy">
-                <p class="eyebrow">{p.eyebrow}</p>
-                <h3>{p.title}</h3>
-                <p>{p.body}</p>
-              </div>
-              <figure class="shot">
-                <Image
-                  src={p.image}
-                  alt={p.alt}
-                  widths={[720, 1080, 1440]}
-                  sizes="(min-width: 1180px) 1148px, calc(100vw - 3.2rem)"
-                />
-              </figure>
-            </article>
-          ))
-        }
-      </div>
-    </section>
-
-    <!-- 4 · ¿Dónde viven los datos de mis estudiantes? -->
-    <section class="band" id="datos">
-      <div class="wrap narrow">
-        <h2>Dónde viven los datos de sus estudiantes</h2>
-        <p>
-          Cada colegio recibe <strong>su propia base de datos</strong>. Los datos
-          de un colegio no se guardan junto a los de otro y ninguna consulta
-          puede cruzar de uno a otro. Se cifran en tránsito y en reposo.
-        </p>
-        <p>
-          La región de alojamiento es Estados Unidos, lo que significa que los
-          expedientes se almacenan fuera de Costa Rica. Está dicho acá porque es
-          de lo primero que un colegio debería preguntar, y porque se trata de
-          expedientes de personas menores de edad.
-        </p>
-        <p>
-          <a href={PRIVACY_URL}>Leer la política de privacidad completa</a>
-        </p>
-      </div>
-    </section>
-
-    <!-- 5 · Qué no incluye -->
-    <section class="band" id="limites">
-      <div class="wrap narrow">
-        <h2>Qué no incluye</h2>
-        <p>Para que no lo descubra en la primera reunión:</p>
-        <ul class="plain">
-          {limits.map((l) => <li>{l}</li>)}
-        </ul>
-      </div>
-    </section>
-
-    <!-- 6 · Qué es exactamente el piloto -->
-    <section class="band" id="piloto">
-      <div class="wrap">
-        <div class="narrow">
-          <h2>El piloto 2027</h2>
-          <p>
-            Tres colegios, empezando con el curso lectivo en febrero de 2027.
-            Tres, porque cada colegio corre sobre su propia base de datos y cada
-            una se configura a mano.
-          </p>
-        </div>
-
-        <div class="two-col">
-          <div>
-            <h3>Qué recibe el colegio</h3>
-            <ul class="plain">
-              {pilotGives.map((g) => <li>{g}</li>)}
-            </ul>
-          </div>
-          <div>
-            <h3>Qué se necesita del colegio</h3>
-            <ul class="plain">
-              {pilotAsks.map((a) => <li>{a}</li>)}
-            </ul>
-          </div>
-        </div>
-
-        <div class="narrow">
-          <p class="aside">
-            El piloto no es gratuito. Cubre el costo de la infraestructura,
-            porque cada colegio tiene su propia base de datos con sus propios
-            respaldos. El monto depende del tamaño del colegio y se conversa
-            directamente — no hay planes, ni tarjeta de crédito, ni contrato
-            anual firmado desde una página web.
-          </p>
-        </div>
-      </div>
-    </section>
-
-    <!-- 7 · ¿Quién es usted? -->
-    <section class="band" id="fundador">
-      <div class="wrap narrow">
-        <h2>Quién está detrás</h2>
-        <p>
-          Simple Manage Pro lo construyó Gabriel Zelaya, acá en Costa Rica. No
-          hay un centro de soporte: cuando usted escriba por WhatsApp, le
-          contesta él.
-        </p>
-        <p>
-          Eso tiene una ventaja y una limitación, y las dos son ciertas. La
-          ventaja es que quien le contesta es quien puede arreglarlo. La
-          limitación es la razón por la que el piloto es de tres colegios y no
-          de treinta.
-        </p>
-      </div>
-    </section>
-
-    <!-- 8 · Cómo hablamos -->
-    <section class="band contact">
-      <div class="wrap narrow">
-        <h2>Hablemos</h2>
-        <p>
-          Si le interesa el piloto 2027, la conversación empieza por WhatsApp o
-          por correo. La decisión no se toma desde acá: se toma después de ver
-          el sistema con la estructura de su colegio.
-        </p>
-        <div class="cta-row">
-          <a class="btn btn-primary" href={waHref}>Escribir por WhatsApp</a>
-          <a class="btn btn-quiet" href={DEMO_URL}>Ver la demo</a>
-        </div>
-        <p class="note">
-          O escriba a <a href={`mailto:${EMAIL}`}>{EMAIL}</a>.
-        </p>
-      </div>
-    </section>
-
-    <footer class="footer">
-      <div class="wrap narrow">
-        <p>Simple Manage Pro · Costa Rica</p>
-        <p>
-          <a href={PRIVACY_URL}>Política de privacidad</a>
-          <span aria-hidden="true"> · </span>
-          <a href={TERMS_URL}>Términos del servicio</a>
-        </p>
-      </div>
-    </footer>
-  </main>
+  <Hero />
+  <Problema />
+  <PortalesResumen />
+  <Datos />
+  <PilotoResumen />
+  <CierreCta />
 </Layout>
-
-<style>
-  .wrap {
-    max-width: var(--page-max);
-    margin-inline: auto;
-    padding-inline: var(--space-3);
-  }
-  .narrow {
-    max-width: 70ch;
-  }
-
-  section {
-    padding-block: var(--space-6);
-  }
-  .hero {
-    padding-block: var(--space-7) var(--space-6);
-  }
-
-  .eyebrow {
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.78rem;
-    font-weight: 600;
-    color: var(--color-primary-text);
-    margin-bottom: var(--space-2);
-  }
-
-  h1 {
-    font-size: clamp(2.2rem, 5.5vw, 3.6rem);
-    max-width: 20ch;
-  }
-  h2 {
-    font-size: clamp(1.6rem, 3.2vw, 2.2rem);
-    margin-bottom: var(--space-3);
-  }
-  h3 {
-    font-size: 1.35rem;
-    margin-bottom: var(--space-2);
-  }
-
-  .lede {
-    font-size: clamp(1.05rem, 1.6vw, 1.25rem);
-    color: var(--color-dark-variant);
-    max-width: var(--measure);
-    margin-top: var(--space-3);
-  }
-  .note {
-    margin-top: var(--space-3);
-    font-size: 0.9rem;
-    color: var(--color-info-dark);
-  }
-
-  .cta-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-top: var(--space-4);
-  }
-
-  .btn {
-    display: inline-block;
-    padding: 0.85rem 1.5rem;
-    border-radius: var(--border-radius-2);
-    font-weight: 600;
-    text-decoration: none;
-    transition: transform 120ms ease;
-  }
-  .btn:hover {
-    transform: translateY(-1px);
-  }
-  .btn-primary {
-    background: var(--color-primary);
-    color: #fff;
-  }
-  .btn-quiet {
-    background: var(--color-white);
-    color: var(--color-dark);
-    box-shadow: inset 0 0 0 1px var(--color-light);
-  }
-
-  .band p,
-  .band li {
-    color: var(--color-dark-variant);
-    font-size: 1.05rem;
-  }
-  .band p + p {
-    margin-top: var(--space-3);
-  }
-  .band strong {
-    color: var(--color-dark);
-  }
-
-  /* Set apart from the argument around it: a correction of an assumption the
-     reader arrived with, rather than the next step in the pitch. */
-  .aside {
-    margin-top: var(--space-4);
-    padding: var(--space-3);
-    border-radius: var(--border-radius-2);
-    background: var(--color-primary-light);
-    font-size: 1rem;
-  }
-
-  .plain {
-    list-style: none;
-    padding: 0;
-    margin: var(--space-3) 0 0;
-    display: grid;
-    gap: var(--space-2);
-  }
-  .plain li {
-    padding-left: var(--space-3);
-    border-left: 2px solid var(--color-light);
-  }
-
-  .two-col {
-    display: grid;
-    gap: var(--space-5);
-    margin-top: var(--space-5);
-  }
-
-  .section-title {
-    margin-bottom: var(--space-5);
-  }
-
-  /* Stacked, not side-by-side. These are dense console screenshots: in a
-     two-column split the image lands at ~600px and the gradebook's rows stop
-     being readable, which defeats the only job this section has. Copy on a
-     measure-limited column, screenshot at the full container width. */
-  .portal {
-    margin-bottom: var(--space-7);
-  }
-  .portal:last-child {
-    margin-bottom: 0;
-  }
-  .portal-copy {
-    max-width: var(--measure);
-    margin-bottom: var(--space-4);
-  }
-  .portal p {
-    color: var(--color-dark-variant);
-  }
-
-  .shot {
-    margin: 0;
-    border-radius: var(--card-border-radius);
-    overflow: hidden;
-    box-shadow: var(--box-shadow);
-    outline: 1px solid var(--color-light);
-  }
-  .shot :global(img) {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
-
-  .footer {
-    padding-block: var(--space-5);
-    border-top: 1px solid var(--color-light);
-    font-size: 0.9rem;
-    color: var(--color-info-dark);
-  }
-  .footer p + p {
-    margin-top: var(--space-1);
-  }
-
-  /* nth-of-type, not nth-child: the section's h2 is also a child of .wrap and
-     would shift the parity of every portal below it. */
-  @media (min-width: 900px) {
-    .portal:nth-of-type(even) .portal-copy {
-      margin-left: auto;
-      text-align: right;
-    }
-    .two-col {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-</style>

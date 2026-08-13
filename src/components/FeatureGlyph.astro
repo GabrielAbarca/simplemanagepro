@@ -1,0 +1,160 @@
+---
+/**
+ * A drawn panel, one per job the problem section contrasts.
+ *
+ * Same reasoning as PortalGlyph, and for the same reason: a real capture at
+ * this size is illegible mush, and the point here is to show the SHAPE of the
+ * answer — a roster with marks against it, a gradebook with a column of
+ * results, a spreadsheet turning into records — not to show readable UI. Where
+ * a console has to be readable the page uses ConsoleShot at 1:1 instead.
+ *
+ * TWO THINGS ABOUT THE CLASS NAMES AND THE COLOUR, both learned the hard way.
+ * Every class is `g-` prefixed because these are global: an unprefixed `.chip`
+ * here matched `base.css`'s pill component, which sets `color`, so the grade
+ * chips inherited the page's dark text colour. And the fills read `var(--g)`
+ * rather than `currentColor` for the same reason — `currentColor` is reachable
+ * by any global rule that happens to set `color` on a matching selector, and a
+ * private custom property is not.
+ */
+interface Props {
+  variant: "asistencia" | "notas" | "matricula";
+  class?: string;
+}
+
+const { variant, class: className } = Astro.props;
+---
+
+<svg
+  class:list={["fglyph", className]}
+  viewBox="0 0 160 104"
+  role="presentation"
+  aria-hidden="true"
+>
+  <rect class="g-frame" x="1" y="1" width="158" height="102" rx="9"></rect>
+
+  {
+    variant === "asistencia" && (
+      <>
+        <rect class="g-bar" x="12" y="12" width="46" height="6" rx="3" />
+        {/* The month's figure, which is the thing the panel exists to produce. */}
+        <circle class="g-ring-track" cx="132" cy="28" r="14" />
+        <path class="g-ring" d="M132 14a14 14 0 0 1 11.9 21.4" />
+        <rect class="g-bar g-dim" x="112" y="48" width="40" height="4" rx="2" />
+        {[0, 1, 2, 3].map((i) => (
+          <>
+            <rect class="g-row" x="12" y={32 + i * 15} width="62" height="9" rx="4" />
+            <rect class="g-mark" x="82" y={33 + i * 15} width="7" height="7" rx="2" />
+            <rect class="g-mark g-soft" x="93" y={33 + i * 15} width="7" height="7" rx="2" />
+          </>
+        ))}
+      </>
+    )
+  }
+
+  {
+    variant === "notas" && (
+      <>
+        <rect class="g-bar" x="12" y="12" width="40" height="6" rx="3" />
+        {/* Weighted categories: the bar is split, which is the whole claim. */}
+        <rect class="g-track" x="12" y="24" width="136" height="6" rx="3" />
+        <rect class="g-fill" x="12" y="24" width="58" height="6" rx="3" />
+        <rect class="g-fill g-mid" x="72" y="24" width="38" height="6" rx="3" />
+        {[0, 1, 2, 3].map((i) => (
+          <>
+            <rect class="g-row" x="12" y={40 + i * 15} width="70" height="9" rx="4" />
+            <rect class="g-row g-dim" x="90" y={40 + i * 15} width="24" height="9" rx="4" />
+            <rect class="g-chip" x="122" y={39 + i * 15} width="26" height="11" rx="5" />
+          </>
+        ))}
+      </>
+    )
+  }
+
+  {
+    variant === "matricula" && (
+      <>
+        {/* A sheet on the left, records on the right, and the arrow between
+            them is the import doing the work. */}
+        <rect class="g-sheet" x="12" y="26" width="42" height="52" rx="4" />
+        <path class="g-grid" d="M12 40h42M12 54h42M12 68h42M33 26v52" />
+        <path class="g-arrow" d="M62 52h22M78 46l6 6-6 6" />
+        {[0, 1, 2].map((i) => (
+          <>
+            <rect class="g-row" x="94" y={30 + i * 18} width="34" height="9" rx="4" />
+            <rect class="g-chip" x="132" y={29 + i * 18} width="16" height="11" rx="5" />
+          </>
+        ))}
+      </>
+    )
+  }
+</svg>
+
+<style>
+  .fglyph {
+    --g: var(--accent, var(--color-primary-fill));
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  .g-frame {
+    fill: none;
+    stroke: var(--g);
+    stroke-width: 1.4;
+    opacity: 0.24;
+  }
+
+  .g-bar,
+  .g-row,
+  .g-sheet {
+    fill: var(--g);
+    opacity: 0.24;
+  }
+  .g-row.g-dim,
+  .g-bar.g-dim {
+    opacity: 0.13;
+  }
+
+  .g-chip,
+  .g-fill,
+  .g-mark {
+    fill: var(--g);
+    opacity: 0.62;
+  }
+  .g-fill.g-mid {
+    opacity: 0.38;
+  }
+  .g-mark.g-soft {
+    opacity: 0.16;
+  }
+  .g-track {
+    fill: var(--g);
+    opacity: 0.12;
+  }
+
+  .g-ring-track,
+  .g-ring,
+  .g-grid,
+  .g-arrow {
+    fill: none;
+    stroke: var(--g);
+    stroke-linecap: round;
+  }
+  .g-ring-track {
+    stroke-width: 5;
+    opacity: 0.14;
+  }
+  .g-ring {
+    stroke-width: 5;
+    opacity: 0.7;
+  }
+  .g-grid {
+    stroke-width: 1.2;
+    opacity: 0.28;
+  }
+  .g-arrow {
+    stroke-width: 2;
+    stroke-linejoin: round;
+    opacity: 0.55;
+  }
+</style>

@@ -166,6 +166,76 @@ asked, not foregrounded).
 
 ## 7. Page structure
 
+> **Amendment, August 2026 — one page became five.** Agreed with Gabriel before
+> the work started; recorded here rather than by rewriting the section, so the
+> original reasoning stays readable.
+>
+> The eight sections below are still the argument and still run in this order.
+> What changed is that they no longer all live on one document:
+>
+> | Route | Carries |
+> | --- | --- |
+> | `/` | 1, 2, a condensed 3, 4, a teaser of 6 |
+> | `/portales` | 3, in full |
+> | `/piloto` | 6, plus 5 relocated |
+> | `/nosotros` | 7, rewritten — plus misión and visión, which this brief does not cover |
+> | `/contacto` | 8 |
+>
+> Four changes of substance:
+>
+> - **Section 5 moved to `/piloto` and is now `Respuestas directas`.** All three
+>   facts are intact and none is softened. The framing changed: a list of
+>   deficits headed *"para que no lo descubra en la primera reunión"* announces
+>   bad news before the reader has asked for it, and it was doing that on the
+>   first-impression surface. As the director's own three questions, answered
+>   straight, it still buys the trust §7 says it buys.
+> - **Section 7 moved to `/nosotros`.** On the home page, "no hay un centro de
+>   soporte: le contesta él" read as solo-founder risk to a director who had not
+>   yet decided anything. The founder is still named, and the scarcity argument
+>   it used to carry now sits in the pilot's own framing.
+> - **The pilot timeline is gone.** Publishing dates for *la conversación*,
+>   *arranque* and *revisión* commits to a process that will differ per colegio,
+>   and the same dates are already in the prose without the commitment.
+> - **Section 8 became a page, headed `¿Su colegio podría ser uno de los tres?`**
+>   *Hablemos* was accurate and did no work.
+>
+> §8's rule that the demo is persistent rather than a section is unchanged, and
+> the demo CTA is now in the header on every route.
+
+> **Second amendment, August 2026 — two deviations, agreed with Gabriel.**
+> Recorded here rather than taken quietly, per the rule that this document is
+> settled and departures need agreement first.
+>
+> - **`Respuestas directas` becomes an FAQ, and loses two of its three facts.**
+>   The block now carries eight questions a director asks before deciding
+>   anything: how long configuration takes, whether each docente gets an
+>   account, whether students log in, whether existing Excel files come across,
+>   whether this replaces anything of the MEP, whether it works on a phone,
+>   where the expedientes live, and who answers when something breaks.
+>
+>   **Off the page:** *there is no encargado portal* and *no colegio uses it
+>   yet*. Gabriel's position is that both are answered better in the
+>   conversation, with context, than pre-emptively on a page the director is
+>   still deciding whether to take seriously. §7 above argued the opposite, and
+>   that argument is not withdrawn: an explicit limits section buys trust with
+>   this audience. What changed is the judgement about which two facts have to
+>   carry it.
+>
+>   **On the page, unchanged:** *the expedientes are hosted abroad*, both here
+>   and in the home page's data section. It is the first thing a colegio should
+>   ask, it is already in `privacy.html`, and §7's instinct about volunteering
+>   it stands. The hard constraint from §1 is also untouched: **nothing on the
+>   page may imply an encargado logs in.** The parent portal is still not
+>   built, still not promised, and still absent from the portal lineup.
+>
+> - **`/nosotros` gains a dated origin story.** Four beats: a feria científica
+>   project in 2024, built out through 2025, a public demo with Costa Rican
+>   fixture data in 2026, three colegios in February 2027. §6 puts the
+>   founder's student status off the page, and a science-fair origin implies
+>   it. Gabriel's call, on the one route §7's amendment already assigns to the
+>   founder. It stays off every other route, and the biography stays off this
+>   one: he is named, the work is dated, nothing else.
+
 One page. Order follows the director's skepticism.
 
 1. **What this is, for whom** — one breath, with the demo immediately available

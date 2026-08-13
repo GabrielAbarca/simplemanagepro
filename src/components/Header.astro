@@ -1,0 +1,495 @@
+---
+import { NAV, DEMO_URL } from "../config";
+import BrandMark from "./BrandMark.astro";
+
+// Normalised so /piloto and /piloto/ both mark the same link current, whatever
+// build.format produces.
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path === href || path.startsWith(`${href}/`);
+---
+
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="/" aria-label="Simple Manage Pro, inicio">
+      <BrandMark size={30} />
+      <span class="wordmark">
+        <span class="wm-1">SIMPLE</span> <span class="wm-2">MANAGE PRO</span>
+      </span>
+    </a>
+
+    <nav class="nav" aria-label="Principal">
+      <ul>
+        {
+          NAV.map((n) => (
+            <li>
+              <a href={n.href} aria-current={isActive(n.href) ? "page" : undefined}>
+                {n.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="actions">
+      <button
+        class="theme-toggle"
+        type="button"
+        data-theme-toggle
+        aria-label="Cambiar a tema oscuro"
+      >
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="4.2"></circle>
+          <path
+            d="M12 2.4v2.6M12 19v2.6M4.4 12H1.8M22.2 12h-2.6M6.3 6.3 4.5 4.5M19.5 19.5l-1.8-1.8M17.7 6.3l1.8-1.8M4.5 19.5l1.8-1.8"
+          ></path>
+        </svg>
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.5 14.4A8.6 8.6 0 1 1 9.6 3.5a7 7 0 0 0 10.9 10.9Z"></path>
+        </svg>
+      </button>
+
+      <a class="header-cta" href={DEMO_URL}>Ver la demo</a>
+
+      <!-- A <details> disclosure rather than a JS-driven panel: this is the
+           only navigation on a phone, and the page's primary channel is a
+           WhatsApp forward. The browser gives open/close state, keyboard
+           support and aria-expanded for free, so the menu still works with
+           JavaScript disabled. Navigation reloads the document, which closes
+           it, so there is nothing to reset. -->
+      <details class="menu">
+        <summary aria-label="Abrir el menú">
+          <svg class="i-bars" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M3.5 6.5h17M3.5 12h17M3.5 17.5h17"></path>
+          </svg>
+          <svg class="i-x" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5.5 5.5l13 13M18.5 5.5l-13 13"></path>
+          </svg>
+        </summary>
+
+        <nav class="menu-panel" aria-label="Principal, móvil">
+          <ul>
+            {
+              NAV.map((n) => (
+                <li>
+                  <a
+                    href={n.href}
+                    aria-current={isActive(n.href) ? "page" : undefined}
+                  >
+                    {n.label}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+          <a class="menu-cta" href={DEMO_URL}>Ver la demo</a>
+        </nav>
+      </details>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: color-mix(in srgb, var(--color-background) 82%, transparent);
+    /* The blur is the whole reason the header can be translucent over a
+       moving gradient without the text sitting on noise. Where it is
+       unsupported the color-mix above still leaves an 82% opaque bar. */
+    backdrop-filter: saturate(1.6) blur(14px);
+    -webkit-backdrop-filter: saturate(1.6) blur(14px);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--dur-mid) var(--ease-out);
+  }
+  /* Set by the scroll listener rather than always-on: at the top of the page
+     the header should dissolve into the hero, not sit on a rule. */
+  .site-header[data-scrolled] {
+    border-bottom-color: var(--color-light);
+  }
+
+  .bar {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: 0.7rem var(--space-3);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  .brand {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    color: var(--color-dark);
+    flex-shrink: 0;
+  }
+  /* Same trick as the two controls, for the same reason: the lockup's line box
+     is 30px tall, and below 360 the wordmark hides and it becomes a 30px
+     square. Stretched over the brand's own width rather than a fixed square,
+     so the whole lockup is tappable and not just its middle. */
+  .brand::after {
+    content: "";
+    position: absolute;
+    inset: -7px 0;
+  }
+  /* The mark carries its own corner radius in the path now, so nothing here
+     has to round a bitmap's square edge. */
+
+  /* Caps, matching the product's own sidebar, which is visible inside the
+     screenshots further down the page. Caps need positive tracking to stop
+     reading as a solid block; lowercase does not. */
+  .wordmark {
+    font-weight: 700;
+    font-size: 0.92rem;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .wm-1 {
+    color: var(--color-dark);
+  }
+  .wm-2 {
+    color: var(--color-brand);
+  }
+
+  .nav {
+    margin-inline: auto;
+  }
+  .nav ul {
+    display: flex;
+    gap: var(--space-3);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .nav a {
+    color: var(--color-dark-variant);
+    text-decoration: none;
+    font-size: 0.94rem;
+    font-weight: 500;
+    padding: 0.4rem 0;
+    border-bottom: 2px solid transparent;
+    transition:
+      color var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out);
+  }
+  .nav a:hover {
+    color: var(--color-dark);
+    border-bottom-color: var(--color-primary);
+  }
+  .nav a[aria-current="page"] {
+    color: var(--color-dark);
+    border-bottom-color: var(--color-primary);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-left: auto;
+  }
+
+  /* THE HIT AREA IS BIGGER THAN THE BUTTON, AND ON PURPOSE.
+   *
+   * These two controls draw at 2.4rem (38.4px), which is under the 44px a
+   * thumb needs, and on a phone the disclosure is the only navigation there
+   * is. Growing the boxes to 44 was the obvious fix and the wrong one: the bar
+   * is sized by its tallest child, so it would push the real header past
+   * --header-h (4.1rem), and CLAUDE.md records that under-estimating that
+   * constant forces a scrollbar on the hero while over-estimating leaves the
+   * next section peeking. The pseudo-element takes no layout space, so the
+   * target is 44px and the header is the height it has always been. */
+  .theme-toggle::after,
+  .menu summary::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    width: 44px;
+    height: 44px;
+  }
+
+  .theme-toggle {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    padding: 0;
+    border: 1px solid var(--color-light);
+    border-radius: var(--border-radius-2);
+    background: transparent;
+    color: var(--color-dark-variant);
+    cursor: pointer;
+    transition:
+      background var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out);
+  }
+  .theme-toggle:hover {
+    background: var(--color-white);
+    color: var(--color-dark);
+  }
+  .theme-toggle svg {
+    width: 1.15rem;
+    height: 1.15rem;
+    grid-area: 1 / 1;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+  }
+  /* The icon shows the DESTINATION, not the current state, so that it agrees
+     with the button's own label: in light mode the label reads "Cambiar a
+     tema oscuro" and the glyph is a moon. A lone icon button is read as the
+     action it performs, and icon and label disagreeing is worse than either
+     convention on its own. */
+  .i-sun {
+    display: none;
+  }
+  :global(:root[data-theme="dark"]) .i-moon {
+    display: none;
+  }
+  :global(:root[data-theme="dark"]) .i-sun {
+    display: block;
+  }
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme="light"])) .i-moon {
+      display: none;
+    }
+    :global(:root:not([data-theme="light"])) .i-sun {
+      display: block;
+    }
+  }
+
+  .header-cta {
+    display: inline-block;
+    padding: 0.55rem 1.05rem;
+    border-radius: var(--border-radius-2);
+    background: var(--color-primary-fill);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.94rem;
+    text-decoration: none;
+    white-space: nowrap;
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .header-cta:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--elev-2);
+  }
+
+  /* ── Mobile disclosure ──────────────────────────────────────────────── */
+
+  .menu {
+    display: none;
+  }
+  .menu summary {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 1px solid var(--color-light);
+    border-radius: var(--border-radius-2);
+    color: var(--color-dark-variant);
+    cursor: pointer;
+    list-style: none;
+  }
+  .menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .menu summary svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    grid-area: 1 / 1;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+  }
+  .menu .i-x {
+    display: none;
+  }
+  .menu[open] .i-bars {
+    display: none;
+  }
+  .menu[open] .i-x {
+    display: block;
+  }
+
+  .menu-panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: var(--space-3);
+    background: var(--color-background);
+    border-bottom: 1px solid var(--color-light);
+    box-shadow: var(--elev-2);
+  }
+  .menu-panel ul {
+    list-style: none;
+    margin: 0 0 var(--space-3);
+    padding: 0;
+    display: grid;
+    gap: 0.15rem;
+  }
+  .menu-panel a {
+    display: block;
+    padding: 0.8rem 0.6rem;
+    border-radius: var(--border-radius-2);
+    color: var(--color-dark);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .menu-panel a:hover {
+    background: var(--color-white);
+  }
+  .menu-panel a[aria-current="page"] {
+    color: var(--color-primary-text);
+    background: var(--color-primary-light);
+  }
+  .menu-cta {
+    display: block;
+    padding: 0.85rem 1.2rem;
+    border-radius: var(--border-radius-2);
+    background: var(--color-primary-fill);
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+  }
+
+  /* ── Breakpoints ────────────────────────────────────────────────────── */
+
+  @media (max-width: 899px) {
+    .nav {
+      display: none;
+    }
+    .menu {
+      display: block;
+    }
+  }
+
+  /* The bar runs out of room before the wordmark does. The demo CTA is the
+     first thing to go, because the mobile menu carries a full-width copy of it
+     and every page's hero carries another. The product name stays: it is the
+     first impression for someone opening a forwarded WhatsApp link. */
+  @media (max-width: 559px) {
+    .bar {
+      gap: var(--space-2);
+      padding-inline: var(--space-2);
+    }
+    .header-cta {
+      display: none;
+    }
+  }
+  @media (max-width: 389px) {
+    .wordmark {
+      font-size: 0.82rem;
+    }
+  }
+  @media (max-width: 339px) {
+    .wordmark {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const root = document.documentElement;
+  const btn = document.querySelector<HTMLButtonElement>("[data-theme-toggle]");
+  const header = document.querySelector<HTMLElement>(".site-header");
+
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+  // Three states, not two: no stored value means "follow the OS", which is
+  // what a first visitor gets. Reading the resolved value rather than the
+  // stored one is what makes the first click always do the visible thing.
+  const isDark = () =>
+    root.dataset.theme ? root.dataset.theme === "dark" : prefersDark.matches;
+
+  const label = () => {
+    if (!btn) return;
+    btn.setAttribute(
+      "aria-label",
+      isDark() ? "Cambiar a tema claro" : "Cambiar a tema oscuro",
+    );
+  };
+
+  // <picture> resolves `media` against the OS preference and has no idea the
+  // page carries its own toggle, so an explicit choice has to rewrite the
+  // query itself. "not all" never matches, "all" always does — which is how
+  // the screenshots follow the toggle instead of the operating system.
+  // Only the dark sources are touched; the light ones are the fallback either
+  // way.
+  //
+  // The attribute's VALUE is any condition that has to survive the rewrite.
+  // The hero's fragment also switches on viewport, so its mobile dark source
+  // carries "(max-width: 999px)" and must keep it when dark is selected —
+  // rewriting that one to a bare "all" would hand the phone crop to desktop.
+  // Blank means the source has no condition beyond the theme.
+  const syncShots = () => {
+    const dark = isDark();
+    document
+      .querySelectorAll<HTMLSourceElement>("[data-dark-source]")
+      .forEach((s) => {
+        const extra = s.getAttribute("data-dark-source") || "";
+        s.media = dark ? extra || "all" : "not all";
+      });
+  };
+
+  btn?.addEventListener("click", () => {
+    const next = isDark() ? "light" : "dark";
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem("smp-landing-theme", next);
+    } catch (e) {
+      /* private mode — the toggle still works for this page view */
+    }
+    label();
+    syncShots();
+  });
+
+  // Keep the label honest if the OS flips while the page is open and the
+  // visitor never made an explicit choice. The screenshots need no help in
+  // that case — their media query is still the live OS one.
+  prefersDark.addEventListener("change", () => {
+    if (!root.dataset.theme) label();
+  });
+
+  label();
+  // Only if a stored choice already overrode the OS before first paint.
+  if (root.dataset.theme) syncShots();
+
+  if (header) {
+    const onScroll = () => {
+      if (window.scrollY > 8) header.setAttribute("data-scrolled", "");
+      else header.removeAttribute("data-scrolled");
+    };
+    addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+
+  // Enhancements only. The disclosure already opens, closes and traps focus
+  // correctly without any of this.
+  const menu = document.querySelector<HTMLDetailsElement>(".menu");
+  if (menu) {
+    addEventListener("keydown", (ev) => {
+      if (ev.key === "Escape" && menu.open) {
+        menu.open = false;
+        menu.querySelector("summary")?.focus();
+      }
+    });
+    document.addEventListener("click", (ev) => {
+      if (menu.open && !menu.contains(ev.target as Node)) menu.open = false;
+    });
+  }
+</script>

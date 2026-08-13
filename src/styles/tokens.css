@@ -4,6 +4,59 @@
    product reads as a template with someone else's screenshots pasted in.
    Layout diverges on purpose: the console is dense, this page is not. */
 
+/* Poppins — the same self-hosted files the app ships. The stack below named
+   "Poppins" from the first commit but nothing ever loaded it, so the page
+   silently rendered in system-ui: the one thing token inheritance was supposed
+   to guarantee was the thing it wasn't delivering.
+   Latin subset only. U+0000-00FF covers every Spanish accent (á é í ó ú ñ ü
+   ¿ ¡) and the page is Spanish-only (BRIEF §9), so latin-ext would never be
+   fetched — shipping it would be five requests that can't fire. */
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-500-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-600-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-700-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/poppins-latin-800-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
+    U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD;
+}
+
 :root {
   color-scheme: light;
 
@@ -18,10 +71,66 @@
   --color-white: #fff;
   --color-background: #f6f6f9;
   --color-dark: #363949;
-  --color-dark-variant: #667281;
-  --color-info-dark: #627388;
+
+  /* Darkened away from the app's #667281 / #627388, deliberately, and the one
+     token divergence this page takes from the product.
+
+     The app's values clear 4.5:1 on a flat surface by 0.09 and 0.07. That is
+     enough for a console, which is flat everywhere, and not enough for a
+     marketing page, where anything decorative behind text spends the margin
+     immediately: the hero's own wash tints the background to #f4f4f7 and drops
+     them to 4.46:1 and 4.42:1. The previous pass answered that by keeping all
+     decoration off the type, which is why the page had a gradient in exactly
+     one place and flat bands everywhere else.
+
+     Both now clear 6:1 on #f6f6f9, so roughly 1.5 points are available for
+     tint, glow and gradient behind body copy. Run `npm run audit:contrast`
+     after changing either. */
+  --color-dark-variant: #515c6b; /* 6.34:1 on --color-background */
+  --color-info-dark: #4e5c70; /* 6.35:1 on --color-background */
   --color-light: rgba(132, 139, 200, 0.18);
   --color-primary-text: #4455e6;
+
+  /* The colour a button is FILLED with, as opposed to the one text is set in.
+     --color-primary carries white at only 3.48:1, so every primary CTA on the
+     page was failing 1.4.3 until this came over from the app alongside the
+     rest of the palette. 4.53:1 with #fff.
+     Not overridden in dark: a fill carries its own white text, so its contrast
+     is a property of the fill, not of the theme. */
+  --color-primary-fill: #5a69e9;
+
+  /* Brand accent — the wordmark's crimson and the logo's folded ribbon.
+     Deliberately distinct from --color-primary: periwinkle is the product's
+     system colour (every button inside the console), crimson is the brand's
+     (the mark, the wordmark's second half). The page uses periwinkle for
+     anything that behaves like the product and crimson only for identity, so
+     a visitor never learns that red means "action" here and something else
+     there. Value is the app's audited --color-danger-text, not a new red. */
+  --color-brand: #d30011;
+  --color-brand-deep: #8f0c1e;
+
+  /* The app's violet, used here only in gradients and the hero wash — never
+     as a text or fill colour, so it needs no contrast audit. */
+  --color-primary-accent: #a78bfa;
+
+  /* One hue per portal, so the three consoles are the same three objects
+     wherever they appear: the home lineup, the /portales hero ornament, each
+     portal's badge and its folded corner. Without this the three read as three
+     copies of one card, which is exactly the complaint they drew.
+
+     FILLS, not text. Each is dark enough to carry #fff above 4.5:1, and a
+     fill's contrast is a property of the fill rather than of the theme, so
+     none of them is overridden in dark — same reasoning as
+     --color-primary-fill. Never set one as `color` on the page background:
+     periwinkle is already borderline there, which is what --color-primary-text
+     exists to solve.
+
+     Not crimson. --color-brand is identity only (the mark, the wordmark, the
+     crease); if a portal wore it, red would mean "action" here and "brand"
+     three sections later. */
+  --accent-direccion: #5a69e9; /* 4.53:1 with #fff */
+  --accent-docente: #7c5cd6; /* 4.62:1 with #fff */
+  --accent-estudiante: #0b7a5c; /* 5.09:1 with #fff */
 
   --card-border-radius: 1.6rem;
   --border-radius-1: 0.4rem;
@@ -29,14 +138,66 @@
 
   --box-shadow: 0 2rem 3rem var(--color-light);
 
-  /* Editorial spacing scale — wider than the console's */
+  /* Elevation — the hero composite stacks three planes, and the app's single
+     tint-based --box-shadow can't separate them. Neutral-tinted so the frames
+     read as lit from above rather than glowing periwinkle. */
+  --elev-1:
+    0 1px 2px rgba(24, 26, 30, 0.06), 0 2px 8px rgba(24, 26, 30, 0.05);
+  --elev-2:
+    0 4px 12px rgba(24, 26, 30, 0.08), 0 14px 34px rgba(24, 26, 30, 0.08);
+  --elev-3:
+    0 12px 28px rgba(24, 26, 30, 0.12), 0 36px 68px rgba(24, 26, 30, 0.14);
+
+  /* A COLOUR, not a shadow: the caller supplies the offset and blur.
+     --elev-1..3 are ambient, and ambient alone leaves a tilted object floating
+     — the home hero's phone sits on a lavender wash where --elev-3's 12% is
+     almost invisible. A contact shadow is tight, dark and directional, so it
+     cannot be a fixed token the way the ambient ones are. It is a token at all
+     because a literal rgba would stay ink-on-white in dark mode, and
+     color-mix off --color-dark inverts there: that is the TEXT colour. */
+  --elev-contact: rgba(24, 26, 30, 0.3);
+
+  /* The sticky header's height, so a hero locked to the viewport can subtract
+     it. It used to be implicit, which was fine while nothing depended on it.
+     Measured at 65.03px with the nav and 61.77px with the menu button, so this
+     is deliberately ROUNDED UP past both: over-estimating leaves a few px of
+     the next section peeking, which is harmless and even reads as a hint that
+     there is more, while under-estimating pushes the hero past the viewport
+     and forces the scrollbar the lock exists to remove. */
+  --header-h: 4.1rem;
+
+  /* Motion. One ease and three durations — a landing page that eases six
+     different ways reads as six different pages. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 160ms;
+  --dur-mid: 320ms;
+  --dur-slow: 640ms;
+
+  /* Editorial spacing scale — wider than the console's.
+   *
+   * THE TOP THREE STEPS ARE FLUID, THE BOTTOM FOUR ARE NOT. The small steps
+   * are component-internal — a gap between a label and its value, the padding
+   * inside a pill — and they should not change with the window, because the
+   * things they separate do not either.
+   *
+   * The large steps are page rhythm, and they were set for a 1180px column.
+   * At their fixed values every <section> carried 102.4px of padding at each
+   * end and PageHero another 153.6 below it, which on a 390px phone is most of
+   * a screen of nothing between one band and the next: the home page ran to
+   * 10,097px, about twelve screens, and the sub-pages to between 3,000 and
+   * 6,600. That is the reader's whole experience of the site, because the
+   * primary channel for this page is a WhatsApp forward opened on a phone.
+   *
+   * Each ramps from its phone value at 390 to its full value at 1180 and is
+   * clamped flat outside that range, so the desktop composition is untouched —
+   * every one of these resolves to exactly its old value at 1180 and above. */
   --space-1: 0.5rem;
   --space-2: 1rem;
   --space-3: 1.6rem;
   --space-4: 2.4rem;
-  --space-5: 4rem;
-  --space-6: 6.4rem;
-  --space-7: 9.6rem;
+  --space-5: clamp(2.6rem, 1.91rem + 2.84vw, 4rem);
+  --space-6: clamp(3.2rem, 1.62rem + 6.48vw, 6.4rem);
+  --space-7: clamp(4.8rem, 2.43rem + 9.72vw, 9.6rem);
 
   --measure: 62ch;
   --page-max: 1180px;
@@ -54,8 +215,22 @@
     --color-white: #202528;
     --color-dark: #edeffd;
     --color-dark-variant: #a3bdcc;
-    --color-info-dark: #7d8da1;
+    --color-info-dark: #8f9eb1; /* 6.38:1 on the dark page; was 5.14:1 */
     --color-light: rgba(0, 0, 0, 0.4);
+
+    /* Light mode DARKENS a hue to clear 4.5:1 on white; dark mode has to
+       BRIGHTEN it instead. Carrying the light values through unchanged left
+       every link and eyebrow at 3.06:1 on the page and 2.72:1 on a card —
+       a 1.4.3 failure. Same values and same reasoning as the app. */
+    --color-primary-text: #8994ef; /* 6.26:1 page · 5.56:1 card */
+    --color-brand: #ff7782; /* 6.81:1 page — #d30011 was 3.13:1 */
+
+    /* Neutral drop-shadows vanish on a near-black page; depth has to come
+       from a darker-than-background shadow plus a lit top edge. */
+    --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+    --elev-2: 0 4px 12px rgba(0, 0, 0, 0.45), 0 14px 34px rgba(0, 0, 0, 0.4);
+    --elev-3: 0 12px 28px rgba(0, 0, 0, 0.5), 0 36px 68px rgba(0, 0, 0, 0.5);
+    --elev-contact: rgba(0, 0, 0, 0.55);
   }
 }
 
@@ -65,8 +240,19 @@
   --color-white: #202528;
   --color-dark: #edeffd;
   --color-dark-variant: #a3bdcc;
-  --color-info-dark: #7d8da1;
+  --color-info-dark: #8f9eb1; /* 6.38:1 on the dark page; was 5.14:1 */
   --color-light: rgba(0, 0, 0, 0.4);
+
+  /* Repeated verbatim from the media query above — see the note there. An
+     explicit choice has to win in both directions, so neither block can
+     delegate to the other. */
+  --color-primary-text: #8994ef;
+  --color-brand: #ff7782;
+
+  --elev-1: 0 1px 2px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --elev-2: 0 4px 12px rgba(0, 0, 0, 0.45), 0 14px 34px rgba(0, 0, 0, 0.4);
+  --elev-3: 0 12px 28px rgba(0, 0, 0, 0.5), 0 36px 68px rgba(0, 0, 0, 0.5);
+  --elev-contact: rgba(0, 0, 0, 0.55);
 }
 
 *,

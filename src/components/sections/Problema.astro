@@ -1,0 +1,284 @@
+---
+import FeatureGlyph from "../FeatureGlyph.astro";
+import { contrasts, type SourceKind } from "../../data/site";
+
+/** The three kinds of object a colegio does this work with today. Drawn rather
+ *  than named, because "un cuaderno" and "un archivo de Excel" are recognised
+ *  faster as shapes than as words. */
+const GLYPHS: Record<SourceKind, string[]> = {
+  sheet: ["M4.5 3.5h15v17h-15z", "M4.5 9h15", "M4.5 14.5h15", "M11 9v11.5"],
+  paper: ["M6 3.5h7.5l4.5 4.5v12H6z", "M13.5 3.5V8H18", "M9 12h6", "M9 16h4"],
+  chat: ["M4 5.5h16v10.5h-9l-5 4v-4H4z", "M8 9h8", "M8 12.5h5"],
+};
+---
+
+<section class="band pain fold-band">
+  <div class="wrap">
+    <div class="intro narrow reveal">
+      <h2>Tener 10 documentos Excel no es ideal</h2>
+      <p>
+        Uno de los trabajos tediosos de un colegio es mantener la información de los estudiantes en distintos lugares. 
+        Cada docente tiene su propio cuaderno, cada área tiene su propio archivo de Excel, nosotros unificamos todo en un solo sistema pensado para estas tareas.
+      </p>
+    </div>
+
+    <!-- Three jobs, each shown twice: with what it is done today, and with the
+         console that replaces it.
+
+         NOT numbered. The three are parallel, not a sequence, and a reader who
+         sees 01/02/03 will look for an order that is not there. -->
+    <ol class="jobs">
+      {
+        contrasts.map((c) => (
+          <li class="job reveal" style={`--accent: ${c.fix.accent}`}>
+            <h3 class="job-title">{c.job}</h3>
+
+            <div class="job-grid">
+              <div class="hoy">
+                <p class="side-label">Hoy</p>
+                <ul class="scatter">
+                  {c.hoy.map((h, i) => (
+                    <li style={`--i:${i}`}>
+                      <svg class="glyph" viewBox="0 0 24 24" aria-hidden="true">
+                        {GLYPHS[h.kind].map((d) => (
+                          <path d={d} />
+                        ))}
+                      </svg>
+                      <span class="scatter-text">
+                        <span class="scatter-name">{h.label}</span>
+                        <span class="scatter-meta">{h.meta}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <p class="cost">{c.cost}</p>
+              </div>
+
+              <div class="turn" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M3 12h16M13 6l6 6-6 6" />
+                </svg>
+              </div>
+
+              <div class="fix card-lead">
+                <div class="fix-glyph">
+                  <FeatureGlyph variant={c.fix.glyph} />
+                </div>
+                <p class="side-label is-fix">Con Simple Manage Pro</p>
+                <h4>{c.fix.title}</h4>
+                <p class="fix-body">{c.fix.body}</p>
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <p class="outro narrow reveal">
+      Es el mismo colegio y la misma información. Lo que cambia es que deja de
+      estar en seis lugares distintos.
+    </p>
+  </div>
+</section>
+
+<style>
+  .intro h2 {
+    font-size: clamp(1.8rem, 3.4vw, 2.7rem);
+    letter-spacing: -0.02em;
+    margin: 0 0 var(--space-2);
+    text-wrap: balance;
+  }
+  .intro p {
+    color: var(--color-dark-variant);
+    margin: 0;
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
+  }
+
+  .jobs {
+    list-style: none;
+    margin: var(--space-5) 0 var(--space-4);
+    padding: 0;
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .job-title {
+    margin: 0 0 var(--space-2);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-info-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .job-title::before {
+    content: "";
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .job-grid {
+    display: grid;
+    gap: var(--space-3);
+    align-items: center;
+  }
+
+  /* ── Hoy ────────────────────────────────────────────────────────────── */
+
+  .side-label {
+    margin: 0 0 var(--space-2);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-info-dark);
+  }
+  .side-label.is-fix {
+    color: var(--color-dark-variant);
+  }
+
+  .scatter {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.6rem;
+  }
+
+  .scatter li {
+    display: grid;
+    grid-template-columns: 1.4rem 1fr;
+    gap: 0.65rem;
+    align-items: center;
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--border-radius-2);
+    padding: 0.65rem 0.9rem;
+    box-shadow: var(--elev-1);
+    /* Each row sits at its own small angle. The point is legibility of the
+       mess, not the mess itself: they stay readable, just visibly unaligned. */
+    rotate: var(--tilt, 0deg);
+  }
+  .scatter li:nth-child(1) {
+    --tilt: -1.3deg;
+  }
+  .scatter li:nth-child(2) {
+    --tilt: 0.9deg;
+    margin-left: 0.7rem;
+  }
+  .scatter li:nth-child(3) {
+    --tilt: -0.7deg;
+    margin-left: 0.25rem;
+  }
+
+  .glyph {
+    width: 1.4rem;
+    height: 1.4rem;
+    fill: none;
+    stroke: var(--color-info-dark);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0.85;
+  }
+
+  .scatter-text {
+    display: grid;
+    min-width: 0;
+  }
+  .scatter-name {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--color-dark);
+  }
+  .scatter-meta {
+    font-size: 0.78rem;
+    color: var(--color-info-dark);
+  }
+
+  .cost {
+    margin: var(--space-2) 0 0;
+    font-size: 0.9rem;
+    color: var(--color-info-dark);
+    max-width: 38ch;
+  }
+
+  /* ── The turn ───────────────────────────────────────────────────────── */
+
+  .turn {
+    justify-self: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--accent) 12%, var(--color-white));
+    box-shadow: var(--elev-1);
+    /* Points down when the pair is stacked, along the row when it is not. */
+    rotate: 90deg;
+  }
+  .turn svg {
+    width: 1.3rem;
+    height: 1.3rem;
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* ── The answer ─────────────────────────────────────────────────────── */
+
+  .fix {
+    padding: var(--space-4);
+    display: grid;
+    gap: 0;
+  }
+  .fix-glyph {
+    margin-bottom: var(--space-3);
+    max-width: 15rem;
+  }
+  .fix h4 {
+    margin: 0 0 0.4rem;
+    font-size: clamp(1.15rem, 1.9vw, 1.45rem);
+    letter-spacing: -0.01em;
+  }
+  .fix-body {
+    margin: 0;
+    color: var(--color-dark-variant);
+    max-width: 42ch;
+  }
+
+  .outro {
+    margin: 0;
+    color: var(--color-dark-variant);
+    font-size: clamp(1rem, 1.5vw, 1.12rem);
+  }
+
+  @media (min-width: 860px) {
+    .job-grid {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.05fr);
+      gap: var(--space-4);
+    }
+    .turn {
+      rotate: none;
+    }
+    .fix {
+      padding: var(--space-4) var(--space-5);
+    }
+    .fix-glyph {
+      max-width: 17rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scatter li {
+      rotate: none;
+      margin-left: 0;
+    }
+  }
+</style>

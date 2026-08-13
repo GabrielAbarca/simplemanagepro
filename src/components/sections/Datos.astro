@@ -1,0 +1,284 @@
+---
+import { PRIVACY_URL } from "../../config";
+
+// Three vaults, one of them the reader's own. The section used to be three
+// paragraphs with nothing to look at, which is a waste of the strongest single
+// fact in the product: schools are not neighbours in a shared database.
+const vaults = [
+  { name: "Colegio A", own: false },
+  { name: "Su colegio", own: true },
+  { name: "Colegio B", own: false },
+];
+---
+
+<section class="band fold-band" id="datos">
+  <div class="wrap">
+    <div class="narrow reveal">
+      <h2>Los datos de su colegio <br>
+        no se mezclan.</h2>
+      <p>
+        Cada colegio recibe <strong>su propia base de datos</strong>.
+        Ninguna consulta puede cruzar fuera del cifrado.
+      </p>
+    </div>
+
+    <!-- Decorative: the caption below carries the same claim in text, so
+         nothing here is the only way to reach the meaning.
+
+         The two dashed connectors are the point. Three cards in a row show
+         separation; a connector that visibly terminates before it arrives
+         shows that the separation is ENFORCED, which is the actual claim and
+         the thing a director is trying to satisfy themselves about. -->
+    <div class="vaults reveal" aria-hidden="true">
+      {
+        vaults.map((v, i) => (
+          <>
+            {i > 0 && (
+              <span class="bar">
+                <svg viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="8.5" />
+                  <path d="M8.6 8.6l6.8 6.8M15.4 8.6l-6.8 6.8" />
+                </svg>
+              </span>
+            )}
+            <div class:list={["vault", v.own && "is-own"]}>
+              <span class="vault-icon">
+                {v.own && (
+                  <svg class="shield" viewBox="0 0 48 48">
+                    <path
+                      class="shield-path"
+                      d="M24 3 42 10v14c0 10-8 17-18 21C14 41 6 34 6 24V10Z"
+                    />
+                  </svg>
+                )}
+                <svg class="db" viewBox="0 0 40 44">
+                  <ellipse cx="20" cy="9" rx="15" ry="6" />
+                  <path d="M5 9v26c0 3.3 6.7 6 15 6s15-2.7 15-6V9" />
+                  <path d="M5 18c0 3.3 6.7 6 15 6s15-2.7 15-6" />
+                  <path d="M5 27c0 3.3 6.7 6 15 6s15-2.7 15-6" />
+                </svg>
+                {v.own && (
+                  <span class="lock">
+                    <svg viewBox="0 0 24 24">
+                      <path class="shackle" d="M8 11V8a4 4 0 0 1 8 0v3" />
+                      <rect x="5" y="11" width="14" height="9.5" rx="2.5" />
+                    </svg>
+                  </span>
+                )}
+              </span>
+              <span class="vault-name">{v.name}</span>
+            </div>
+          </>
+        ))
+      }
+    </div>
+
+    <p class="vaults-caption reveal">
+      Tres colegios, tres bases de datos. Ninguna consulta cruza de una a otra.
+    </p>
+
+    <p class="vaults-chip reveal">
+      <span class="chip">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 11V8a4 4 0 0 1 8 0v3"></path>
+          <rect x="5" y="11" width="14" height="9.5" rx="2.5"></rect>
+        </svg>
+        Cifrado en tránsito y en reposo, con respaldos propios
+      </span>
+    </p>
+
+    <div class="narrow reveal">
+      <p>
+        La base de datos se aloja en Estados Unidos. nos preocupamos por la privacidad de su información, para saber cada detalle,
+        tenemos una sección específica en nuestra Política de Privacidad.
+      </p>
+      <p>
+        <a href={PRIVACY_URL}>Leer la política de privacidad completa</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .vaults {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+
+  .vault {
+    display: grid;
+    justify-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    max-width: 15rem;
+    padding: var(--space-4) var(--space-2);
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--card-border-radius);
+    /* The gap between the cards is the argument. Nothing bridges them. */
+  }
+
+  .vault:not(.is-own) {
+    border-style: dashed;
+    opacity: 0.72;
+  }
+
+  .vault.is-own {
+    border-color: color-mix(in srgb, var(--color-primary) 55%, transparent);
+    box-shadow: var(--elev-2);
+  }
+
+  /* ── The icons ──────────────────────────────────────────────────────── */
+
+  .vault-icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 4.6rem;
+    height: 4.6rem;
+  }
+
+  .db {
+    width: 2.1rem;
+    height: 2.3rem;
+    fill: none;
+    stroke: var(--color-info-dark);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+  .is-own .db {
+    stroke: var(--color-primary);
+  }
+
+  .shield {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .shield-path {
+    fill: color-mix(in srgb, var(--color-primary) 6%, transparent);
+    stroke: color-mix(in srgb, var(--color-primary) 65%, transparent);
+    stroke-width: 2.2;
+    stroke-linejoin: round;
+  }
+
+  .lock {
+    position: absolute;
+    right: -0.15rem;
+    bottom: 0.1rem;
+    display: grid;
+    place-items: center;
+    width: 1.65rem;
+    height: 1.65rem;
+    border-radius: 50%;
+    background: var(--color-primary-fill);
+    box-shadow: var(--elev-1);
+  }
+  .lock svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    fill: none;
+    stroke: #fff;
+    stroke-width: 2.1;
+    stroke-linecap: round;
+  }
+
+  /* The shield draws itself and the padlock closes as the section arrives.
+     Both are gated behind .js, which Layout.astro adds only when the visitor
+     has not asked for reduced motion — so a reduced-motion or no-JavaScript
+     visitor gets the finished state rather than a shield that never appears. */
+  .js .shield-path {
+    stroke-dasharray: 130;
+    stroke-dashoffset: 130;
+    transition: stroke-dashoffset 900ms var(--ease-out) 150ms;
+  }
+  .js .vaults.is-in .shield-path {
+    stroke-dashoffset: 0;
+  }
+
+  .js .lock .shackle {
+    transform: scaleY(0.15);
+    transform-origin: 12px 11px;
+    transition: transform var(--dur-mid) var(--ease-out) 900ms;
+  }
+  .js .vaults.is-in .lock .shackle {
+    transform: none;
+  }
+
+  /* ── The blocked connectors ─────────────────────────────────────────── */
+
+  .bar {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    min-height: 3rem;
+  }
+  .bar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    border-left: 2px dashed color-mix(in srgb, var(--color-dark) 22%, transparent);
+  }
+  .bar svg {
+    position: relative;
+    width: 1.6rem;
+    height: 1.6rem;
+    padding: 0.1rem;
+    box-sizing: content-box;
+    border-radius: 50%;
+    background: var(--color-background);
+    fill: none;
+    stroke: var(--color-danger);
+    stroke-width: 2;
+    stroke-linecap: round;
+  }
+
+  /* ── Captions ───────────────────────────────────────────────────────── */
+
+  .vaults-caption {
+    margin-top: var(--space-3);
+    font-size: 0.9rem;
+    color: var(--color-info-dark);
+    text-align: center;
+  }
+
+  .vaults-chip {
+    margin-top: var(--space-2);
+    margin-bottom: var(--space-5);
+    text-align: center;
+  }
+
+  @media (min-width: 760px) {
+    .vaults {
+      grid-template-columns: 1fr auto 1fr auto 1fr;
+      align-items: center;
+      gap: var(--space-2);
+      max-width: 52rem;
+      margin-inline: auto;
+    }
+    .vault {
+      max-width: none;
+    }
+    .bar {
+      width: auto;
+      min-width: 3.5rem;
+      min-height: 0;
+    }
+    .bar::before {
+      top: 50%;
+      bottom: auto;
+      left: 0;
+      right: 0;
+      border-left: 0;
+      border-top: 2px dashed
+        color-mix(in srgb, var(--color-dark) 22%, transparent);
+    }
+  }
+</style>

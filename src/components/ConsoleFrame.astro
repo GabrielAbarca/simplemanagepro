@@ -1,0 +1,34 @@
+---
+import { DEMO_URL } from "../config";
+
+/**
+ * Browser chrome around a console capture. Styles live in base.css because
+ * three routes use this; the component only owns the markup.
+ *
+ * `phone` renders the frame at the 390@3x capture's own scale and drops the
+ * chrome bar, for the second plane beside a section's copy.
+ */
+interface Props {
+  phone?: boolean;
+  class?: string;
+}
+
+const { phone = false, class: className } = Astro.props;
+
+// Shown in the URL bar, so it has to be the host the CTAs actually open.
+const host = DEMO_URL.replace(/^https?:\/\//, "");
+---
+
+<figure class:list={["console-frame", phone && "is-phone", className]}>
+  {
+    !phone && (
+      <div class="frame-bar" aria-hidden="true">
+        <span class="dot" />
+        <span class="dot" />
+        <span class="dot" />
+        <span class="url">{host}</span>
+      </div>
+    )
+  }
+  <slot />
+</figure>

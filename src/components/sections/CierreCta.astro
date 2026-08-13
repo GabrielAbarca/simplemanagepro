@@ -1,0 +1,32 @@
+---
+import { DEMO_URL } from "../../config";
+
+interface Props {
+  /** Set false on /contacto, where the page itself is the call to action. */
+  showDemo?: boolean;
+}
+
+const { showDemo = true } = Astro.props;
+---
+
+<section class="band cierre fold-band">
+  <div class="wrap narrow reveal">
+    <h2>¿Su colegio podría ser uno de los tres?</h2>
+    <p>
+      Si estás interesado en conocer más sobre nuestro sistema y participar en el piloto 2027, 
+      contáctanos para obtener más información y programar una demostración.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="/contacto">Hablar del piloto 2027</a>
+      {showDemo && <a class="btn btn-quiet" href={DEMO_URL}>Ver la demo</a>}
+    </div>
+  </div>
+</section>
+
+<style>
+  /* No border-top: the fold band's own angled edge is the divider, and a
+     horizontal rule crossing it would contradict the angle. */
+  .cierre h2 {
+    max-width: 20ch;
+  }
+</style>

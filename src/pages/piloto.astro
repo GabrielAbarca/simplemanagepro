@@ -1,0 +1,415 @@
+---
+import Layout from "../layouts/Layout.astro";
+import PageHero from "../components/PageHero.astro";
+import CierreCta from "../components/sections/CierreCta.astro";
+import { pilotGives, pilotAsks, faq } from "../data/site";
+import BrandMark from "../components/BrandMark.astro";
+import { breadcrumbLd, faqLd } from "../lib/schema";
+
+// Three, because each colegio is a hand-provisioned database. The number is
+// the offer, so the ornament is the number.
+const seats = [
+  { label: "Colegio", own: false },
+  { label: "Su colegio", own: true },
+  { label: "Colegio", own: false },
+];
+---
+
+<Layout
+  title="El piloto 2027 para tres colegios"
+  description="Tres colegios empiezan el curso lectivo 2027 con el sistema ya configurado: su estructura, su matrícula y su propia base de datos. Qué incluye el piloto."
+>
+  <script
+    slot="head"
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(breadcrumbLd("Piloto 2027", "/piloto"))}
+  />
+  <script
+    slot="head"
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(faqLd(faq))}
+  />
+
+  <PageHero
+    eyebrow="Febrero de 2027"
+    title="El piloto 2027"
+    lede="Tres colegios, empezando con el curso lectivo en febrero de 2027. Cada uno con su propia base de datos, configurada con la estructura de su colegio."
+  >
+    <div class="cta-row">
+      <a class="btn btn-primary" href="/contacto">Hablar del piloto</a>
+    </div>
+
+    <!-- The offer as an object: three places, one of them the reader's. The
+         scarcity is real (each colegio is a hand-provisioned database), so it
+         is worth showing rather than only stating. -->
+    <div class="seats" slot="ornament" aria-hidden="true">
+      <!-- The mark, extruded. Layered copies on their own Z, the deepest one
+           carrying the underside crimson, so the sheet reads as an object with
+           a thickness rather than as a sticker. It rotates about the right
+           edge with a negative rotateY, the same discipline the home hero's
+           lineup follows: no face is ever brought toward the viewer, so
+           nothing is magnified. -->
+      <div class="mark">
+        <span class="mark-slab"><BrandMark size="100%" /></span>
+        <span class="mark-slab"><BrandMark size="100%" /></span>
+        <span class="mark-slab"><BrandMark size="100%" /></span>
+        <span class="mark-slab"><BrandMark size="100%" /></span>
+        <span class="mark-slab"><BrandMark size="100%" /></span>
+      </div>
+      {
+        seats.map((s) => (
+          <span class:list={["seat", s.own && "is-own"]}>
+            <svg viewBox="0 0 24 24">
+              <path d="M3 20.5V9.6L12 4l9 5.6v10.9" />
+              <path d="M9 20.5v-6h6v6" />
+            </svg>
+            <span class="seat-label">{s.label}</span>
+          </span>
+        ))
+      }
+      <span class="chip seats-when">
+        <svg viewBox="0 0 24 24">
+          <rect x="3.5" y="5" width="17" height="15.5" rx="3"></rect>
+          <path d="M3.5 10h17M8 3.2v3.6M16 3.2v3.6"></path>
+        </svg>
+        Arranque en febrero de 2027
+      </span>
+    </div>
+  </PageHero>
+
+  <section class="band fold-band">
+    <div class="wrap">
+      <!-- Two sides of one exchange, and read as such: the receiving side
+           carries the weight, the committing side answers it. They used to be
+           two identical cards, which said the two were the same kind of thing
+           and gave the reader no reason to start with either. -->
+      <div class="exchange">
+        <div class="card-lead card-fold give reveal">
+          <p class="chip">Lo que se entrega</p>
+          <h2>Qué recibe el colegio</h2>
+          <ul class="icon-list reveal reveal-stagger">
+            {
+              pilotGives.map((g, i) => (
+                <li style={`--i:${i}`}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <circle cx="12" cy="12" r="9.2" />
+                    <path d="M7.8 12.3 10.7 15.2 16.2 9.4" />
+                  </svg>
+                  <span>{g}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="card-lead card-fold take reveal">
+          <p class="chip">Lo que se acuerda</p>
+          <h2>Qué se necesita del colegio</h2>
+          <ul class="icon-list reveal reveal-stagger">
+            {
+              pilotAsks.map((a, i) => (
+                <li style={`--i:${i}`}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <rect x="3.4" y="3.4" width="17.2" height="17.2" rx="4.6" />
+                    <path d="M7.8 12.3 10.7 15.2 16.2 9.4" />
+                  </svg>
+                  <span>{a}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <div class="narrow reveal">
+        <p class="aside">
+          El piloto no es gratuito. Cubre el costo de la infraestructura,
+          El monto depende del tamaño del colegio y se conversa directamente con nosotros. 
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- The questions a director actually asks before the first meeting. See
+       src/data/site.ts for what changed here and why, and BRIEF §7 for the
+       decision behind it. The markup is <details> so the list stays scannable
+       at eight questions and still works with JavaScript disabled. -->
+  <section class="band" id="respuestas">
+    <div class="wrap">
+      <div class="narrow reveal">
+        <p class="eyebrow">Preguntas frecuentes</p>
+        <h2>Lo que preguntan antes de la primera reunión</h2>
+        <p>
+          Contestadas acá, para que la conversación empiece en el punto que le
+          interesa a su colegio.
+        </p>
+      </div>
+
+      <div class="faq reveal">
+        {
+          faq.map((f, i) => (
+            <details class="faq-item" open={i === 0}>
+              <summary>
+                <span>{f.q}</span>
+                <svg viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M3.5 6 8 10.5 12.5 6" />
+                </svg>
+              </summary>
+              <p>{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <CierreCta />
+</Layout>
+
+<style>
+  /* ── The hero ornament ────────────────────────────────────────────────── */
+
+  .seats {
+    display: grid;
+    gap: var(--space-2);
+    justify-items: start;
+  }
+
+  /* ── The extruded mark ──────────────────────────────────────────────────
+     Five copies of the same vector, each one step further back, with only the
+     deepest showing its underside crimson. The stack is what gives the shape a
+     thickness; the rotation is what shows you that it has one.
+
+     GEOMETRY, and it is the same rule the home hero's lineup runs on:
+     perspective scales a point by p / (p - z), so a positive translateZ
+     magnifies. Every slab here sits at or BEHIND z = 0 and the rotation is
+     about the right edge with a negative rotateY, so no face is ever brought
+     toward the viewer. Nothing is magnified, and a vector would not soften
+     anyway — the discipline is kept because the next person to edit this will
+     assume it applies. */
+  .mark {
+    position: relative;
+    width: clamp(6.5rem, 13vw, 10rem);
+    aspect-ratio: 1;
+    margin-bottom: var(--space-4);
+    perspective: 900px;
+    transform-style: preserve-3d;
+    /* Grounds the object on the page. Without it the extrusion reads as a
+       flat sticker that happens to be drawn at an angle. */
+    filter: drop-shadow(0 18px 26px color-mix(in srgb, var(--color-brand-deep) 26%, transparent));
+  }
+
+  .mark-slab {
+    position: absolute;
+    inset: 0;
+    transform-origin: right center;
+    transform: rotateY(-24deg) rotateX(9deg) translateZ(calc(var(--d, 0) * -3px));
+    animation: mark-in var(--dur-slow) var(--ease-out) both;
+  }
+  .mark-slab :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Only the front slab keeps the gradients; the ones behind it are the
+     extrusion, so both the face and the folds flatten to the underside crimson
+     and carry no detail that could ghost through the edge. `fill` has to win
+     over the paint server the mark sets inline, hence !important. */
+  .mark-slab:not(:first-child) :global(.face),
+  .mark-slab:not(:first-child) :global(.under) {
+    fill: var(--color-brand-deep) !important;
+  }
+  .mark-slab:nth-child(2) { --d: 1; }
+  .mark-slab:nth-child(3) { --d: 2; }
+  .mark-slab:nth-child(4) { --d: 3; }
+  .mark-slab:nth-child(5) { --d: 4; }
+
+  /* Painted back to front: the deepest slab must not cover the face. */
+  .mark-slab:nth-child(1) { z-index: 5; }
+  .mark-slab:nth-child(2) { z-index: 4; }
+  .mark-slab:nth-child(3) { z-index: 3; }
+  .mark-slab:nth-child(4) { z-index: 2; }
+  .mark-slab:nth-child(5) { z-index: 1; }
+
+  @keyframes mark-in {
+    from {
+      opacity: 0;
+      transform: rotateY(-46deg) rotateX(9deg)
+        translateZ(calc(var(--d, 0) * -3px));
+    }
+  }
+
+  @media (max-width: 999px) {
+    .mark {
+      width: clamp(4.5rem, 18vw, 6.5rem);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mark-slab {
+      animation: none;
+    }
+  }
+
+  .seat {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    padding: var(--space-3);
+    border-radius: var(--border-radius-2);
+    border: 1px dashed color-mix(in srgb, var(--color-dark) 25%, transparent);
+    color: var(--color-info-dark);
+    font-size: 1rem;
+  }
+
+  .seat svg {
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  /* The one that is the reader's: taken, not offered. Scaled up a touch so the
+     three rows read as "one of these is yours" rather than as a form. */
+  .seat.is-own {
+    background: var(--color-white);
+    border: 1px solid
+      color-mix(in srgb, var(--color-primary) 55%, transparent);
+    box-shadow: var(--elev-2);
+    color: var(--color-dark);
+    font-weight: 700;
+    scale: 1.045;
+  }
+  .seat.is-own svg {
+    stroke: var(--color-primary);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .seat.is-own {
+      scale: none;
+    }
+  }
+
+  .seats-when {
+    margin-top: var(--space-2);
+  }
+
+  /* ── The exchange ─────────────────────────────────────────────────────── */
+
+  .exchange {
+    display: grid;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+
+  .give {
+    --accent: var(--accent-direccion);
+  }
+  .take {
+    --accent: var(--accent-docente);
+    height: stretch;
+  }
+
+  .exchange h2 {
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+    margin-top: var(--space-2);
+    margin-bottom: 0;
+  }
+
+  .exchange .chip {
+    background: color-mix(in srgb, var(--accent) 14%, var(--color-white));
+    color: var(--color-dark);
+  }
+
+  .exchange .icon-list {
+    color: var(--color-dark-variant);
+    font-size: 0.98rem;
+  }
+  .exchange .icon-list svg {
+    stroke: var(--accent);
+  }
+
+  /* ── The FAQ ──────────────────────────────────────────────────────────── */
+
+  /* One column, not two.
+     In a two-column grid each row is as tall as its taller item, so opening
+     any answer leaves a matching hole beside it — and CSS columns re-balance
+     on every toggle, which makes items jump between columns as the reader
+     works down the list. A single column at a capped measure has neither
+     problem, and the answers get a comfortable line length. */
+  .faq {
+    margin-top: var(--space-4);
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+    max-width: 54rem;
+  }
+
+  .faq-item {
+    background: var(--color-white);
+    border: 1px solid var(--color-light);
+    border-radius: var(--border-radius-2);
+    /* Height follows the open state, so a two-column grid stays tidy. */
+    height: fit-content;
+  }
+
+  .faq summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 1.02rem;
+    color: var(--color-dark);
+    list-style: none;
+  }
+  .faq summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq summary svg {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    fill: none;
+    stroke: var(--color-primary-text);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transition: rotate var(--dur-fast) var(--ease-out);
+  }
+  .faq-item[open] summary svg {
+    rotate: 180deg;
+  }
+
+  .faq p {
+    margin: 0;
+    padding: 0 var(--space-3) var(--space-3);
+    color: var(--color-dark-variant);
+    font-size: 0.98rem;
+  }
+
+  @media (min-width: 760px) {
+    .exchange {
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+      gap: var(--space-4);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faq summary svg {
+      transition: none;
+    }
+  }
+</style>
