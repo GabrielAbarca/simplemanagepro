@@ -19,15 +19,16 @@ import { DEMO_URL, EMAIL, WHATSAPP_MSG, waHref } from "../config";
 
   <PageHero
     eyebrow="Piloto 2027"
-    title="¿Su colegio podría ser uno de los tres?"
-    lede="La conversación empieza por WhatsApp o por correo. La decisión no se toma desde acá: se toma después de ver el sistema con la estructura de su colegio."
+    title="¿Está interesado en el sistema?"
+    lede="Si estás interesado en conocer más sobre nuestro sistema y participar en el piloto 2027, 
+      contáctanos para obtener más información y programar una demostración."
   >
     <div class="cta-row">
       <a class="btn btn-primary" href={waHref}>Escribir por WhatsApp</a>
       <a class="btn btn-quiet" href={`mailto:${EMAIL}`}>Escribir un correo</a>
     </div>
     <p class="note">
-      No hay formulario, ni plan que escoger, ni tarjeta de crédito.
+      No hay formulario, ni plan que escoger.
     </p>
 
     <!-- What tapping the button actually produces. The pre-filled message is
@@ -35,7 +36,7 @@ import { DEMO_URL, EMAIL, WHATSAPP_MSG, waHref } from "../config";
          removes the one hesitation a director has about a chat link: not
          knowing what they are about to send. -->
     <div class="preview" slot="ornament">
-      <p class="preview-title">El mensaje ya viene escrito</p>
+      <p class="preview-title">Nos sería de utilidad conocer información básica</p>
       <div class="bubble">
         <p>{WHATSAPP_MSG}</p>
       </div>
@@ -99,7 +100,7 @@ import { DEMO_URL, EMAIL, WHATSAPP_MSG, waHref } from "../config";
             Lo más rápido. El mensaje va prellenado y usted lo edita antes de
             enviarlo.
           </p>
-          <a class="ch-link" href={waHref}>Abrir WhatsApp</a>
+          <p class="ch-phone">+506 7184-8300</p>
         </li>
       </ul>
 
@@ -220,7 +221,10 @@ import { DEMO_URL, EMAIL, WHATSAPP_MSG, waHref } from "../config";
     font-weight: 600;
     overflow-wrap: anywhere;
   }
-
+  li.card .ch-phone {
+    font-weight: 600;
+    color: var(--color-primary-text);
+  }
   @media (min-width: 760px) {
     .channels {
       grid-template-columns: repeat(2, 1fr);

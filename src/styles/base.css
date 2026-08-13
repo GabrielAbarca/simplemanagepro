@@ -18,7 +18,7 @@
 }
 
 .narrow {
-  max-width: 70ch;
+  max-width: 73ch;
 }
 
 /* .narrow caps the measure, and inside a .wrap that is all it does. Put on the

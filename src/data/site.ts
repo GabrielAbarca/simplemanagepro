@@ -60,12 +60,13 @@ export const portals: Portal[] = [
     label: "Consola de la dirección",
     title: "El colegio completo, configurado desde un solo lugar",
     short:
-      "Curso lectivo, periodos, secciones, materias, docentes y matrícula, en un solo tablero.",
-    body: "Curso lectivo y periodos, niveles, secciones, aulas, materias, docentes, horarios, expedientes y matrícula. La matrícula entra directamente desde un archivo de Excel.",
+      "Curso lectivo, periodos, secciones, materias, docentes y matrícula, en un solo lugar.",
+    body: "Curso lectivo y periodos, niveles, secciones, aulas, materias, docentes, horarios, expedientes y matrícula. La información se pueden importar directamente desde un archivo de Excel.",
     capabilities: [
       "Curso lectivo y periodos, con sus fechas",
       "Niveles, secciones, aulas y horarios",
       "Matrícula importada desde su archivo de Excel",
+      "Manejo de credenciales de docentes y estudiantes",
     ],
     accent: "var(--accent-direccion)",
     glyph: "direccion",
@@ -78,14 +79,15 @@ export const portals: Portal[] = [
   {
     id: "docentes",
     label: "Consola del docente",
-    title: "El libro de notas que reemplaza el archivo de Excel",
+    title: "El libro de notas digital reemplaza el archivo de Excel",
     short:
       "Categorías ponderadas, asistencia por sección e informe de progreso listo para imprimir.",
-    body: "Categorías ponderadas, notas por periodo, asistencia por sección, registro disciplinario e informe de progreso listo para imprimir. Al cerrar el periodo, las notas ya están donde tienen que estar.",
+    body: "Categorías ponderadas, notas por periodo, asistencia por sección, registro disciplinario e informe de progreso listo para imprimir. Al cerrar el periodo, las notas ya están unificadas y disponibles para el estudiante.",
     capabilities: [
       "Categorías ponderadas por periodo",
       "Asistencia por sección, también desde el teléfono",
       "Informe de progreso listo para imprimir",
+      "Desglose de clases y estudiantes, con notas y asistencia por periodo",
     ],
     accent: "var(--accent-docente)",
     glyph: "docente",
@@ -111,7 +113,8 @@ export const portals: Portal[] = [
     capabilities: [
       "Promedio y porcentaje de asistencia al día",
       "Notas por materia y por periodo",
-      "Horario semanal y cartelera del colegio",
+      "Horario semanal y eventos del colegio",
+      "Lista de profesores y materias, con sus datos de contacto",
     ],
     accent: "var(--accent-estudiante)",
     glyph: "estudiante",
@@ -157,7 +160,7 @@ export const contrasts: {
       { label: "Ausencias del mes", meta: "conteo a mano", kind: "paper" },
       { label: "Avisos de ausencia", meta: "WhatsApp", kind: "chat" },
     ],
-    cost: "Alguien tiene que pasar cada lista a un archivo antes de poder contar nada.",
+    cost: "El profesor pasa la información de múltiples fuentes, dando lugar a un margen de error.",
     fix: {
       title: "Panel de asistencia",
       body: "La lista se toma en el sistema y el reporte del mes sale en unos clics, por sección o por estudiante.",
@@ -173,26 +176,26 @@ export const contrasts: {
       { label: "Notas de 8° B", meta: "copia_de_notas_v3.xlsx", kind: "sheet" },
       { label: "Notas de 9° A", meta: "notas9A_REVISADO.xlsx", kind: "sheet" },
     ],
-    cost: "Un archivo por docente, y al cierre nadie sabe cuál versión es la buena.",
+    cost: "Horas unificando información de distintos archivos, toma tiempo y esfuerzo.",
     fix: {
       title: "Libro de notas",
-      body: "Categorías ponderadas por periodo. Al cerrar, las notas ya están donde tienen que estar.",
+      body: "Categorías ponderadas por periodo. Toda la información de notas queda en un solo lugar, y el informe de progreso sale listo para imprimir.",
       glyph: "notas",
       accent: "var(--accent-docente)",
     },
   },
   {
     id: "matricula",
-    job: "Matrícula",
+    job: "Documentos",
     hoy: [
       { label: "Matrícula 2026", meta: "matricula_ok.xlsx", kind: "sheet" },
       { label: "Cambios de sección", meta: "correo", kind: "chat" },
       { label: "Expedientes", meta: "carpetas en papel", kind: "paper" },
     ],
-    cost: "La misma lista, tecleada otra vez en cada lugar que la necesita.",
+    cost: "Documentos interminables, difíciles de leer.",
     fix: {
-      title: "Matrícula importada",
-      body: "El mismo archivo de Excel entra directo, con secciones y expedientes ya asociados.",
+      title: "Documentos importados",
+      body: "Nuestro sistema escanéa su archivo de Excel y lo añade al sistema, sus documentos se muestran en cuestión de segundos.",
       glyph: "matricula",
       accent: "var(--accent-direccion)",
     },
@@ -201,14 +204,14 @@ export const contrasts: {
 
 export const pilotGives = [
   "El sistema configurado con la estructura de su colegio: curso lectivo, periodos, niveles, secciones, materias, docentes y horarios.",
-  "La matrícula importada desde sus archivos de Excel, y las cuentas de docentes y estudiantes creadas.",
-  "Su propia base de datos, con respaldos verificados antes de que entre un solo expediente real.",
-  "Acompañamiento durante todo el curso lectivo, por WhatsApp, con la persona que construyó el sistema.",
+  "La información previa fundamental importada desde sus archivos de Excel, y las cuentas de docentes y estudiantes creadas.",
+  "Su propia base de datos, con respaldos verificados antes de que entre un solo dato real.",
+  "Acompañamiento durante todo el curso lectivo, manteniendo el sistema funcionando y en constante mejora.",
 ];
 
 export const pilotAsks = [
-  "Una persona de contacto que lo use todas las semanas, normalmente la coordinación académica.",
-  "Una conversación al cierre de cada periodo, para corregir lo que no sirva.",
+  "Uso real del sistema con la estructura de su colegio durante un periodo establecido.",
+  "Una conversación al cierre de el periodo, con fines de recibir retroalimentación de nuestro servicio.",
   "Permiso para nombrar al colegio públicamente, si el primer periodo cierra bien.",
 ];
 
@@ -229,6 +232,10 @@ export const pilotAsks = [
  *  reader cannot see is a structured-data violation, not a shortcut. */
 export const faq = [
   {
+    q: "¿Podemos traer lo que ya tenemos en Excel?",
+    a: "Sí. Los documentos se importan desde los archivos que el colegio ya usa, y lo mismo con docentes y secciones. No hay que volver a digitar el colegio entero para empezar.",
+  },
+  {
     q: "¿Se puede dejar un colegio configurado desde cero en menos de una hora?",
     a: "La estructura sí: curso lectivo, periodos, niveles, secciones, materias y aulas se configuran en esa primera sesión, y la matrícula entra importada desde su archivo de Excel. Lo que toma tiempo no es el sistema, es ponerse de acuerdo en cómo está organizado el colegio.",
   },
@@ -241,24 +248,20 @@ export const faq = [
     a: "Sí, con su propio usuario. Ven su promedio, su porcentaje de asistencia, su horario semanal y sus notas por materia y periodo. No pueden modificar nada.",
   },
   {
-    q: "¿Podemos traer lo que ya tenemos en Excel?",
-    a: "Sí. La matrícula se importa desde el archivo que el colegio ya usa, y lo mismo con docentes y secciones. No hay que volver a digitar el colegio entero para empezar.",
-  },
-  {
     q: "¿Esto reemplaza algo del MEP?",
-    a: "No. Simple Manage Pro no reemplaza nada del MEP. Ordena la información que el colegio ya maneja por dentro: notas, asistencia, horarios, expedientes y matrícula.",
+    a: "No. Simple Manage Pro no reemplaza nada del MEP. Ordena la información que el colegio ya maneja por dentro: notas, asistencia, horarios, expedientes y documentos para una mejor experiencia administrativa.",
   },
   {
     q: "¿Funciona desde el teléfono?",
-    a: "Sí. Docentes y estudiantes entran desde el teléfono con el mismo usuario, que es donde se pasa asistencia y donde se consultan notas. La configuración del colegio se hace más cómoda desde una computadora.",
+    a: "Sí. Docentes y estudiantes entran desde el teléfono con el mismo usuario, que es donde se pasa asistencia y donde se consultan notas. Sin embargo, la configuración del colegio se hace más cómoda desde una computadora.",
   },
   {
-    q: "¿Dónde se alojan los expedientes?",
-    a: "En Estados Unidos, fuera del país. Está dicho también en la política de privacidad, y es de lo primero que un colegio debería preguntar.",
+    q: "¿Dónde se aloja la información?",
+    a: "En Estados Unidos, fuera del país. Está dicho también en la política de privacidad.",
   },
   {
     q: "¿Y si algo falla durante el curso lectivo?",
-    a: "Escribe por WhatsApp y le contesta la persona que construyó el sistema y puede cambiarlo. Por eso el piloto es de tres colegios y no de treinta.",
+    a: "Escribe por cualquier medio de contacto disponible y recibe respuesta en menos de 24h. Al ser un piloto de tres colegios, el soporte es prioritario y se atiende de inmediato.",
   },
 ];
 
@@ -268,21 +271,21 @@ export const story = [
   {
     year: "2024",
     title: "Un proyecto de feria científica",
-    body: "El problema es el mismo que sigue siendo hoy: al cierre de cada periodo, alguien arma las notas a mano desde archivos sueltos.",
+    body: "La idea fue plasmada en un proyecto de feria científica, con un prototipo estático que mostraba mucho potencial, ganando así el segundo puesto de la feria.",
   },
   {
     year: "2025",
     title: "De prototipo a sistema",
-    body: "Las tres consolas, los periodos ponderados, la asistencia por sección y la matrícula. Deja de ser un proyecto y empieza a ser software.",
+    body: "Las tres consolas, los periodos ponderados, la asistencia por sección y la matrícula. se empezó a construir un software funcional con un propoósito.",
   },
   {
     year: "2026",
-    title: "Una demo pública, con datos costarricenses",
+    title: "Lanzamiento oficial del sistema junto a la demo pública",
     body: "Curso lectivo, secciones, cédula y materias en español, abierta para que cualquier colegio la revise sin pedir permiso ni dejar datos.",
   },
   {
     year: "2027",
     title: "Tres colegios",
-    body: "El piloto arranca en febrero, con el curso lectivo. Cada colegio con su estructura y su propia base de datos.",
+    body: "El piloto arranca en febrero con el curso lectivo 2027. Cada colegio con su estructura y su propia base de datos.",
   },
 ];
