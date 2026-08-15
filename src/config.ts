@@ -10,7 +10,7 @@ export const PRIVACY_URL = `${DEMO_URL}/privacy.html`;
 export const TERMS_URL = `${DEMO_URL}/terms.html`;
 
 // TODO: real number. wa.me wants digits only, country code first (506 = CR).
-export const WHATSAPP = "50600000000";
+export const WHATSAPP = "50671848300";
 export const EMAIL = "contact@gzelaya.com";
 
 export const WHATSAPP_MSG =
