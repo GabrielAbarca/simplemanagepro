@@ -63,9 +63,9 @@ const ogImageUrl = new URL(ogImage, Astro.site);
     <meta name="twitter:image" content={ogImageUrl} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
 
-    <!-- The app's own icon set, copied rather than relinked: the landing page
-         is a separate Vercel project on the apex domain, so it cannot reach
-         the demo subdomain's /public. -->
+    {/* The app's own icon set, copied rather than relinked: the landing page
+        is a separate Vercel project on the apex domain, so it cannot reach
+        the demo subdomain's /public. */}
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
@@ -82,8 +82,8 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       content="#181a1e"
     />
 
-    <!-- Only the weights that render above the fold. 800 is the display head,
-         700 the wordmark, 600 the nav and eyebrows, 400 the lede. -->
+    {/* Only the weights that render above the fold. 800 is the display head,
+        700 the wordmark, 600 the nav and eyebrows, 400 the lede. */}
     <link
       rel="preload"
       as="font"
@@ -106,20 +106,20 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       crossorigin
     />
 
+    {/* Set before first paint so a returning visitor never sees a flash of
+        the other theme. */}
     <script is:inline>
-      // Set before first paint so a returning visitor never sees a flash of
-      // the other theme.
       try {
         const saved = localStorage.getItem("smp-landing-theme");
         if (saved) document.documentElement.dataset.theme = saved;
       } catch (e) {}
     </script>
 
-    <!-- Prefetch the next route on hover/pointerdown so a director clicking
-         through the site never waits on a fresh document. Same-origin only:
-         "/*" never matches the demo/legal origins, which must not be
-         prefetched. A pure hint, ignored where unsupported and inert with
-         JavaScript disabled, so the no-JS render is unaffected. -->
+    {/* Prefetch the next route on hover/pointerdown so a director clicking
+        through the site never waits on a fresh document. Same-origin only:
+        "/*" never matches the demo/legal origins, which must not be
+        prefetched. A pure hint, ignored where unsupported and inert with
+        JavaScript disabled, so the no-JS render is unaffected. */}
     <script is:inline type="speculationrules">
       {
         "prefetch": [
@@ -128,7 +128,7 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       }
     </script>
 
-    <!-- Per-page structured data and any other head extras. -->
+    {/* Per-page structured data and any other head extras. */}
     <slot name="head" />
   </head>
   <body>
@@ -139,17 +139,17 @@ const ogImageUrl = new URL(ogImage, Astro.site);
     </main>
     <Footer />
 
-    <!-- Vercel Web Analytics and Speed Insights. Both are cookie-free, so there
-         is no consent banner and nothing to explain under Ley 8968 (BRIEF §9).
-         Speed Insights adds real-user Core Web Vitals, which matter here because
-         the primary channel is a WhatsApp forward opening on mobile data.
+    {/* Vercel Web Analytics and Speed Insights. Both are cookie-free, so there
+        is no consent banner and nothing to explain under Ley 8968 (BRIEF §9).
+        Speed Insights adds real-user Core Web Vitals, which matter here because
+        the primary channel is a WhatsApp forward opening on mobile data.
 
-         Deliberately here and not in <head>, where Vercel's docs put them. Each
-         component renders a real custom element (<vercel-analytics>,
-         <vercel-speed-insights>), and an unknown element in <head> ends head
-         parsing: everything below it, including the theme script and the JSON-LD
-         slot, would be reparented into <body> and the theme script would then
-         run after first paint, which is the flash it exists to prevent. -->
+        Deliberately here and not in <head>, where Vercel's docs put them. Each
+        component renders a real custom element (<vercel-analytics>,
+        <vercel-speed-insights>), and an unknown element in <head> ends head
+        parsing: everything below it, including the theme script and the JSON-LD
+        slot, would be reparented into <body> and the theme script would then
+        run after first paint, which is the flash it exists to prevent. */}
     <Analytics />
     <SpeedInsights />
 

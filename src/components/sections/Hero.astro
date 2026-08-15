@@ -19,9 +19,9 @@ const key = [
 ---
 
 <section class="hero fold-hero" data-tilt>
-  <!-- The fold. The brand mark is a crimson ribbon folded back on itself, and
-       this is that shape at page scale. Geometry lives in base.css; the hero
-       only sets where the crease crosses. -->
+  {/* The fold. The brand mark is a crimson ribbon folded back on itself, and
+      this is that shape at page scale. Geometry lives in base.css; the hero
+      only sets where the crease crosses. */}
   <div class="fold" aria-hidden="true">
     <span class="face face-up"></span>
     <span class="face face-down"></span>
@@ -46,41 +46,41 @@ const key = [
       </p>
     </div>
 
-    <!-- Below the breakpoint only one console is legible, so the other two
-         keep their claim in words.
+    {/* Below the breakpoint only one console is legible, so the other two
+        keep their claim in words.
 
-         It sits BEFORE the lineup in the source, which matters: after it, the
-         collapsed layout put the key underneath a device that is 884px tall
-         and bleeding past the viewport, so the one element carrying the
-         three-console idea on a phone landed at y1478 and was clipped out of
-         the page entirely. -->
+        It sits BEFORE the lineup in the source, which matters: after it, the
+        collapsed layout put the key underneath a device that is 884px tall
+        and bleeding past the viewport, so the one element carrying the
+        three-console idea on a phone landed at y1478 and was clipped out of
+        the page entirely. */}
     <ul class="portal-key">
       {
         key.map((k) => <li style={`--accent: ${k.accent}`}>{k.name}</li>)
       }
     </ul>
 
-    <!-- THE LINEUP.
-         Three consoles, three devices, one perspective, and the page's thesis
-         moved into the first viewport instead of 900px down it.
+    {/* THE LINEUP.
+        Three consoles, three devices, one perspective, and the page's thesis
+        moved into the first viewport instead of 900px down it.
 
-         It fits because each device behind is partly occluded by the one in
-         front. Nothing is scaled to make room, which is the only way three
-         whole consoles stay legible at once.
+        It fits because each device behind is partly occluded by the one in
+        front. Nothing is scaled to make room, which is the only way three
+        whole consoles stay legible at once.
 
-         WHY EVERY DEVICE SITS AT OR BEHIND z=0. Perspective scales a point by
-         p / (p - z), so a positive translateZ pulls a plane toward the viewer
-         and MAGNIFIES it, and magnification is the one transform that visibly
-         softens a screenshot. Depth is built by pushing the back devices away
-         instead: the phone is the reference at 0 and everything behind it is
-         minified, which is only ever a downsample. The same reasoning governs
-         the rotation, which is about the right edge with a negative rotateY so
-         no point comes forward, and the pointer parallax below is clamped to
-         keep it that way.
+        WHY EVERY DEVICE SITS AT OR BEHIND z=0. Perspective scales a point by
+        p / (p - z), so a positive translateZ pulls a plane toward the viewer
+        and MAGNIFIES it, and magnification is the one transform that visibly
+        softens a screenshot. Depth is built by pushing the back devices away
+        instead: the phone is the reference at 0 and everything behind it is
+        minified, which is only ever a downsample. The same reasoning governs
+        the rotation, which is about the right edge with a negative rotateY so
+        no point comes forward, and the pointer parallax below is clamped to
+        keep it that way.
 
-         The cost, stated plainly rather than buried: the console draws at
-         about 0.93 of 1240, so it is no longer pixel-for-pixel with the app.
-         It is still a clean downsample from a 2x source. -->
+        The cost, stated plainly rather than buried: the console draws at
+        about 0.93 of 1240, so it is no longer pixel-for-pixel with the app.
+        It is still a clean downsample from a 2x source. */}
     <div class="rig">
       <div class="dev dev-monitor">
         <DeviceFrame kind="monitor" screenWidth={1000} accent={admin.accent}>
@@ -106,19 +106,19 @@ const key = [
         </DeviceFrame>
       </div>
 
-      <!-- The phone changes console at the breakpoint, which is the one place
-           this hero is asymmetric on purpose. Above it the phone is the
-           estudiante portal and the lineup reads as three. Below it the other
-           two devices are gone, so whatever is in the phone IS the hero image,
-           and the person holding that phone is far more likely to be the
-           director deciding than a student. So it carries the dirección
-           console there, and the rim follows it.
+      {/* The phone changes console at the breakpoint, which is the one place
+          this hero is asymmetric on purpose. Above it the phone is the
+          estudiante portal and the lineup reads as three. Below it the other
+          two devices are gone, so whatever is in the phone IS the hero image,
+          and the person holding that phone is far more likely to be the
+          director deciding than a student. So it carries the dirección
+          console there, and the rim follows it.
 
-           A <picture> carries one accessible name, and this one shows a
-           different console at each side of the breakpoint, so no portal's own
-           alt is right at both. The alt is portal-neutral instead: true of
-           whichever capture is on screen. The monitor and tablet still carry
-           their specific alts, so the lineup is not left unlabelled. -->
+          A <picture> carries one accessible name, and this one shows a
+          different console at each side of the breakpoint, so no portal's own
+          alt is right at both. The alt is portal-neutral instead: true of
+          whichever capture is on screen. The monitor and tablet still carry
+          their specific alts, so the lineup is not left unlabelled. */}
       <div class="dev dev-phone">
         <DeviceFrame kind="phone" screenWidth="var(--phone-w)">
           <ConsoleShot

@@ -52,12 +52,12 @@ const isActive = (href: string) =>
 
       <a class="header-cta" target="_blank" href={DEMO_URL}>Ver la demo</a>
 
-      <!-- A <details> disclosure rather than a JS-driven panel: this is the
-           only navigation on a phone, and the page's primary channel is a
-           WhatsApp forward. The browser gives open/close state, keyboard
-           support and aria-expanded for free, so the menu still works with
-           JavaScript disabled. Navigation reloads the document, which closes
-           it, so there is nothing to reset. -->
+      {/* A <details> disclosure rather than a JS-driven panel: this is the
+          only navigation on a phone, and the page's primary channel is a
+          WhatsApp forward. The browser gives open/close state, keyboard
+          support and aria-expanded for free, so the menu still works with
+          JavaScript disabled. Navigation reloads the document, which closes
+          it, so there is nothing to reset. */}
       <details class="menu">
         <summary aria-label="Abrir el menú">
           <svg class="i-bars" viewBox="0 0 24 24" aria-hidden="true">
