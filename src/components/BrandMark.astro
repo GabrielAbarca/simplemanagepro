@@ -69,10 +69,10 @@ const underId = `bm-under-${uid}`;
   aria-label={title}
 >
   <defs>
-    <!-- userSpaceOnUse: the two folds are small boxes near the top and bottom
-         of the mark, so an objectBoundingBox ramp would run a full light-to-
-         dark sweep inside each of them and the folds would not sit on the same
-         gradient as the face they belong to. -->
+    {/* userSpaceOnUse: the two folds are small boxes near the top and bottom
+        of the mark, so an objectBoundingBox ramp would run a full light-to-
+        dark sweep inside each of them and the folds would not sit on the same
+        gradient as the face they belong to. */}
     <linearGradient id={faceId} gradientUnits="userSpaceOnUse" x1="0" y1="32" x2="0" y2="469">
       <stop offset="0" stop-color="#f6133b"></stop>
       <stop offset="1" stop-color="#cb0022"></stop>

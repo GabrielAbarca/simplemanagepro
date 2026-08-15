@@ -41,16 +41,16 @@ const seats = [
       <a class="btn btn-primary" href="/contacto">Hablar del piloto</a>
     </div>
 
-    <!-- The offer as an object: three places, one of them the reader's. The
-         scarcity is real (each colegio is a hand-provisioned database), so it
-         is worth showing rather than only stating. -->
+    {/* The offer as an object: three places, one of them the reader's. The
+        scarcity is real (each colegio is a hand-provisioned database), so it
+        is worth showing rather than only stating. */}
     <div class="seats" slot="ornament" aria-hidden="true">
-      <!-- The mark, extruded. Layered copies on their own Z, the deepest one
-           carrying the underside crimson, so the sheet reads as an object with
-           a thickness rather than as a sticker. It rotates about the right
-           edge with a negative rotateY, the same discipline the home hero's
-           lineup follows: no face is ever brought toward the viewer, so
-           nothing is magnified. -->
+      {/* The mark, extruded. Layered copies on their own Z, the deepest one
+          carrying the underside crimson, so the sheet reads as an object with
+          a thickness rather than as a sticker. It rotates about the right
+          edge with a negative rotateY, the same discipline the home hero's
+          lineup follows: no face is ever brought toward the viewer, so
+          nothing is magnified. */}
       <div class="mark">
         <span class="mark-slab"><BrandMark size="100%" /></span>
         <span class="mark-slab"><BrandMark size="100%" /></span>
@@ -81,10 +81,10 @@ const seats = [
 
   <section class="band fold-band">
     <div class="wrap">
-      <!-- Two sides of one exchange, and read as such: the receiving side
-           carries the weight, the committing side answers it. They used to be
-           two identical cards, which said the two were the same kind of thing
-           and gave the reader no reason to start with either. -->
+      {/* Two sides of one exchange, and read as such: the receiving side
+          carries the weight, the committing side answers it. They used to be
+          two identical cards, which said the two were the same kind of thing
+          and gave the reader no reason to start with either. */}
       <div class="exchange">
         <div class="card-lead card-fold give reveal">
           <p class="chip">Lo que se entrega</p>
@@ -132,10 +132,10 @@ const seats = [
     </div>
   </section>
 
-  <!-- The questions a director actually asks before the first meeting. See
-       src/data/site.ts for what changed here and why, and BRIEF §7 for the
-       decision behind it. The markup is <details> so the list stays scannable
-       at eight questions and still works with JavaScript disabled. -->
+  {/* The questions a director actually asks before the first meeting. See
+      src/data/site.ts for what changed here and why, and BRIEF §7 for the
+      decision behind it. The markup is <details> so the list stays scannable
+      at eight questions and still works with JavaScript disabled. */}
   <section class="band" id="respuestas">
     <div class="wrap">
       <div class="narrow reveal">
