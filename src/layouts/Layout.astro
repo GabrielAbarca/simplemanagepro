@@ -115,6 +115,19 @@ const ogImageUrl = new URL(ogImage, Astro.site);
       } catch (e) {}
     </script>
 
+    <!-- Prefetch the next route on hover/pointerdown so a director clicking
+         through the site never waits on a fresh document. Same-origin only:
+         "/*" never matches the demo/legal origins, which must not be
+         prefetched. A pure hint, ignored where unsupported and inert with
+         JavaScript disabled, so the no-JS render is unaffected. -->
+    <script is:inline type="speculationrules">
+      {
+        "prefetch": [
+          { "where": { "href_matches": "/*" }, "eagerness": "moderate" }
+        ]
+      }
+    </script>
+
     <!-- Per-page structured data and any other head extras. -->
     <slot name="head" />
   </head>

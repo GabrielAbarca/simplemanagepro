@@ -25,6 +25,16 @@ const jsonLd = {
       email: EMAIL,
       areaServed: { "@type": "Country", name: "Costa Rica" },
       founder: { "@type": "Person", name: "Gabriel Zelaya" },
+      // The entity-resolution signal that ties the brand to a reachable
+      // channel. Email only: the WhatsApp number in config is still a
+      // placeholder, and a placeholder phone in schema is worse than none.
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: EMAIL,
+        areaServed: "CR",
+        availableLanguage: "Spanish",
+      },
     },
     {
       "@type": "WebSite",
@@ -36,6 +46,7 @@ const jsonLd = {
     },
     {
       "@type": "SoftwareApplication",
+      "@id": `${site}/#software`,
       name: SITE_NAME,
       applicationCategory: "BusinessApplication",
       operatingSystem: "Web",

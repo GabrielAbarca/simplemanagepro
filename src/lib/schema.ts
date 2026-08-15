@@ -17,7 +17,9 @@ export function breadcrumbLd(name: string, path: string) {
         "@type": "ListItem",
         position: 2,
         name,
-        item: `${ORIGIN}${path}`,
+        // Trailing slash so the crumb matches the page's own canonical
+        // (/contacto/), not the slashless form that reads as a separate URL.
+        item: `${ORIGIN}${path.replace(/\/$/, "")}/`,
       },
     ],
   };

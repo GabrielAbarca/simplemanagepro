@@ -112,7 +112,13 @@ const key = [
            two devices are gone, so whatever is in the phone IS the hero image,
            and the person holding that phone is far more likely to be the
            director deciding than a student. So it carries the dirección
-           console there, and the rim follows it. -->
+           console there, and the rim follows it.
+
+           A <picture> carries one accessible name, and this one shows a
+           different console at each side of the breakpoint, so no portal's own
+           alt is right at both. The alt is portal-neutral instead: true of
+           whichever capture is on screen. The monitor and tablet still carry
+           their specific alts, so the lineup is not left unlabelled. -->
       <div class="dev dev-phone">
         <DeviceFrame kind="phone" screenWidth="var(--phone-w)">
           <ConsoleShot
@@ -120,7 +126,7 @@ const key = [
             dark={estudiante.mobileImageDark}
             mobileLight={admin.mobileImage}
             mobileDark={admin.mobileImageDark}
-            alt={admin.alt}
+            alt="Simple Manage Pro en un teléfono, con una de las consolas del colegio en pantalla."
             displayWidth={330}
             mobileDisplayWidth={280}
             mobileSizes="min(280px, 58vw)"

@@ -64,6 +64,9 @@ import { DEMO_URL } from "../config";
               <p class="portal-label">{p.label}</p>
               <h2>{p.title}</h2>
               <p class="portal-body">{p.body}</p>
+              {p.detail?.map((par) => (
+                <p class="portal-detail" set:html={par} />
+              ))}
               <ul class="portal-caps">
                 {p.capabilities.map((c) => (
                   <li>
@@ -217,6 +220,17 @@ import { DEMO_URL } from "../config";
     margin-top: var(--space-3);
     color: var(--color-dark-variant);
     font-size: 1.05rem;
+  }
+
+  /* The body is the section's one-line claim; these are the paragraphs that
+     back it. Same muted tier as the body, a touch smaller, with the reading
+     measure the intro already sets. Links inherit the global --color-primary-text,
+     which is audited on this ground. */
+  .portal-detail {
+    margin-top: var(--space-3);
+    color: var(--color-dark-variant);
+    font-size: 1rem;
+    line-height: 1.65;
   }
 
   .portal-caps {

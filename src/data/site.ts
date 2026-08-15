@@ -27,6 +27,10 @@ export interface Portal {
   /** One line for the home page's condensed lineup. */
   short: string;
   body: string;
+  /** Paragraph-length elaboration shown only on /portales, below `body`.
+   *  Rendered with set:html so a sentence can carry one contextual link. The
+   *  home page never renders it, so growing it does not touch the lineup cards. */
+  detail?: string[];
   /** Three concrete things this console does, so a card is not one claim and a
    *  picture. Kept to three: a fourth turns a card into a feature list. */
   capabilities: string[];
@@ -62,6 +66,10 @@ export const portals: Portal[] = [
     short:
       "Curso lectivo, periodos, secciones, materias, docentes y matrícula, en un solo lugar.",
     body: "Curso lectivo y periodos, niveles, secciones, aulas, materias, docentes, horarios, expedientes y matrícula. La información se pueden importar directamente desde un archivo de Excel.",
+    detail: [
+      "Desde esta consola la dirección y la coordinación arman el curso lectivo antes de que empiecen las clases. Se definen los periodos de evaluación con su peso, de modo que la suma siempre cierra en cien por ciento, y quedan registrados los niveles, las secciones con su profesor guía y las aulas con su capacidad y su tipo, sea aula, laboratorio, biblioteca o gimnasio. Cada lista, desde los grados hasta la matrícula, se puede cargar de una vez desde un archivo, sin digitar registro por registro. Las materias se ordenan en un catálogo con su código y su color, y cada docente queda registrado con su cédula, su correo y su especialización.",
+      "El horario semanal se arma por sección sobre las jornadas ya definidas, una sección puede copiar la semana de otra para no empezar de cero, y la consola avisa cuando dos clases coinciden en la misma aula o con el mismo docente, así que un choque se corrige antes de llegar al aula. El resumen muestra la matrícula total, la asistencia del mes y los estudiantes en riesgo por ausencias. El campo de identificación se ajusta al término que use cada colegio, sea cédula, DIMEX o tarjeta de identificación de menores, porque el sistema está <a href=\"/nosotros/\">hecho para el colegio costarricense</a> y no traducido de otro país.",
+    ],
     capabilities: [
       "Curso lectivo y periodos, con sus fechas",
       "Niveles, secciones, aulas y horarios",
@@ -83,6 +91,10 @@ export const portals: Portal[] = [
     short:
       "Categorías ponderadas, asistencia por sección e informe de progreso listo para imprimir.",
     body: "Categorías ponderadas, notas por periodo, asistencia por sección, registro disciplinario e informe de progreso listo para imprimir. Al cerrar el periodo, las notas ya están unificadas y disponibles para el estudiante.",
+    detail: [
+      "El docente entra y ve primero las clases del día, cada una con su hora, su sección y el aula, y con la asistencia y el libro de notas a un toque. Pasar lista es marcar a cada estudiante como presente, ausente, tardía o justificada, con espacio para una observación, y la consola va sumando las ausencias y señalando quién queda en riesgo por inasistencia. Desde Mis clases pasa de un grupo a otro, y cada clase trae su lista, su libro de notas, su asistencia y su horario en el mismo lugar.",
+      "El libro de notas trabaja por periodo y por categorías con su peso, así que la nota de cada estudiante se calcula sola conforme se califican las tareas. El docente arma sus categorías, agrega las tareas y, cuando el periodo está listo, publica las notas para que el estudiante las vea desde su portal. El trabajo que antes vivía repartido en archivos de Excel queda en una sola vista, por sección y por materia, y llega al cierre del periodo ya unificado.",
+    ],
     capabilities: [
       "Categorías ponderadas por periodo",
       "Asistencia por sección, también desde el teléfono",
@@ -110,6 +122,10 @@ export const portals: Portal[] = [
     short:
       "Promedio, asistencia, horario semanal y notas por periodo, desde el teléfono.",
     body: "Promedio, porcentaje de asistencia, notas por materia y periodo, horario semanal, docentes y la cartelera de eventos del colegio. Consultable en cualquier momento, desde el teléfono.",
+    detail: [
+      "El estudiante abre el portal desde el teléfono y encuentra, sin tener que pedirlo, su promedio del curso lectivo, su porcentaje de asistencia y cuál es su próxima clase. El resumen de notas presenta cada materia con su calificación por periodo y el promedio, de modo que sabe dónde va parado mientras el periodo sigue abierto, no cuando ya no hay nada que hacer. En la sección de asistencia ve el detalle de cada ausencia y si quedó justificada, sin tener que preguntar en la oficina.",
+      "En el mismo lugar consulta el horario de la semana, la lista de sus docentes con los datos para contactarlos y la cartelera con las fechas del colegio, desde los exámenes de cada periodo hasta la matrícula del próximo curso lectivo. Todo lo que el docente publica y la dirección configura aparece aquí en el momento, así que lo que ve el estudiante es la misma información que está en la consola. Es lo que un colegio pone a funcionar durante <a href=\"/piloto/\">el piloto 2027</a>.",
+    ],
     capabilities: [
       "Promedio y porcentaje de asistencia al día",
       "Notas por materia y por periodo",
