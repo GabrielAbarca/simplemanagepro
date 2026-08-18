@@ -67,14 +67,18 @@ const ogImageUrl = new URL(ogImage, Astro.site);
         is a separate Vercel project on the apex domain, so it cannot reach
         the demo subdomain's /public.
 
-        The 192px PNG is linked as an icon here, not left to the manifest
-        alone. Google recommends a Search favicon larger than 48px and ignores
-        the manifest when choosing one, so without this line its only
-        rel="icon" candidates top out at 48 (the .ico) and it falls back to
-        the apple-touch-icon. Ordered small to large. */}
+        The 48, 96 and 192 PNGs are linked as icons here, not left to the
+        manifest alone. Google wants a Search favicon that is a square multiple
+        of 48px and ignores the manifest when choosing one, so without these
+        lines its only rel="icon" candidates top out at 32 (the .ico) and it
+        falls back to the apple-touch-icon. 48 and 96 give it a clean direct
+        match so it never has to downscale the 192 heavily; all three derive
+        from the 512px source. Ordered small to large. */}
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
